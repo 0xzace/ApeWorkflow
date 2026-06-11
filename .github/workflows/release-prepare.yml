@@ -45,6 +45,13 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - name: Configure npm authentication
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
+
+      - name: Verify npm authentication
+        run: npm whoami
+
       # Opens/updates the Version Packages PR; publishes when the Version PR merges
       - name: Create/Update Version PR
         id: changesets
@@ -57,4 +64,4 @@ jobs:
           publish: pnpm run release:ci
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
-          # npm authentication handled via OIDC trusted publishing (no token needed)
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
