@@ -46,10 +46,14 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       - name: Configure npm authentication
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
 
       - name: Verify npm authentication
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm whoami
 
       # Opens/updates the Version Packages PR; publishes when the Version PR merges
