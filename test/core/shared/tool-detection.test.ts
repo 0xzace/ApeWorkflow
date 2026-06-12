@@ -27,8 +27,9 @@ describe('tool-detection', () => {
   });
 
   describe('SKILL_NAMES', () => {
-    it('should contain all skill names matching COMMAND_IDS', () => {
-      expect(SKILL_NAMES).toHaveLength(11);
+    it('should contain all skill names (workflow + global)', () => {
+      expect(SKILL_NAMES).toHaveLength(26);
+      // Workflow skills
       expect(SKILL_NAMES).toContain('apeworkflow-explore');
       expect(SKILL_NAMES).toContain('apeworkflow-new-change');
       expect(SKILL_NAMES).toContain('apeworkflow-continue-change');
@@ -40,6 +41,22 @@ describe('tool-detection', () => {
       expect(SKILL_NAMES).toContain('apeworkflow-verify-change');
       expect(SKILL_NAMES).toContain('apeworkflow-onboard');
       expect(SKILL_NAMES).toContain('apeworkflow-propose');
+      // Global skills
+      expect(SKILL_NAMES).toContain('apeworkflow-brainstorming');
+      expect(SKILL_NAMES).toContain('apeworkflow-dispatching-parallel-agents');
+      expect(SKILL_NAMES).toContain('apeworkflow-executing-plans');
+      expect(SKILL_NAMES).toContain('apeworkflow-finishing-a-development-branch');
+      expect(SKILL_NAMES).toContain('apeworkflow-receiving-code-review');
+      expect(SKILL_NAMES).toContain('apeworkflow-requesting-code-review');
+      expect(SKILL_NAMES).toContain('apeworkflow-subagent-driven-development');
+      expect(SKILL_NAMES).toContain('apeworkflow-systematic-debugging');
+      expect(SKILL_NAMES).toContain('apeworkflow-test-driven-development');
+      expect(SKILL_NAMES).toContain('apeworkflow-using-git-worktrees');
+      expect(SKILL_NAMES).toContain('apeworkflow-using-skills');
+      expect(SKILL_NAMES).toContain('apeworkflow-verification-before-completion');
+      expect(SKILL_NAMES).toContain('apeworkflow-writing-plans');
+      expect(SKILL_NAMES).toContain('apeworkflow-writing-skills');
+      expect(SKILL_NAMES).toContain('apeworkflow-feedback');
     });
   });
 
