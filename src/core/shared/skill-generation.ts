@@ -42,7 +42,22 @@ import {
   getApeVerifyCommandTemplate,
   getApeOnboardCommandTemplate,
   getApeProposeCommandTemplate,
+  getApeBrainstormingCommandTemplate,
+  getApeDispatchingParallelAgentsCommandTemplate,
+  getApeExecutingPlansCommandTemplate,
+  getApeFinishingADevelopmentBranchCommandTemplate,
+  getApeReceivingCodeReviewCommandTemplate,
+  getApeRequestingCodeReviewCommandTemplate,
+  getApeSubagentDrivenDevelopmentCommandTemplate,
+  getApeSystematicDebuggingCommandTemplate,
+  getApeTestDrivenDevelopmentCommandTemplate,
+  getApeUsingGitWorktreesCommandTemplate,
+  getApeUsingSkillsCommandTemplate,
+  getApeVerificationBeforeCompletionCommandTemplate,
+  getApeWritingPlansCommandTemplate,
+  getApeWritingSkillsCommandTemplate,
   type SkillTemplate,
+  type CommandTemplate,
 } from '../templates/skill-templates.js';
 import type { WorkflowId } from '../profiles.js';
 import type { CommandContent } from '../command-generation/index.js';
@@ -77,6 +92,7 @@ export function isGlobalEntry(e: SkillTemplateEntry): boolean {
 export interface CommandTemplateEntry {
   template: ReturnType<typeof getApeExploreCommandTemplate>;
   id: string;
+  scope?: 'workflow' | 'global';
 }
 
 /**
@@ -137,24 +153,44 @@ export function getSkillTemplates(workflowFilter?: readonly string[]): SkillTemp
  * @param workflowFilter - If provided, only return templates whose id is in this array
  */
 export function getCommandTemplates(workflowFilter?: readonly string[]): CommandTemplateEntry[] {
-  const all: CommandTemplateEntry[] = [
-    { template: getApeExploreCommandTemplate(), id: 'explore' },
-    { template: getApeNewCommandTemplate(), id: 'new' },
-    { template: getApeContinueCommandTemplate(), id: 'continue' },
-    { template: getApeApplyCommandTemplate(), id: 'apply' },
-    { template: getApeFfCommandTemplate(), id: 'ff' },
-    { template: getApeSyncCommandTemplate(), id: 'sync' },
-    { template: getApeArchiveCommandTemplate(), id: 'archive' },
-    { template: getApeBulkArchiveCommandTemplate(), id: 'bulk-archive' },
-    { template: getApeVerifyCommandTemplate(), id: 'verify' },
-    { template: getApeOnboardCommandTemplate(), id: 'onboard' },
-    { template: getApeProposeCommandTemplate(), id: 'propose' },
+  // Workflow commands (subject to profile filtering)
+  const workflowCommands: CommandTemplateEntry[] = [
+    { template: getApeExploreCommandTemplate(), id: 'explore', scope: 'workflow' },
+    { template: getApeNewCommandTemplate(), id: 'new', scope: 'workflow' },
+    { template: getApeContinueCommandTemplate(), id: 'continue', scope: 'workflow' },
+    { template: getApeApplyCommandTemplate(), id: 'apply', scope: 'workflow' },
+    { template: getApeFfCommandTemplate(), id: 'ff', scope: 'workflow' },
+    { template: getApeSyncCommandTemplate(), id: 'sync', scope: 'workflow' },
+    { template: getApeArchiveCommandTemplate(), id: 'archive', scope: 'workflow' },
+    { template: getApeBulkArchiveCommandTemplate(), id: 'bulk-archive', scope: 'workflow' },
+    { template: getApeVerifyCommandTemplate(), id: 'verify', scope: 'workflow' },
+    { template: getApeOnboardCommandTemplate(), id: 'onboard', scope: 'workflow' },
+    { template: getApeProposeCommandTemplate(), id: 'propose', scope: 'workflow' },
   ];
 
-  if (!workflowFilter) return all;
+  // Global commands (always available, not profile-controlled) — 14 total
+  const globalCommands: CommandTemplateEntry[] = [
+    { template: getApeBrainstormingCommandTemplate(), id: 'brainstorming', scope: 'global' },
+    { template: getApeDispatchingParallelAgentsCommandTemplate(), id: 'dispatching-parallel-agents', scope: 'global' },
+    { template: getApeExecutingPlansCommandTemplate(), id: 'executing-plans', scope: 'global' },
+    { template: getApeFinishingADevelopmentBranchCommandTemplate(), id: 'finishing-a-development-branch', scope: 'global' },
+    { template: getApeReceivingCodeReviewCommandTemplate(), id: 'receiving-code-review', scope: 'global' },
+    { template: getApeRequestingCodeReviewCommandTemplate(), id: 'requesting-code-review', scope: 'global' },
+    { template: getApeSubagentDrivenDevelopmentCommandTemplate(), id: 'subagent-driven-development', scope: 'global' },
+    { template: getApeSystematicDebuggingCommandTemplate(), id: 'systematic-debugging', scope: 'global' },
+    { template: getApeTestDrivenDevelopmentCommandTemplate(), id: 'test-driven-development', scope: 'global' },
+    { template: getApeUsingGitWorktreesCommandTemplate(), id: 'using-git-worktrees', scope: 'global' },
+    { template: getApeUsingSkillsCommandTemplate(), id: 'using-skills', scope: 'global' },
+    { template: getApeVerificationBeforeCompletionCommandTemplate(), id: 'verification-before-completion', scope: 'global' },
+    { template: getApeWritingPlansCommandTemplate(), id: 'writing-plans', scope: 'global' },
+    { template: getApeWritingSkillsCommandTemplate(), id: 'writing-skills', scope: 'global' },
+  ];
+
+  if (!workflowFilter) return [...workflowCommands, ...globalCommands];
 
   const filterSet = new Set(workflowFilter);
-  return all.filter(entry => filterSet.has(entry.id));
+  const filteredWorkflow = workflowCommands.filter(entry => filterSet.has(entry.id));
+  return [...filteredWorkflow, ...globalCommands];
 }
 
 /**

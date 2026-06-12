@@ -1,7 +1,7 @@
 /**
  * Skill Template: apeworkflow-using-skills
  */
-import type { SkillTemplate } from '../types.js';
+import type { SkillTemplate, CommandTemplate } from '../types.js';
 
 export function getUsingSkillsSkillTemplate(): SkillTemplate {
   return {
@@ -113,5 +113,15 @@ Instructions say WHAT, not HOW. "Add X" or "Fix Y" doesn't mean skip workflows.
     license: 'MIT',
     compatibility: '',
     metadata: { author: 'apeworkflow', version: '1.0' },
+  };
+}
+
+export function getApeUsingSkillsCommandTemplate(): CommandTemplate {
+  return {
+    name: 'APE: Using Skills',
+    description: 'Find and apply skills to enhance your workflow capabilities',
+    category: 'Methodology',
+    tags: ['methodology', 'skills'],
+    content: getUsingSkillsSkillTemplate().instructions,
   };
 }

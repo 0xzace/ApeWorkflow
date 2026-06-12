@@ -1,7 +1,7 @@
 /**
  * Skill Template: apeworkflow-writing-plans
  */
-import type { SkillTemplate } from '../types.js';
+import type { SkillTemplate, CommandTemplate } from '../types.js';
 
 export function getWritingPlansSkillTemplate(): SkillTemplate {
   return {
@@ -163,4 +163,14 @@ After saving the plan, offer execution choice:
 - **REQUIRED SUB-SKILL:** Use apeworkflow-executing-plans
 - Batch execution with checkpoints for review
 `;
+}
+
+export function getApeWritingPlansCommandTemplate(): CommandTemplate {
+  return {
+    name: 'APE: Writing Plans',
+    description: 'Create a detailed, actionable implementation plan before touching code',
+    category: 'Methodology',
+    tags: ['methodology', 'planning', 'writing'],
+    content: getWritingPlansInstructions(),
+  };
 }

@@ -1,7 +1,7 @@
 /**
  * Skill Template: apeworkflow-verification-before-completion
  */
-import type { SkillTemplate } from '../types.js';
+import type { SkillTemplate, CommandTemplate } from '../types.js';
 
 export function getVerificationBeforeCompletionSkillTemplate(): SkillTemplate {
   return {
@@ -145,5 +145,15 @@ This is non-negotiable.
     license: 'MIT',
     compatibility: '',
     metadata: { author: 'apeworkflow', version: '1.0' },
+  };
+}
+
+export function getApeVerificationBeforeCompletionCommandTemplate(): CommandTemplate {
+  return {
+    name: 'APE: Verification Before Completion',
+    description: 'Run verification commands and confirm output before making success claims',
+    category: 'Methodology',
+    tags: ['methodology', 'verification', 'completion'],
+    content: getVerificationBeforeCompletionSkillTemplate().instructions,
   };
 }

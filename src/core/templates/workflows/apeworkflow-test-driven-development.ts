@@ -1,7 +1,7 @@
 /**
  * Skill Template: apeworkflow-test-driven-development
  */
-import type { SkillTemplate } from '../types.js';
+import type { SkillTemplate, CommandTemplate } from '../types.js';
 
 export function getTestDrivenDevelopmentSkillTemplate(): SkillTemplate {
   return {
@@ -382,4 +382,14 @@ Otherwise -> not TDD
 
 No exceptions without your human partner's permission.
 `;
+}
+
+export function getApeTestDrivenDevelopmentCommandTemplate(): CommandTemplate {
+  return {
+    name: 'APE: Test-Driven Development',
+    description: 'Write test first, watch it fail, write minimal code to pass — red-green-refactor cycle',
+    category: 'Methodology',
+    tags: ['methodology', 'test-driven-development', 'tdd'],
+    content: getTestDrivenDevelopmentInstructions(),
+  };
 }

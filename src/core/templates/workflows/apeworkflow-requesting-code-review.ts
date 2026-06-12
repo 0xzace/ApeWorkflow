@@ -1,7 +1,7 @@
 /**
  * Skill Template: apeworkflow-requesting-code-review
  */
-import type { SkillTemplate } from '../types.js';
+import type { SkillTemplate, CommandTemplate } from '../types.js';
 
 export function getRequestingCodeReviewSkillTemplate(): SkillTemplate {
   return {
@@ -109,5 +109,15 @@ See template at: apeworkflow-requesting-code-review/code-reviewer.md
     license: 'MIT',
     compatibility: '',
     metadata: { author: 'apeworkflow', version: '1.0' },
+  };
+}
+
+export function getApeRequestingCodeReviewCommandTemplate(): CommandTemplate {
+  return {
+    name: 'APE: Requesting Code Review',
+    description: 'Dispatch a code reviewer subagent to catch issues before they cascade',
+    category: 'Methodology',
+    tags: ['methodology', 'code-review', 'requesting'],
+    content: getRequestingCodeReviewSkillTemplate().instructions,
   };
 }

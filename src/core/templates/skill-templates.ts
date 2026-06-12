@@ -32,3 +32,18 @@ export { getUsingSkillsSkillTemplate } from './workflows/apeworkflow-using-skill
 export { getVerificationBeforeCompletionSkillTemplate } from './workflows/apeworkflow-verification-before-completion.js';
 export { getWritingPlansSkillTemplate } from './workflows/apeworkflow-writing-plans.js';
 export { getWritingSkillsSkillTemplate } from './workflows/apeworkflow-writing-skills.js';
+
+export { getApeBrainstormingCommandTemplate } from './workflows/apeworkflow-brainstorming.js';
+export { getApeDispatchingParallelAgentsCommandTemplate } from './workflows/apeworkflow-dispatching-parallel-agents.js';
+export { getApeExecutingPlansCommandTemplate } from './workflows/apeworkflow-executing-plans.js';
+export { getApeFinishingADevelopmentBranchCommandTemplate } from './workflows/apeworkflow-finishing-a-development-branch.js';
+export { getApeReceivingCodeReviewCommandTemplate } from './workflows/apeworkflow-receiving-code-review.js';
+export { getApeRequestingCodeReviewCommandTemplate } from './workflows/apeworkflow-requesting-code-review.js';
+export { getApeSubagentDrivenDevelopmentCommandTemplate } from './workflows/apeworkflow-subagent-driven-development.js';
+export { getApeSystematicDebuggingCommandTemplate } from './workflows/apeworkflow-systematic-debugging.js';
+export { getApeTestDrivenDevelopmentCommandTemplate } from './workflows/apeworkflow-test-driven-development.js';
+export { getApeUsingGitWorktreesCommandTemplate } from './workflows/apeworkflow-using-git-worktrees.js';
+export { getApeUsingSkillsCommandTemplate } from './workflows/apeworkflow-using-skills.js';
+export { getApeVerificationBeforeCompletionCommandTemplate } from './workflows/apeworkflow-verification-before-completion.js';
+export { getApeWritingPlansCommandTemplate } from './workflows/apeworkflow-writing-plans.js';
+export { getApeWritingSkillsCommandTemplate } from './workflows/apeworkflow-writing-skills.js';

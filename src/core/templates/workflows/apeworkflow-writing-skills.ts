@@ -1,7 +1,7 @@
 /**
  * Skill Template: apeworkflow-writing-skills
  */
-import type { SkillTemplate } from '../types.js';
+import type { SkillTemplate, CommandTemplate } from '../types.js';
 
 export function getWritingSkillsSkillTemplate(): SkillTemplate {
   return {
@@ -666,4 +666,14 @@ Same benefits: Better quality, fewer surprises, bulletproof results.
 
 If you follow TDD for code, follow it for skills. It's the same discipline applied to documentation.
 `;
+}
+
+export function getApeWritingSkillsCommandTemplate(): CommandTemplate {
+  return {
+    name: 'APE: Writing Skills',
+    description: 'Create, edit, or verify skills before deployment',
+    category: 'Methodology',
+    tags: ['methodology', 'skills', 'writing'],
+    content: getWritingSkillsInstructions(),
+  };
 }

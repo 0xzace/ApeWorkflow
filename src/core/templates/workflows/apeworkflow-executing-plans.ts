@@ -1,7 +1,7 @@
 /**
  * Skill Template: apeworkflow-executing-plans
  */
-import type { SkillTemplate } from '../types.js';
+import type { SkillTemplate, CommandTemplate } from '../types.js';
 
 export function getExecutingPlansSkillTemplate(): SkillTemplate {
   return {
@@ -76,5 +76,15 @@ After all tasks complete and verified:
     license: 'MIT',
     compatibility: '',
     metadata: { author: 'apeworkflow', version: '1.0' },
+  };
+}
+
+export function getApeExecutingPlansCommandTemplate(): CommandTemplate {
+  return {
+    name: 'APE: Executing Plans',
+    description: 'Execute a written implementation plan task by task with review checkpoints',
+    category: 'Methodology',
+    tags: ['methodology', 'plans', 'execution'],
+    content: getExecutingPlansSkillTemplate().instructions,
   };
 }

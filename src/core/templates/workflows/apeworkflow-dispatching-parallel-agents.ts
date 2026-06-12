@@ -1,7 +1,7 @@
 /**
  * Skill Template: apeworkflow-dispatching-parallel-agents
  */
-import type { SkillTemplate } from '../types.js';
+import type { SkillTemplate, CommandTemplate } from '../types.js';
 
 export function getDispatchingParallelAgentsSkillTemplate(): SkillTemplate {
   return {
@@ -188,5 +188,15 @@ From debugging session (2025-10-03):
     license: 'MIT',
     compatibility: '',
     metadata: { author: 'apeworkflow', version: '1.0' },
+  };
+}
+
+export function getApeDispatchingParallelAgentsCommandTemplate(): CommandTemplate {
+  return {
+    name: 'APE: Dispatching Parallel Agents',
+    description: 'Delegate independent tasks to specialized agents with isolated context',
+    category: 'Methodology',
+    tags: ['methodology', 'parallel-agents', 'dispatch'],
+    content: getDispatchingParallelAgentsSkillTemplate().instructions,
   };
 }

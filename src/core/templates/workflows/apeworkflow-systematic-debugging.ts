@@ -1,7 +1,7 @@
 /**
  * Skill Template: apeworkflow-systematic-debugging
  */
-import type { SkillTemplate } from '../types.js';
+import type { SkillTemplate, CommandTemplate } from '../types.js';
 
 export function getSystematicDebuggingSkillTemplate(): SkillTemplate {
   return {
@@ -307,4 +307,14 @@ From debugging sessions:
 - First-time fix rate: 95% vs 40%
 - New bugs introduced: Near zero vs common
 `;
+}
+
+export function getApeSystematicDebuggingCommandTemplate(): CommandTemplate {
+  return {
+    name: 'APE: Systematic Debugging',
+    description: 'Find root cause before attempting fixes using a structured four-phase approach',
+    category: 'Methodology',
+    tags: ['methodology', 'debugging', 'systematic'],
+    content: getSystematicDebuggingInstructions(),
+  };
 }

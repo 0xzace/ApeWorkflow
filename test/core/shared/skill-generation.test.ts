@@ -92,9 +92,9 @@ describe('skill-generation', () => {
   });
 
   describe('getCommandTemplates', () => {
-    it('should return all 11 command templates', () => {
+    it('should return all 25 command templates (workflow + global)', () => {
       const templates = getCommandTemplates();
-      expect(templates).toHaveLength(11);
+      expect(templates).toHaveLength(25);
     });
 
     it('should have unique IDs', () => {
@@ -108,6 +108,7 @@ describe('skill-generation', () => {
       const templates = getCommandTemplates();
       const ids = templates.map(t => t.id);
 
+      // Workflow commands
       expect(ids).toContain('explore');
       expect(ids).toContain('new');
       expect(ids).toContain('continue');
@@ -119,11 +120,27 @@ describe('skill-generation', () => {
       expect(ids).toContain('verify');
       expect(ids).toContain('onboard');
       expect(ids).toContain('propose');
+      // Global commands
+      expect(ids).toContain('brainstorming');
+      expect(ids).toContain('dispatching-parallel-agents');
+      expect(ids).toContain('executing-plans');
+      expect(ids).toContain('finishing-a-development-branch');
+      expect(ids).toContain('receiving-code-review');
+      expect(ids).toContain('requesting-code-review');
+      expect(ids).toContain('subagent-driven-development');
+      expect(ids).toContain('systematic-debugging');
+      expect(ids).toContain('test-driven-development');
+      expect(ids).toContain('using-git-worktrees');
+      expect(ids).toContain('using-skills');
+      expect(ids).toContain('verification-before-completion');
+      expect(ids).toContain('writing-plans');
+      expect(ids).toContain('writing-skills');
     });
 
-    it('should filter by workflow IDs when provided', () => {
+    it('should filter workflow commands but always include global commands', () => {
       const filtered = getCommandTemplates(['propose', 'explore', 'apply', 'archive']);
-      expect(filtered).toHaveLength(4);
+      // 4 workflow matches + 14 global = 18
+      expect(filtered).toHaveLength(18);
       const ids = filtered.map(t => t.id);
       expect(ids).toContain('propose');
       expect(ids).toContain('explore');
@@ -131,6 +148,9 @@ describe('skill-generation', () => {
       expect(ids).toContain('archive');
       expect(ids).not.toContain('new');
       expect(ids).not.toContain('ff');
+      // Global commands always present
+      expect(ids).toContain('brainstorming');
+      expect(ids).toContain('writing-plans');
     });
 
     it('should return all templates when filter is undefined', () => {
@@ -139,16 +159,20 @@ describe('skill-generation', () => {
       expect(noFilter).toHaveLength(all.length);
     });
 
-    it('should return empty array when filter matches nothing', () => {
+    it('should return only global commands when filter matches no workflow commands', () => {
       const filtered = getCommandTemplates(['nonexistent']);
-      expect(filtered).toHaveLength(0);
+      // Global commands are always included
+      expect(filtered).toHaveLength(14);
+      const ids = filtered.map(t => t.id);
+      expect(ids).toContain('brainstorming');
+      expect(ids).not.toContain('explore');
     });
   });
 
   describe('getCommandContents', () => {
-    it('should return all 11 command contents', () => {
+    it('should return all 25 command contents (workflow + global)', () => {
       const contents = getCommandContents();
-      expect(contents).toHaveLength(11);
+      expect(contents).toHaveLength(25);
     });
 
     it('should have valid content structure', () => {
@@ -172,13 +196,16 @@ describe('skill-generation', () => {
       expect(contentIds).toEqual(templateIds);
     });
 
-    it('should filter by workflow IDs when provided', () => {
+    it('should filter workflow contents but always include global contents', () => {
       const filtered = getCommandContents(['propose', 'explore']);
-      expect(filtered).toHaveLength(2);
+      // 2 workflow matches + 14 global = 16
+      expect(filtered).toHaveLength(16);
       const ids = filtered.map(c => c.id);
       expect(ids).toContain('propose');
       expect(ids).toContain('explore');
       expect(ids).not.toContain('new');
+      // Global commands always present
+      expect(ids).toContain('brainstorming');
     });
 
     it('should return all contents when filter is undefined', () => {

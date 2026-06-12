@@ -1,7 +1,7 @@
 /**
  * Skill Template: apeworkflow-brainstorming
  */
-import type { SkillTemplate } from '../types.js';
+import type { SkillTemplate, CommandTemplate } from '../types.js';
 
 export function getBrainstormingSkillTemplate(): SkillTemplate {
   return {
@@ -170,5 +170,15 @@ If they agree to the companion, read the detailed guide before proceeding:
     license: 'MIT',
     compatibility: '',
     metadata: { author: 'apeworkflow', version: '1.0' },
+  };
+}
+
+export function getApeBrainstormingCommandTemplate(): CommandTemplate {
+  return {
+    name: 'APE: Brainstorming',
+    description: 'Start brainstorming — explore ideas and design collaboratively',
+    category: 'Methodology',
+    tags: ['methodology', 'brainstorming', 'design'],
+    content: getBrainstormingSkillTemplate().instructions,
   };
 }

@@ -1,7 +1,7 @@
 /**
  * Skill Template: apeworkflow-receiving-code-review
  */
-import type { SkillTemplate } from '../types.js';
+import type { SkillTemplate, CommandTemplate } from '../types.js';
 
 export function getReceivingCodeReviewSkillTemplate(): SkillTemplate {
   return {
@@ -224,4 +224,14 @@ Verify. Question. Then implement.
 
 No performative agreement. Technical rigor always.
 `;
+}
+
+export function getApeReceivingCodeReviewCommandTemplate(): CommandTemplate {
+  return {
+    name: 'APE: Receiving Code Review',
+    description: 'Evaluate code review feedback with technical rigor before implementing suggestions',
+    category: 'Methodology',
+    tags: ['methodology', 'code-review', 'receiving'],
+    content: getReceivingCodeReviewInstructions(),
+  };
 }

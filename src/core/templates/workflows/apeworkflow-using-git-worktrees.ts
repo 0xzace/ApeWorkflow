@@ -1,7 +1,7 @@
 /**
  * Skill Template: apeworkflow-using-git-worktrees
  */
-import type { SkillTemplate } from '../types.js';
+import type { SkillTemplate, CommandTemplate } from '../types.js';
 
 export function getUsingGitWorktreesSkillTemplate(): SkillTemplate {
   return {
@@ -226,4 +226,14 @@ Ready to implement <feature-name>
 - Auto-detect and run project setup
 - Verify clean test baseline
 `;
+}
+
+export function getApeUsingGitWorktreesCommandTemplate(): CommandTemplate {
+  return {
+    name: 'APE: Using Git Worktrees',
+    description: 'Ensure an isolated workspace exists for feature work or implementation plans',
+    category: 'Methodology',
+    tags: ['methodology', 'git', 'worktrees'],
+    content: getUsingGitWorktreesInstructions(),
+  };
 }

@@ -1,7 +1,7 @@
 /**
  * Skill Template: apeworkflow-subagent-driven-development
  */
-import type { SkillTemplate } from '../types.js';
+import type { SkillTemplate, CommandTemplate } from '../types.js';
 
 export function getSubagentDrivenDevelopmentSkillTemplate(): SkillTemplate {
   return {
@@ -290,4 +290,14 @@ Done!
 **Alternative workflow:**
 - **apeworkflow-executing-plans** - Use for parallel session instead of same-session execution
 `;
+}
+
+export function getApeSubagentDrivenDevelopmentCommandTemplate(): CommandTemplate {
+  return {
+    name: 'APE: Subagent-Driven Development',
+    description: 'Execute implementation plans with fresh subagents per task and two-stage review',
+    category: 'Methodology',
+    tags: ['methodology', 'subagent', 'development'],
+    content: getSubagentDrivenDevelopmentInstructions(),
+  };
 }

@@ -1,7 +1,7 @@
 /**
  * Skill Template: apeworkflow-finishing-a-development-branch
  */
-import type { SkillTemplate } from '../types.js';
+import type { SkillTemplate, CommandTemplate } from '../types.js';
 
 export function getFinishingADevelopmentBranchSkillTemplate(): SkillTemplate {
   return {
@@ -262,4 +262,14 @@ git worktree prune  # Self-healing: clean up any stale registrations
 - \`cd\` to main repo root before worktree removal
 - Run \`git worktree prune\` after removal
 `;
+}
+
+export function getApeFinishingADevelopmentBranchCommandTemplate(): CommandTemplate {
+  return {
+    name: 'APE: Finishing a Development Branch',
+    description: 'Complete development work by choosing the right integration path — merge, PR, or cleanup',
+    category: 'Methodology',
+    tags: ['methodology', 'branch', 'finishing'],
+    content: getFinishingADevelopmentBranchInstructions(),
+  };
 }

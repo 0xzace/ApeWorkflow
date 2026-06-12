@@ -54,9 +54,9 @@ export const SKILL_NAMES = [...WORKFLOW_SKILL_NAMES, ...GLOBAL_SKILL_NAMES] as c
 export type SkillName = (typeof SKILL_NAMES)[number];
 
 /**
- * IDs of command templates created by apeworkflow init.
+ * IDs of workflow command templates (profile-filtered).
  */
-export const COMMAND_IDS = [
+export const WORKFLOW_COMMAND_IDS = [
   'explore',
   'new',
   'continue',
@@ -70,6 +70,33 @@ export const COMMAND_IDS = [
   'propose',
 ] as const;
 
+/**
+ * IDs of global (methodology) command templates — always available, not profile-controlled.
+ */
+export const GLOBAL_COMMAND_IDS = [
+  'brainstorming',
+  'dispatching-parallel-agents',
+  'executing-plans',
+  'finishing-a-development-branch',
+  'receiving-code-review',
+  'requesting-code-review',
+  'subagent-driven-development',
+  'systematic-debugging',
+  'test-driven-development',
+  'using-git-worktrees',
+  'using-skills',
+  'verification-before-completion',
+  'writing-plans',
+  'writing-skills',
+] as const;
+
+/**
+ * All command IDs (workflow + global). Backward compatible.
+ */
+export const COMMAND_IDS = [...WORKFLOW_COMMAND_IDS, ...GLOBAL_COMMAND_IDS] as const;
+
+export type WorkflowCommandId = (typeof WORKFLOW_COMMAND_IDS)[number];
+export type GlobalCommandId = (typeof GLOBAL_COMMAND_IDS)[number];
 export type CommandId = (typeof COMMAND_IDS)[number];
 
 /**
