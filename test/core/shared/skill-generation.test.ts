@@ -10,7 +10,7 @@ describe('skill-generation', () => {
   describe('getSkillTemplates', () => {
     it('should return all skill templates (workflow + global)', () => {
       const templates = getSkillTemplates();
-      expect(templates).toHaveLength(12);
+      expect(templates).toHaveLength(26);
     });
 
     it('should have unique directory names', () => {
@@ -59,7 +59,7 @@ describe('skill-generation', () => {
 
     it('should filter by workflow IDs when provided', () => {
       const filtered = getSkillTemplates(['propose', 'explore', 'apply', 'archive']);
-      expect(filtered).toHaveLength(5); // 4 workflow + 1 global
+      expect(filtered).toHaveLength(19); // 4 workflow + 15 global
       const workflowIds = filtered.filter(t => t.workflowId !== undefined).map(t => t.workflowId!);
       expect(workflowIds).toContain('propose');
       expect(workflowIds).toContain('explore');
@@ -83,8 +83,8 @@ describe('skill-generation', () => {
 
     it('should return workflow match + global skills when filter has one workflow', () => {
       const filtered = getSkillTemplates(['propose']);
-      // 1 matching workflow skill + 1 global skill (feedback) = 2
-      expect(filtered).toHaveLength(2);
+      // 1 matching workflow skill + 15 global skills = 16
+      expect(filtered).toHaveLength(16);
       const workflowMatch = filtered.find(t => t.workflowId === 'propose');
       expect(workflowMatch).toBeTruthy();
       expect(workflowMatch!.dirName).toBe('apeworkflow-propose');

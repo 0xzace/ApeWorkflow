@@ -25,5 +25,10 @@ export { getFinishingADevelopmentBranchSkillTemplate } from './workflows/apework
 export { getReceivingCodeReviewSkillTemplate } from './workflows/apeworkflow-receiving-code-review.js';
 export { getRequestingCodeReviewSkillTemplate } from './workflows/apeworkflow-requesting-code-review.js';
 export { getSubagentDrivenDevelopmentSkillTemplate } from './workflows/apeworkflow-subagent-driven-development.js';
-export { getWritingPlansSkillTemplate } from './workflows/apeworkflow-writing-plans/apeworkflow-writing-plans.js';
-export { getWritingSkillsSkillTemplate } from './workflows/apeworkflow-writing-skills/apeworkflow-writing-skills.js';
+export { getSystematicDebuggingSkillTemplate } from './workflows/apeworkflow-systematic-debugging.js';
+export { getTestDrivenDevelopmentSkillTemplate } from './workflows/apeworkflow-test-driven-development.js';
+export { getUsingGitWorktreesSkillTemplate } from './workflows/apeworkflow-using-git-worktrees.js';
+export { getUsingSkillsSkillTemplate } from './workflows/apeworkflow-using-skills.js';
+export { getVerificationBeforeCompletionSkillTemplate } from './workflows/apeworkflow-verification-before-completion.js';
+export { getWritingPlansSkillTemplate } from './workflows/apeworkflow-writing-plans.js';
+export { getWritingSkillsSkillTemplate } from './workflows/apeworkflow-writing-skills.js';

@@ -1,7 +1,7 @@
 /**
  * Skill Template: apeworkflow-writing-plans
  */
-import type { SkillTemplate } from '../../types.js';
+import type { SkillTemplate } from '../types.js';
 
 export function getWritingPlansSkillTemplate(): SkillTemplate {
   return {

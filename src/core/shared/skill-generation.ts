@@ -26,6 +26,11 @@ import {
   getSubagentDrivenDevelopmentSkillTemplate,
   getWritingPlansSkillTemplate,
   getWritingSkillsSkillTemplate,
+  getSystematicDebuggingSkillTemplate,
+  getTestDrivenDevelopmentSkillTemplate,
+  getUsingGitWorktreesSkillTemplate,
+  getUsingSkillsSkillTemplate,
+  getVerificationBeforeCompletionSkillTemplate,
   getApeExploreCommandTemplate,
   getApeNewCommandTemplate,
   getApeContinueCommandTemplate,
@@ -109,6 +114,11 @@ export function getSkillTemplates(workflowFilter?: readonly string[]): SkillTemp
     { template: getSubagentDrivenDevelopmentSkillTemplate(), dirName: 'apeworkflow-subagent-driven-development' },
     { template: getWritingPlansSkillTemplate(), dirName: 'apeworkflow-writing-plans' },
     { template: getWritingSkillsSkillTemplate(), dirName: 'apeworkflow-writing-skills' },
+    { template: getSystematicDebuggingSkillTemplate(), dirName: 'apeworkflow-systematic-debugging' },
+    { template: getTestDrivenDevelopmentSkillTemplate(), dirName: 'apeworkflow-test-driven-development' },
+    { template: getUsingGitWorktreesSkillTemplate(), dirName: 'apeworkflow-using-git-worktrees' },
+    { template: getUsingSkillsSkillTemplate(), dirName: 'apeworkflow-using-skills' },
+    { template: getVerificationBeforeCompletionSkillTemplate(), dirName: 'apeworkflow-verification-before-completion' },
   ];
 
   const all: SkillTemplateEntry[] = [...workflowEntries, ...globalEntries];
