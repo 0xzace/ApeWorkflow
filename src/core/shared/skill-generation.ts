@@ -17,6 +17,9 @@ import {
   getOnboardSkillTemplate,
   getApeProposeSkillTemplate,
   getFeedbackSkillTemplate,
+  getBrainstormingSkillTemplate,
+  getDispatchingParallelAgentsSkillTemplate,
+  getExecutingPlansSkillTemplate,
   getApeExploreCommandTemplate,
   getApeNewCommandTemplate,
   getApeContinueCommandTemplate,
@@ -88,9 +91,12 @@ export function getSkillTemplates(workflowFilter?: readonly string[]): SkillTemp
     { template: getApeProposeSkillTemplate(), dirName: 'apeworkflow-propose', workflowId: 'propose' },
   ];
 
-  // Global skills (methodology) — empty for now, feedback already registered
+  // Global skills (methodology)
   const globalEntries: SkillTemplateEntry[] = [
     { template: getFeedbackSkillTemplate(), dirName: 'apeworkflow-feedback' },
+    { template: getBrainstormingSkillTemplate(), dirName: 'apeworkflow-brainstorming' },
+    { template: getDispatchingParallelAgentsSkillTemplate(), dirName: 'apeworkflow-dispatching-parallel-agents' },
+    { template: getExecutingPlansSkillTemplate(), dirName: 'apeworkflow-executing-plans' },
   ];
 
   const all: SkillTemplateEntry[] = [...workflowEntries, ...globalEntries];
