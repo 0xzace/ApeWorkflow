@@ -30,6 +30,27 @@ export const ALL_WORKFLOWS = [
   'onboard',
 ] as const;
 
+/**
+ * Global (methodology) skills that are always present, independent of profile.
+ */
+export const ALL_GLOBAL_SKILLS = [
+  'apeworkflow-brainstorming',
+  'apeworkflow-dispatching-parallel-agents',
+  'apeworkflow-executing-plans',
+  'apeworkflow-finishing-a-development-branch',
+  'apeworkflow-receiving-code-review',
+  'apeworkflow-requesting-code-review',
+  'apeworkflow-subagent-driven-development',
+  'apeworkflow-systematic-debugging',
+  'apeworkflow-test-driven-development',
+  'apeworkflow-using-git-worktrees',
+  'apeworkflow-using-skills',
+  'apeworkflow-verification-before-completion',
+  'apeworkflow-writing-plans',
+  'apeworkflow-writing-skills',
+  'apeworkflow-feedback',
+] as const;
+
 export type WorkflowId = (typeof ALL_WORKFLOWS)[number];
 export type CoreWorkflowId = (typeof CORE_WORKFLOWS)[number];
 
