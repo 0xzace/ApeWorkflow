@@ -7,6 +7,8 @@
 export {
   SKILL_NAMES,
   type SkillName,
+  WORKFLOW_SKILL_NAMES,
+  GLOBAL_SKILL_NAMES,
   COMMAND_IDS,
   type CommandId,
   type ToolSkillStatus,
