@@ -25,3 +25,5 @@ export { getFinishingADevelopmentBranchSkillTemplate } from './workflows/apework
 export { getReceivingCodeReviewSkillTemplate } from './workflows/apeworkflow-receiving-code-review.js';
 export { getRequestingCodeReviewSkillTemplate } from './workflows/apeworkflow-requesting-code-review.js';
 export { getSubagentDrivenDevelopmentSkillTemplate } from './workflows/apeworkflow-subagent-driven-development.js';
+export { getWritingPlansSkillTemplate } from './workflows/apeworkflow-writing-plans/apeworkflow-writing-plans.js';
+export { getWritingSkillsSkillTemplate } from './workflows/apeworkflow-writing-skills/apeworkflow-writing-skills.js';

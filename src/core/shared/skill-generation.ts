@@ -24,6 +24,8 @@ import {
   getReceivingCodeReviewSkillTemplate,
   getRequestingCodeReviewSkillTemplate,
   getSubagentDrivenDevelopmentSkillTemplate,
+  getWritingPlansSkillTemplate,
+  getWritingSkillsSkillTemplate,
   getApeExploreCommandTemplate,
   getApeNewCommandTemplate,
   getApeContinueCommandTemplate,
@@ -105,6 +107,8 @@ export function getSkillTemplates(workflowFilter?: readonly string[]): SkillTemp
     { template: getReceivingCodeReviewSkillTemplate(), dirName: 'apeworkflow-receiving-code-review' },
     { template: getRequestingCodeReviewSkillTemplate(), dirName: 'apeworkflow-requesting-code-review' },
     { template: getSubagentDrivenDevelopmentSkillTemplate(), dirName: 'apeworkflow-subagent-driven-development' },
+    { template: getWritingPlansSkillTemplate(), dirName: 'apeworkflow-writing-plans' },
+    { template: getWritingSkillsSkillTemplate(), dirName: 'apeworkflow-writing-skills' },
   ];
 
   const all: SkillTemplateEntry[] = [...workflowEntries, ...globalEntries];
