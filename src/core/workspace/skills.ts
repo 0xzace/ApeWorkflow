@@ -300,8 +300,8 @@ async function copyAttachedFiles(
   try {
     const entries = await fs.readdir(srcDir, { withFileTypes: true });
     for (const entry of entries) {
-      // Skip .ts template files — they're the skill definition, not attached content
-      if (entry.name.endsWith('.ts')) continue;
+      // Skip only skill template TS files (the skill definition itself), not attached TS files
+      if (/^apeworkflow-.*\.ts$/.test(entry.name)) continue;
 
       const srcPath = path.join(srcDir, entry.name);
       const dstPath = path.join(targetSkillDir, entry.name);
