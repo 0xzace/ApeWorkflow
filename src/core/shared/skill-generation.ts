@@ -20,6 +20,10 @@ import {
   getBrainstormingSkillTemplate,
   getDispatchingParallelAgentsSkillTemplate,
   getExecutingPlansSkillTemplate,
+  getFinishingADevelopmentBranchSkillTemplate,
+  getReceivingCodeReviewSkillTemplate,
+  getRequestingCodeReviewSkillTemplate,
+  getSubagentDrivenDevelopmentSkillTemplate,
   getApeExploreCommandTemplate,
   getApeNewCommandTemplate,
   getApeContinueCommandTemplate,
@@ -97,6 +101,10 @@ export function getSkillTemplates(workflowFilter?: readonly string[]): SkillTemp
     { template: getBrainstormingSkillTemplate(), dirName: 'apeworkflow-brainstorming' },
     { template: getDispatchingParallelAgentsSkillTemplate(), dirName: 'apeworkflow-dispatching-parallel-agents' },
     { template: getExecutingPlansSkillTemplate(), dirName: 'apeworkflow-executing-plans' },
+    { template: getFinishingADevelopmentBranchSkillTemplate(), dirName: 'apeworkflow-finishing-a-development-branch' },
+    { template: getReceivingCodeReviewSkillTemplate(), dirName: 'apeworkflow-receiving-code-review' },
+    { template: getRequestingCodeReviewSkillTemplate(), dirName: 'apeworkflow-requesting-code-review' },
+    { template: getSubagentDrivenDevelopmentSkillTemplate(), dirName: 'apeworkflow-subagent-driven-development' },
   ];
 
   const all: SkillTemplateEntry[] = [...workflowEntries, ...globalEntries];

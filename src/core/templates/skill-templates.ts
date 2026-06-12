@@ -21,3 +21,7 @@ export { getFeedbackSkillTemplate } from './workflows/feedback.js';
 export { getBrainstormingSkillTemplate } from './workflows/apeworkflow-brainstorming.js';
 export { getDispatchingParallelAgentsSkillTemplate } from './workflows/apeworkflow-dispatching-parallel-agents.js';
 export { getExecutingPlansSkillTemplate } from './workflows/apeworkflow-executing-plans.js';
+export { getFinishingADevelopmentBranchSkillTemplate } from './workflows/apeworkflow-finishing-a-development-branch.js';
+export { getReceivingCodeReviewSkillTemplate } from './workflows/apeworkflow-receiving-code-review.js';
+export { getRequestingCodeReviewSkillTemplate } from './workflows/apeworkflow-requesting-code-review.js';
+export { getSubagentDrivenDevelopmentSkillTemplate } from './workflows/apeworkflow-subagent-driven-development.js';
