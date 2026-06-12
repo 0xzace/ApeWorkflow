@@ -1,5 +1,7 @@
 import * as nodeFs from 'node:fs';
 import { createRequire } from 'node:module';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 import { FileSystemUtils } from '../../utils/file-system.js';
 import { transformToHyphenCommands } from '../../utils/command-references.js';
@@ -277,9 +279,57 @@ async function pathExists(targetPath: string): Promise<boolean> {
   }
 }
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 function isApeWorkflowManagedSkillDir(skillDir: string): boolean {
   const skillFile = FileSystemUtils.joinPath(skillDir, 'SKILL.md');
   return extractGeneratedByVersion(skillFile) !== null;
+}
+
+/**
+ * Copy attached (non-.ts) files from the source workflows directory to the target skill directory.
+ * Attached files live alongside the TS template in src/core/templates/workflows/<dirName>/
+ */
+async function copyAttachedFiles(
+  sourceWorkflowsDir: string,
+  targetSkillDir: string,
+  dirName: string
+): Promise<void> {
+  const srcDir = path.join(sourceWorkflowsDir, dirName);
+
+  try {
+    const entries = await fs.readdir(srcDir, { withFileTypes: true });
+    for (const entry of entries) {
+      // Skip .ts template files — they're the skill definition, not attached content
+      if (entry.name.endsWith('.ts')) continue;
+
+      const srcPath = path.join(srcDir, entry.name);
+      const dstPath = path.join(targetSkillDir, entry.name);
+
+      if (entry.isDirectory()) {
+        await fs.mkdir(dstPath, { recursive: true });
+        await copyDirRecursive(srcPath, dstPath);
+      } else {
+        await fs.copyFile(srcPath, dstPath);
+      }
+    }
+  } catch {
+    // No attached files or directory doesn't exist — this is fine
+  }
+}
+
+async function copyDirRecursive(src: string, dst: string): Promise<void> {
+  await fs.mkdir(dst, { recursive: true });
+  const entries = await fs.readdir(src, { withFileTypes: true });
+  for (const entry of entries) {
+    const srcPath = path.join(src, entry.name);
+    const dstPath = path.join(dst, entry.name);
+    if (entry.isDirectory()) {
+      await copyDirRecursive(srcPath, dstPath);
+    } else {
+      await fs.copyFile(srcPath, dstPath);
+    }
+  }
 }
 
 async function removeManagedWorkflowSkillDirs(
@@ -363,6 +413,12 @@ export async function generateWorkspaceAgentSkills(
         const skillFile = FileSystemUtils.joinPath(skillsDir, dirName, 'SKILL.md');
         const skillContent = generateSkillContent(template, APEWORKFLOW_VERSION, transformer);
         await FileSystemUtils.writeFile(skillFile, skillContent);
+      }
+
+      // Copy attached files (non-.ts files from the workflows source directory)
+      const sourceWorkflowsDir = path.join(__dirname, '../../templates/workflows');
+      for (const { dirName } of skillTemplates) {
+        await copyAttachedFiles(sourceWorkflowsDir, skillsDir, dirName);
       }
 
       const result = makeAgentResult(workspaceRoot, tool, profileContext.workflowIds);
@@ -475,6 +531,12 @@ export async function updateWorkspaceAgentSkills(
         const skillFile = FileSystemUtils.joinPath(skillsDir, dirName, 'SKILL.md');
         const skillContent = generateSkillContent(template, APEWORKFLOW_VERSION, transformer);
         await FileSystemUtils.writeFile(skillFile, skillContent);
+      }
+
+      // Copy attached files
+      const sourceWorkflowsDir = path.join(__dirname, '../../templates/workflows');
+      for (const { dirName } of skillTemplates) {
+        await copyAttachedFiles(sourceWorkflowsDir, skillsDir, dirName);
       }
 
       const removed = await removeManagedWorkflowSkillDirs(
