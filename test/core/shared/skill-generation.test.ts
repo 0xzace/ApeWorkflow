@@ -8,9 +8,9 @@ import {
 
 describe('skill-generation', () => {
   describe('getSkillTemplates', () => {
-    it('should return all 11 skill templates', () => {
+    it('should return all skill templates (workflow + global)', () => {
       const templates = getSkillTemplates();
-      expect(templates).toHaveLength(11);
+      expect(templates).toHaveLength(12);
     });
 
     it('should have unique directory names', () => {
@@ -40,32 +40,33 @@ describe('skill-generation', () => {
     it('should have valid template structure', () => {
       const templates = getSkillTemplates();
 
-      for (const { template, dirName, workflowId } of templates) {
+      for (const { template, dirName } of templates) {
         expect(template.name).toBeTruthy();
         expect(template.description).toBeTruthy();
         expect(template.instructions).toBeTruthy();
         expect(dirName).toBeTruthy();
-        expect(workflowId).toBeTruthy();
       }
+      // workflowId is optional — present for workflow skills, absent for global skills
     });
 
-    it('should have unique workflow IDs', () => {
+    it('should have unique workflow IDs among workflow skills', () => {
       const templates = getSkillTemplates();
-      const ids = templates.map(t => t.workflowId);
+      const workflowEntries = templates.filter(t => t.workflowId !== undefined);
+      const ids = workflowEntries.map(t => t.workflowId!);
       const uniqueIds = new Set(ids);
-      expect(uniqueIds.size).toBe(templates.length);
+      expect(uniqueIds.size).toBe(workflowEntries.length);
     });
 
     it('should filter by workflow IDs when provided', () => {
       const filtered = getSkillTemplates(['propose', 'explore', 'apply', 'archive']);
-      expect(filtered).toHaveLength(4);
-      const ids = filtered.map(t => t.workflowId);
-      expect(ids).toContain('propose');
-      expect(ids).toContain('explore');
-      expect(ids).toContain('apply');
-      expect(ids).toContain('archive');
-      expect(ids).not.toContain('new');
-      expect(ids).not.toContain('ff');
+      expect(filtered).toHaveLength(5); // 4 workflow + 1 global
+      const workflowIds = filtered.filter(t => t.workflowId !== undefined).map(t => t.workflowId!);
+      expect(workflowIds).toContain('propose');
+      expect(workflowIds).toContain('explore');
+      expect(workflowIds).toContain('apply');
+      expect(workflowIds).toContain('archive');
+      expect(workflowIds).not.toContain('new');
+      expect(workflowIds).not.toContain('ff');
     });
 
     it('should return all templates when filter is undefined', () => {
@@ -74,16 +75,19 @@ describe('skill-generation', () => {
       expect(noFilter).toHaveLength(all.length);
     });
 
-    it('should return empty array when filter matches nothing', () => {
+    it('should return global skills when workflow filter matches nothing', () => {
       const filtered = getSkillTemplates(['nonexistent']);
-      expect(filtered).toHaveLength(0);
+      // Returns global skills only since no workflow skill matches
+      expect(filtered.every(t => t.workflowId === undefined)).toBe(true);
     });
 
-    it('should return single template when filter has one workflow', () => {
+    it('should return workflow match + global skills when filter has one workflow', () => {
       const filtered = getSkillTemplates(['propose']);
-      expect(filtered).toHaveLength(1);
-      expect(filtered[0].workflowId).toBe('propose');
-      expect(filtered[0].dirName).toBe('apeworkflow-propose');
+      // 1 matching workflow skill + 1 global skill (feedback) = 2
+      expect(filtered).toHaveLength(2);
+      const workflowMatch = filtered.find(t => t.workflowId === 'propose');
+      expect(workflowMatch).toBeTruthy();
+      expect(workflowMatch!.dirName).toBe('apeworkflow-propose');
     });
   });
 
