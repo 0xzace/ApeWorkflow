@@ -9,6 +9,7 @@ import { getProfileWorkflows } from '../profiles.js';
 import {
   generateSkillContent,
   getSkillTemplates,
+  isWorkflowEntry,
   getToolSkillStatus,
   getToolsWithSkillsDir,
   extractGeneratedByVersion,
@@ -262,7 +263,9 @@ function makeAgentResult(
 }
 
 function getManagedWorkspaceSkillEntries(): Array<{ workflowId: string; dirName: string }> {
-  return getSkillTemplates().map(({ workflowId, dirName }) => ({ workflowId, dirName }));
+  return getSkillTemplates()
+    .filter(isWorkflowEntry)
+    .map(({ workflowId, dirName }) => ({ workflowId: workflowId!, dirName }));
 }
 
 async function pathExists(targetPath: string): Promise<boolean> {

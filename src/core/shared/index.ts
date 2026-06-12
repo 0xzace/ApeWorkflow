@@ -24,6 +24,8 @@ export {
   type SkillTemplateEntry,
   type CommandTemplateEntry,
   getSkillTemplates,
+  isWorkflowEntry,
+  isGlobalEntry,
   getCommandTemplates,
   getCommandContents,
   generateSkillContent,

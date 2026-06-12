@@ -16,6 +16,7 @@ import {
   getVerifyChangeSkillTemplate,
   getOnboardSkillTemplate,
   getApeProposeSkillTemplate,
+  getFeedbackSkillTemplate,
   getApeExploreCommandTemplate,
   getApeNewCommandTemplate,
   getApeContinueCommandTemplate,
@@ -29,15 +30,31 @@ import {
   getApeProposeCommandTemplate,
   type SkillTemplate,
 } from '../templates/skill-templates.js';
+import type { WorkflowId } from '../profiles.js';
 import type { CommandContent } from '../command-generation/index.js';
 
 /**
  * Skill template with directory name and workflow ID mapping.
+ * Global skills (methodology) have no workflowId; workflow skills have one.
  */
 export interface SkillTemplateEntry {
   template: SkillTemplate;
   dirName: string;
-  workflowId: string;
+  workflowId?: WorkflowId;
+}
+
+/**
+ * Determines if a skill template entry is a workflow skill (has a workflow ID).
+ */
+export function isWorkflowEntry(e: SkillTemplateEntry): boolean {
+  return e.workflowId !== undefined;
+}
+
+/**
+ * Determines if a skill template entry is a global skill (no workflow ID).
+ */
+export function isGlobalEntry(e: SkillTemplateEntry): boolean {
+  return e.workflowId === undefined;
 }
 
 /**
@@ -51,10 +68,13 @@ export interface CommandTemplateEntry {
 /**
  * Gets skill templates with their directory names, optionally filtered by workflow IDs.
  *
- * @param workflowFilter - If provided, only return templates whose workflowId is in this array
+ * Returns workflow-scoped entries (filtered by workflowFilter if provided)
+ * merged with all global-scoped entries (always included).
+ *
+ * @param workflowFilter - If provided, only return workflow entries whose workflowId is in this array
  */
 export function getSkillTemplates(workflowFilter?: readonly string[]): SkillTemplateEntry[] {
-  const all: SkillTemplateEntry[] = [
+  const workflowEntries: SkillTemplateEntry[] = [
     { template: getExploreSkillTemplate(), dirName: 'apeworkflow-explore', workflowId: 'explore' },
     { template: getNewChangeSkillTemplate(), dirName: 'apeworkflow-new-change', workflowId: 'new' },
     { template: getContinueChangeSkillTemplate(), dirName: 'apeworkflow-continue-change', workflowId: 'continue' },
@@ -68,10 +88,19 @@ export function getSkillTemplates(workflowFilter?: readonly string[]): SkillTemp
     { template: getApeProposeSkillTemplate(), dirName: 'apeworkflow-propose', workflowId: 'propose' },
   ];
 
+  // Global skills (methodology) — empty for now, feedback already registered
+  const globalEntries: SkillTemplateEntry[] = [
+    { template: getFeedbackSkillTemplate(), dirName: 'apeworkflow-feedback' },
+  ];
+
+  const all: SkillTemplateEntry[] = [...workflowEntries, ...globalEntries];
+
   if (!workflowFilter) return all;
 
   const filterSet = new Set(workflowFilter);
-  return all.filter(entry => filterSet.has(entry.workflowId));
+  return all.filter(
+    entry => isGlobalEntry(entry) || filterSet.has(entry.workflowId!)
+  );
 }
 
 /**
