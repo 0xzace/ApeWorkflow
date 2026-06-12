@@ -9,9 +9,9 @@ import * as fs from 'fs';
 import { AI_TOOLS } from '../config.js';
 
 /**
- * Names of skill directories created by apeworkflow init.
+ * Names of workflow skill directories created by apeworkflow init.
  */
-export const SKILL_NAMES = [
+export const WORKFLOW_SKILL_NAMES = [
   'apeworkflow-explore',
   'apeworkflow-new-change',
   'apeworkflow-continue-change',
@@ -24,6 +24,32 @@ export const SKILL_NAMES = [
   'apeworkflow-onboard',
   'apeworkflow-propose',
 ] as const;
+
+/**
+ * Names of global (methodology) skill directories — always present, not profile-controlled.
+ */
+export const GLOBAL_SKILL_NAMES = [
+  'apeworkflow-brainstorming',
+  'apeworkflow-dispatching-parallel-agents',
+  'apeworkflow-executing-plans',
+  'apeworkflow-finishing-a-development-branch',
+  'apeworkflow-receiving-code-review',
+  'apeworkflow-requesting-code-review',
+  'apeworkflow-subagent-driven-development',
+  'apeworkflow-systematic-debugging',
+  'apeworkflow-test-driven-development',
+  'apeworkflow-using-git-worktrees',
+  'apeworkflow-using-skills',
+  'apeworkflow-verification-before-completion',
+  'apeworkflow-writing-plans',
+  'apeworkflow-writing-skills',
+  'apeworkflow-feedback',
+] as const;
+
+/**
+ * All skill directory names (workflow + global). Backward compatible.
+ */
+export const SKILL_NAMES = [...WORKFLOW_SKILL_NAMES, ...GLOBAL_SKILL_NAMES] as const;
 
 export type SkillName = (typeof SKILL_NAMES)[number];
 
