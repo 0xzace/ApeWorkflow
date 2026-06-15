@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
+import { reportUserVisibleError } from '../cli/error-handling.js';
 import {
   createInitiative,
   INITIATIVE_FILE_NAMES,
@@ -362,7 +363,8 @@ class InitiativeCommand {
 
       printCreateHuman(payload);
     } catch (error) {
-      this.handleFailure(
+      await this.handleFailure(
+        'initiative:create',
         options.json,
         { context_store: null, initiative: null, created_files: [], status: [] },
         error
@@ -381,7 +383,8 @@ class InitiativeCommand {
 
       printListHuman(payload);
     } catch (error) {
-      this.handleFailure(
+      await this.handleFailure(
+        'initiative:list',
         options.json,
         { context_store: null, context_stores: [], initiatives: [], status: [] },
         error
@@ -401,7 +404,8 @@ class InitiativeCommand {
 
       printShowHuman(payload);
     } catch (error) {
-      this.handleFailure(
+      await this.handleFailure(
+        'initiative:show',
         options.json,
         { context_store: null, initiative: null, status: [] },
         error
@@ -440,11 +444,15 @@ class InitiativeCommand {
     };
   }
 
-  private handleFailure<T extends { status: InitiativeDiagnostic[] }>(
+  private async handleFailure<T extends { status: InitiativeDiagnostic[] }>(
+    commandPath: string,
     json: boolean | undefined,
     payload: T,
     error: unknown
-  ): void {
+  ): Promise<void> {
+    // 中文注释：先补共享上报，再保留 initiative 原本的错误输出。
+    await reportUserVisibleError(error, { commandPath, source: 'command' });
+
     const diagnostic = initiativeDiagnosticFromError(error);
 
     if (json) {

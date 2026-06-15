@@ -17,6 +17,7 @@ import {
   writeWorkspaceViewState,
 } from '../core/workspace/index.js';
 import { isInteractive, resolveNoInteractive } from '../utils/interactive.js';
+import { reportUserVisibleError } from '../cli/error-handling.js';
 import {
   addWorkspaceLink,
   createManagedWorkspace,
@@ -546,7 +547,7 @@ class WorkspaceCommand {
 
       setWorkspaceSkillFailureExitCode(skillReport);
     } catch (error) {
-      this.handleFailure(options.json, { workspace: null, status: [] }, error);
+      await this.handleFailure('workspace:setup', options.json, { workspace: null, status: [] }, error);
     }
   }
 
@@ -568,7 +569,7 @@ class WorkspaceCommand {
 
       printWorkspaceListHuman(workspaces);
     } catch (error) {
-      this.handleFailure(options.json, { workspaces: [], status: [] }, error);
+      await this.handleFailure('workspace:list', options.json, { workspaces: [], status: [] }, error);
     }
   }
 
@@ -598,7 +599,7 @@ class WorkspaceCommand {
 
       printLinkMutationHuman('Linked repo or folder:', payload);
     } catch (error) {
-      this.handleFailure(options.json, { workspace: null, link: null, status: [] }, error);
+      await this.handleFailure('workspace:link', options.json, { workspace: null, link: null, status: [] }, error);
     }
   }
 
@@ -628,7 +629,7 @@ class WorkspaceCommand {
 
       printLinkMutationHuman('Relinked repo or folder:', payload);
     } catch (error) {
-      this.handleFailure(options.json, { workspace: null, link: null, status: [] }, error);
+      await this.handleFailure('workspace:relink', options.json, { workspace: null, link: null, status: [] }, error);
     }
   }
 
@@ -644,7 +645,7 @@ class WorkspaceCommand {
 
       printDoctorHuman(result);
     } catch (error) {
-      this.handleFailure(options.json, { workspace: null, status: [] }, error);
+      await this.handleFailure('workspace:doctor', options.json, { workspace: null, status: [] }, error);
     }
   }
 
@@ -664,7 +665,7 @@ class WorkspaceCommand {
       );
       await this.updateSelected(selected, options);
     } catch (error) {
-      this.handleFailure(options.json, { workspace: null, workspace_skills: null, status: [] }, error);
+      await this.handleFailure('workspace:update', options.json, { workspace: null, workspace_skills: null, status: [] }, error);
     }
   }
 
@@ -746,20 +747,24 @@ class WorkspaceCommand {
         printJson(buildWorkspaceOpenJsonPayload(prepared));
       }
     } catch (error) {
-      this.handleFailure(options.json, { workspace: null, status: [] }, error);
+      await this.handleFailure('workspace:open', options.json, { workspace: null, status: [] }, error);
     }
   }
 
-  private handleFailure<T extends { status: WorkspaceStatus[] }>(
+  private async handleFailure<T extends { status: WorkspaceStatus[] }>(
+    commandPath: string,
     json: boolean | undefined,
     payload: T,
     error: unknown
-  ): void {
+  ): Promise<void> {
     if (!json && isPromptCancellationError(error)) {
       console.error('Cancelled.');
       process.exitCode = 130;
       return;
     }
+
+    // 中文注释：先把异常交给共享 reporter，再保留原本的文本/JSON 输出。
+    await reportUserVisibleError(error, { commandPath, source: 'command' });
 
     if (json) {
       printJson(appendStatus(payload, asStatus(error)));

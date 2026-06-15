@@ -2,6 +2,7 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import { Command } from 'commander';
 
+import { reportUserVisibleError } from '../cli/error-handling.js';
 import {
   ContextStoreError,
   doctorContextStores,
@@ -506,7 +507,8 @@ class ContextStoreCommand {
 
       printMutationHuman('Context store ready', payload);
     } catch (error) {
-      this.handleFailure(
+      await this.handleFailure(
+        'context-store:setup',
         options.json,
         { context_store: null, registry: null, git: null, created_files: [], status: [] },
         error
@@ -528,7 +530,8 @@ class ContextStoreCommand {
 
       printMutationHuman('Context store registered', payload);
     } catch (error) {
-      this.handleFailure(
+      await this.handleFailure(
+        'context-store:register',
         options.json,
         { context_store: null, registry: null, git: null, created_files: [], status: [] },
         error
@@ -547,7 +550,8 @@ class ContextStoreCommand {
 
       printCleanupHuman('Unregistered context store', payload);
     } catch (error) {
-      this.handleFailure(
+      await this.handleFailure(
+        'context-store:unregister',
         options.json,
         { context_store: null, registry: null, files: null, status: [] },
         error
@@ -568,7 +572,8 @@ class ContextStoreCommand {
 
       printCleanupHuman('Removed context store', payload);
     } catch (error) {
-      this.handleFailure(
+      await this.handleFailure(
+        'context-store:remove',
         options.json,
         { context_store: null, registry: null, files: null, status: [] },
         error
@@ -587,7 +592,7 @@ class ContextStoreCommand {
 
       printListHuman(payload);
     } catch (error) {
-      this.handleFailure(options.json, { context_stores: [], status: [] }, error);
+      await this.handleFailure('context-store:list', options.json, { context_stores: [], status: [] }, error);
     }
   }
 
@@ -602,20 +607,24 @@ class ContextStoreCommand {
 
       printDoctorHuman(payload);
     } catch (error) {
-      this.handleFailure(options.json, { context_stores: [], status: [] }, error);
+      await this.handleFailure('context-store:doctor', options.json, { context_stores: [], status: [] }, error);
     }
   }
 
-  private handleFailure<T extends { status: ContextStoreDiagnostic[] }>(
+  private async handleFailure<T extends { status: ContextStoreDiagnostic[] }>(
+    commandPath: string,
     json: boolean | undefined,
     payload: T,
     error: unknown
-  ): void {
+  ): Promise<void> {
     if (!json && isPromptCancellationError(error)) {
       console.error('Cancelled.');
       process.exitCode = 130;
       return;
     }
+
+    // 中文注释：命令输出保持不变，只补上共享错误上报。
+    await reportUserVisibleError(error, { commandPath, source: 'command' });
 
     const status = asStatus(error);
     if (json) {

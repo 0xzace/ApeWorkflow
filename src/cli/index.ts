@@ -1,6 +1,5 @@
 import { Command } from 'commander';
 import { createRequire } from 'module';
-import ora from 'ora';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { promises as fs } from 'fs';
@@ -20,6 +19,7 @@ import { registerSchemaCommand } from '../commands/schema.js';
 import { registerWorkspaceCommand } from '../commands/workspace.js';
 import { registerContextStoreCommand } from '../commands/context-store.js';
 import { registerInitiativeCommand } from '../commands/initiative.js';
+import { handleCliFailure, installErrorReportingHooks } from './error-handling.js';
 import { findWorkspaceRoot } from '../core/workspace/index.js';
 import {
   statusCommand,
@@ -94,6 +94,9 @@ program.hook('postAction', async () => {
   await shutdown();
 });
 
+// 中文注释：错误 hooks 和 telemetry hooks 一起在启动阶段安装，确保尽早生效。
+installErrorReportingHooks();
+
 const availableToolIds = AI_TOOLS.filter((tool) => tool.skillsDir).map((tool) => tool.value);
 const toolsOptionDescription = `Configure AI tools non-interactively. Use "all", "none", or a comma-separated list of: ${availableToolIds.join(', ')}`;
 
@@ -148,9 +151,7 @@ program
       });
       await initCommand.execute(targetPath);
     } catch (error) {
-      console.log(); // Empty line for spacing
-      ora().fail(`Error: ${(error as Error).message}`);
-      process.exit(1);
+      await handleCliFailure(error, { commandPath: 'init' });
     }
   });
 
@@ -170,9 +171,7 @@ program
       });
       await initCommand.execute('.');
     } catch (error) {
-      console.log();
-      ora().fail(`Error: ${(error as Error).message}`);
-      process.exit(1);
+      await handleCliFailure(error, { commandPath: 'experimental' });
     }
   });
 
@@ -198,9 +197,7 @@ program
 
       await updateCommand.execute(resolvedPath);
     } catch (error) {
-      console.log(); // Empty line for spacing
-      ora().fail(`Error: ${(error as Error).message}`);
-      process.exit(1);
+      await handleCliFailure(error, { commandPath: 'update' });
     }
   });
 
@@ -218,9 +215,7 @@ program
       const sort = options?.sort === 'name' ? 'name' : 'recent';
       await listCommand.execute('.', mode, { sort, json: options?.json });
     } catch (error) {
-      console.log(); // Empty line for spacing
-      ora().fail(`Error: ${(error as Error).message}`);
-      process.exit(1);
+      await handleCliFailure(error, { commandPath: 'archive' });
     }
   });
 
@@ -232,9 +227,7 @@ program
       const viewCommand = new ViewCommand();
       await viewCommand.execute('.');
     } catch (error) {
-      console.log(); // Empty line for spacing
-      ora().fail(`Error: ${(error as Error).message}`);
-      process.exit(1);
+      await handleCliFailure(error, { commandPath: 'view' });
     }
   });
 
@@ -311,9 +304,7 @@ program
       const archiveCommand = new ArchiveCommand();
       await archiveCommand.execute(changeName, options);
     } catch (error) {
-      console.log(); // Empty line for spacing
-      ora().fail(`Error: ${(error as Error).message}`);
-      process.exit(1);
+      await handleCliFailure(error, { commandPath: 'archive' });
     }
   });
 
@@ -341,9 +332,7 @@ program
       const validateCommand = new ValidateCommand();
       await validateCommand.execute(itemName, options);
     } catch (error) {
-      console.log();
-      ora().fail(`Error: ${(error as Error).message}`);
-      process.exit(1);
+      await handleCliFailure(error, { commandPath: 'validate' });
     }
   });
 
@@ -368,9 +357,7 @@ program
       const showCommand = new ShowCommand();
       await showCommand.execute(itemName, options ?? {});
     } catch (error) {
-      console.log();
-      ora().fail(`Error: ${(error as Error).message}`);
-      process.exit(1);
+      await handleCliFailure(error, { commandPath: 'show' });
     }
   });
 
@@ -384,9 +371,7 @@ program
       const feedbackCommand = new FeedbackCommand();
       await feedbackCommand.execute(message, options);
     } catch (error) {
-      console.log();
-      ora().fail(`Error: ${(error as Error).message}`);
-      process.exit(1);
+      await handleCliFailure(error, { commandPath: 'completion:install' });
     }
   });
 
@@ -403,9 +388,7 @@ completionCmd
       const completionCommand = new CompletionCommand();
       await completionCommand.generate({ shell });
     } catch (error) {
-      console.log();
-      ora().fail(`Error: ${(error as Error).message}`);
-      process.exit(1);
+      await handleCliFailure(error, { commandPath: 'completion:uninstall' });
     }
   });
 
@@ -418,9 +401,7 @@ completionCmd
       const completionCommand = new CompletionCommand();
       await completionCommand.install({ shell, verbose: options?.verbose });
     } catch (error) {
-      console.log();
-      ora().fail(`Error: ${(error as Error).message}`);
-      process.exit(1);
+      await handleCliFailure(error, { commandPath: 'status' });
     }
   });
 
@@ -433,9 +414,7 @@ completionCmd
       const completionCommand = new CompletionCommand();
       await completionCommand.uninstall({ shell, yes: options?.yes });
     } catch (error) {
-      console.log();
-      ora().fail(`Error: ${(error as Error).message}`);
-      process.exit(1);
+      await handleCliFailure(error, { commandPath: 'instructions' });
     }
   });
 
@@ -468,9 +447,7 @@ program
     try {
       await statusCommand(options);
     } catch (error) {
-      console.log();
-      ora().fail(`Error: ${(error as Error).message}`);
-      process.exit(1);
+      await handleCliFailure(error, { commandPath: 'templates' });
     }
   });
 
@@ -490,9 +467,7 @@ program
         await instructionsCommand(artifactId, options);
       }
     } catch (error) {
-      console.log();
-      ora().fail(`Error: ${(error as Error).message}`);
-      process.exit(1);
+      await handleCliFailure(error, { commandPath: 'schemas' });
     }
   });
 
@@ -506,9 +481,7 @@ program
     try {
       await templatesCommand(options);
     } catch (error) {
-      console.log();
-      ora().fail(`Error: ${(error as Error).message}`);
-      process.exit(1);
+      await handleCliFailure(error, { commandPath: 'new:change' });
     }
   });
 
@@ -521,9 +494,7 @@ program
     try {
       await schemasCommand(options);
     } catch (error) {
-      console.log();
-      ora().fail(`Error: ${(error as Error).message}`);
-      process.exit(1);
+      await handleCliFailure(error, { commandPath: 'set:change' });
     }
   });
 
@@ -545,9 +516,7 @@ newCmd
     try {
       await newChangeCommand(name, options);
     } catch (error) {
-      console.log();
-      ora().fail(`Error: ${(error as Error).message}`);
-      process.exit(1);
+      await handleCliFailure(error, { commandPath: 'new:change' });
     }
   });
 
@@ -565,9 +534,7 @@ setCmd
     try {
       await setChangeCommand(name, options);
     } catch (error) {
-      console.log();
-      ora().fail(`Error: ${(error as Error).message}`);
-      process.exit(1);
+      await handleCliFailure(error, { commandPath: 'set:change' });
     }
   });
 
