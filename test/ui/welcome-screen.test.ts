@@ -9,7 +9,7 @@ describe('welcome screen', () => {
 
     // 启动页只展示当前可见的工作流命令，不允许回退到旧的隐藏命令。
     expect(welcomeText).toContain('This setup will configure:');
-    expect(welcomeText).toContain('The current ApeWorkflow command surface');
+    expect(welcomeText).toContain('Workflow-driven methodology and the visible command surface');
     expect(welcomeText).toContain('/ape:explore');
     expect(welcomeText).toContain('/ape:propose');
     expect(welcomeText).toContain('/ape:apply');

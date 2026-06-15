@@ -12,6 +12,7 @@
 
 <p align="center">
   ApeWorkflow keeps intent, specs, and implementation in one fluid workflow.
+  The visible commands are just the entry points; the operating model is workflow-driven.
   No API keys required.
 </p>
 
@@ -34,14 +35,15 @@
 ## This Setup Will Configure
 
 - Agent Skills for AI tools
-- The current ApeWorkflow command surface
+- Workflow-driven methodology and the current ApeWorkflow command surface
 - Project-local workflow files
 
 ## Workflow-Driven Methodology
 
 ApeWorkflow is workflow-driven, not just command-driven.
 
-Work moves through a clear path of workflow stages, and each stage carries the right methodology for the job:
+Work moves through a clear path of workflow stages, and each stage carries the right methodology for the job.
+The visible command surface stays small on purpose, while the methodology skills keep the workflow consistent from stage to stage:
 
 - Think through the problem with `explore`
 - Turn intent into a change with `propose`

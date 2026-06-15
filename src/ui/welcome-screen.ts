@@ -36,7 +36,7 @@ export function getWelcomeText(): string[] {
     BRAND_TEXT('This setup will configure:'),
     // 启动页只展示当前可见的工作流能力，不再出现旧的隐藏命令。
     BRAND_MUTED('  • Agent Skills for AI tools'),
-    BRAND_MUTED('  • The current ApeWorkflow command surface'),
+    BRAND_MUTED('  • Workflow-driven methodology and the visible command surface'),
     BRAND_MUTED('  • Project-local workflow files'),
     '',
     BRAND_TEXT('Quick start after setup:'),
