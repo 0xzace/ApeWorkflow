@@ -31,6 +31,12 @@
 >
 > Keep the source of truth in specs, and keep changes explicit.
 
+## This Setup Will Configure
+
+- Agent Skills for AI tools
+- The current ApeWorkflow command surface
+- Project-local workflow files
+
 ## Why ApeWorkflow
 
 ApeWorkflow gives AI-assisted development a shared contract:
@@ -44,29 +50,21 @@ ApeWorkflow gives AI-assisted development a shared contract:
 
 ```mermaid
 flowchart LR
-  A["/ape:explore"] --> B["/ape:propose"]
-  B --> C["/ape:apply"]
-  C --> D["/ape:sync"]
-  D --> E["/ape:archive"]
+  E["/ape:explore"] --> P["/ape:propose"]
+  P --> A["/ape:apply"]
+  A --> V["/ape:verify"]
+  V --> R["/ape:archive"]
 
-  B -. "expanded workflow" .-> N["/ape:new"]
-  N --> F["/ape:continue"]
-  F --> G["/ape:ff"]
-  G --> C
-  C --> H["/ape:verify"]
-  H --> E
+  O["/ape:onboard"] -. "guided walkthrough" .-> P
+  B["/ape:bulk-archive"] -. "archive many changes" .-> R
+  F["/ape:feedback"] -. "send feedback" .-> R
 ```
 
-The default `core` profile uses:
+The visible command surface is:
 
 ```text
-/ape:propose -> /ape:apply -> /ape:sync -> /ape:archive
-```
-
-If you enable the expanded workflow profile, you also get:
-
-```text
-/ape:new -> /ape:continue or /ape:ff -> /ape:apply -> /ape:verify -> /ape:archive
+Core workflow: /ape:explore -> /ape:propose -> /ape:apply -> /ape:archive
+Supporting commands: /ape:verify, /ape:onboard, /ape:bulk-archive, /ape:feedback
 ```
 
 ## What ApeWorkflow Creates
@@ -125,10 +123,16 @@ apeworkflow init
 ### 4. Start the Workflow
 
 ```text
+/ape:onboard
+```
+
+Or jump straight to a change:
+
+```text
 /ape:propose <what-you-want-to-build>
 ```
 
-If you want the expanded workflow, run:
+If you want to refresh generated instructions after setup, run:
 
 ```bash
 apeworkflow config profile
