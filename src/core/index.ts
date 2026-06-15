@@ -16,3 +16,5 @@ export * from './workspace/index.js';
 export * from './context-store/index.js';
 export * from './collections/index.js';
 export * from './planning-home.js';
+// 中文注释：向上层统一暴露错误上报模块，供 CLI 和反馈复用。
+export * from './error-reporting/index.js';

@@ -1,34 +1,12 @@
-import { execSync, execFileSync } from 'child_process';
 import { createRequire } from 'module';
 import os from 'os';
+import {
+  createGitHubIssue,
+  isGitHubCliAuthenticated,
+  isGitHubCliAvailable,
+} from '../core/error-reporting/github.js';
 
 const require = createRequire(import.meta.url);
-
-/**
- * Check if gh CLI is installed and available in PATH
- * Uses platform-appropriate command: 'where' on Windows, 'which' on Unix/macOS
- */
-function isGhInstalled(): boolean {
-  try {
-    const command = process.platform === 'win32' ? 'where gh' : 'which gh';
-    execSync(command, { stdio: 'pipe' });
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Check if gh CLI is authenticated
- */
-function isGhAuthenticated(): boolean {
-  try {
-    execSync('gh auth status', { stdio: 'pipe' });
-    return true;
-  } catch {
-    return false;
-  }
-}
 
 /**
  * Get ApeWorkflow version from package.json
@@ -119,29 +97,17 @@ function displayFormattedFeedback(title: string, body: string): void {
 }
 
 /**
- * Submit feedback via gh CLI
- * Uses execFileSync to prevent shell injection vulnerabilities
+ * 通过共享 GitHub 客户端提交反馈
  */
-function submitViaGhCli(title: string, body: string): void {
+async function submitViaGhCli(title: string, body: string): Promise<void> {
   try {
-    const result = execFileSync(
-      'gh',
-      [
-        'issue',
-        'create',
-        '--repo',
-        '0xzace/ApeWorkflow',
-        '--title',
-        title,
-        '--body',
-        body,
-        '--label',
-        'feedback',
-      ],
-      { encoding: 'utf-8', stdio: 'pipe' }
-    );
+    const { issueUrl } = await createGitHubIssue({
+      repository: '0xzace/ApeWorkflow',
+      title,
+      body,
+      labels: ['feedback'],
+    });
 
-    const issueUrl = result.trim();
     console.log(`\n✓ Feedback submitted successfully!`);
     console.log(`Issue URL: ${issueUrl}\n`);
   } catch (error: any) {
@@ -191,18 +157,18 @@ export class FeedbackCommand {
     const body = formatBody(options?.body);
 
     // Check if gh CLI is installed
-    if (!isGhInstalled()) {
+    if (!isGitHubCliAvailable()) {
       handleFallback(title, body, 'missing');
       return;
     }
 
     // Check if gh CLI is authenticated
-    if (!isGhAuthenticated()) {
+    if (!isGitHubCliAuthenticated()) {
       handleFallback(title, body, 'unauthenticated');
       return;
     }
 
     // Submit via gh CLI
-    submitViaGhCli(title, body);
+    await submitViaGhCli(title, body);
   }
 }

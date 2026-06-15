@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { FeedbackCommand } from '../../src/commands/feedback.js';
 import { execSync, execFileSync } from 'child_process';
+import * as githubClient from '../../src/core/error-reporting/github.js';
 
 // Mock child_process functions
 vi.mock('child_process', () => ({
@@ -150,6 +151,35 @@ describe('FeedbackCommand', () => {
   });
 
   describe('successful feedback submission', () => {
+    // 中文注释：确认 feedback 命令会走共享 GitHub issue 客户端，而不是单独实现。
+    it('should use the shared GitHub issue client', async () => {
+      const createGitHubIssueSpy = vi.spyOn(githubClient, 'createGitHubIssue').mockResolvedValue({
+        issueNumber: 123,
+        issueUrl: 'https://github.com/0xzace/ApeWorkflow/issues/123',
+      });
+
+      mockExecSync.mockImplementation((cmd: string, options?: any) => {
+        if (cmd === 'which gh' || cmd === 'where gh') {
+          return Buffer.from('/usr/local/bin/gh');
+        }
+        if (cmd === 'gh auth status') {
+          return Buffer.from('Logged in');
+        }
+        return '';
+      });
+
+      await feedbackCommand.execute('Great tool!');
+
+      expect(createGitHubIssueSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          repository: '0xzace/ApeWorkflow',
+          title: 'Feedback: Great tool!',
+          body: expect.stringContaining('Submitted via ApeWorkflow CLI'),
+          labels: ['feedback'],
+        })
+      );
+    });
+
     it('should submit feedback via gh CLI when authenticated', async () => {
       const issueUrl = 'https://github.com/0xzace/ApeWorkflow/issues/123';
 
