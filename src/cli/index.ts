@@ -215,7 +215,7 @@ program
       const sort = options?.sort === 'name' ? 'name' : 'recent';
       await listCommand.execute('.', mode, { sort, json: options?.json });
     } catch (error) {
-      await handleCliFailure(error, { commandPath: 'archive' });
+      await handleCliFailure(error, { commandPath: 'list' });
     }
   });
 
@@ -253,8 +253,7 @@ changeCmd
       const changeCommand = new ChangeCommand();
       await changeCommand.show(changeName, options);
     } catch (error) {
-      console.error(`Error: ${(error as Error).message}`);
-      process.exitCode = 1;
+      await handleCliFailure(error, { commandPath: 'change:show' });
     }
   });
 
@@ -269,8 +268,7 @@ changeCmd
       const changeCommand = new ChangeCommand();
       await changeCommand.list(options);
     } catch (error) {
-      console.error(`Error: ${(error as Error).message}`);
-      process.exitCode = 1;
+      await handleCliFailure(error, { commandPath: 'change:list' });
     }
   });
 
@@ -284,12 +282,8 @@ changeCmd
     try {
       const changeCommand = new ChangeCommand();
       await changeCommand.validate(changeName, options);
-      if (typeof process.exitCode === 'number' && process.exitCode !== 0) {
-        process.exit(process.exitCode);
-      }
     } catch (error) {
-      console.error(`Error: ${(error as Error).message}`);
-      process.exitCode = 1;
+      await handleCliFailure(error, { commandPath: 'change:validate' });
     }
   });
 
@@ -371,7 +365,7 @@ program
       const feedbackCommand = new FeedbackCommand();
       await feedbackCommand.execute(message, options);
     } catch (error) {
-      await handleCliFailure(error, { commandPath: 'completion:install' });
+      await handleCliFailure(error, { commandPath: 'feedback' });
     }
   });
 
@@ -388,7 +382,7 @@ completionCmd
       const completionCommand = new CompletionCommand();
       await completionCommand.generate({ shell });
     } catch (error) {
-      await handleCliFailure(error, { commandPath: 'completion:uninstall' });
+      await handleCliFailure(error, { commandPath: 'completion:generate' });
     }
   });
 
@@ -401,7 +395,7 @@ completionCmd
       const completionCommand = new CompletionCommand();
       await completionCommand.install({ shell, verbose: options?.verbose });
     } catch (error) {
-      await handleCliFailure(error, { commandPath: 'status' });
+      await handleCliFailure(error, { commandPath: 'completion:install' });
     }
   });
 
@@ -414,7 +408,7 @@ completionCmd
       const completionCommand = new CompletionCommand();
       await completionCommand.uninstall({ shell, yes: options?.yes });
     } catch (error) {
-      await handleCliFailure(error, { commandPath: 'instructions' });
+      await handleCliFailure(error, { commandPath: 'completion:uninstall' });
     }
   });
 
@@ -481,7 +475,7 @@ program
     try {
       await templatesCommand(options);
     } catch (error) {
-      await handleCliFailure(error, { commandPath: 'new:change' });
+      await handleCliFailure(error, { commandPath: 'templates' });
     }
   });
 
@@ -494,7 +488,7 @@ program
     try {
       await schemasCommand(options);
     } catch (error) {
-      await handleCliFailure(error, { commandPath: 'set:change' });
+      await handleCliFailure(error, { commandPath: 'schemas' });
     }
   });
 

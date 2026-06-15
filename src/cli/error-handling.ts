@@ -17,6 +17,14 @@ function toReportContext(
   };
 }
 
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return String(error);
+}
+
 export async function reportUserVisibleError(
   error: unknown,
   context: { commandPath: string; source?: ErrorReportSource }
@@ -40,7 +48,8 @@ export async function handleCliFailure(
   });
 
   console.log();
-  ora().fail(`Error: ${(error as Error).message}`);
+  // 中文注释：这里要兼容 string / object 异常，不能只读取 Error.message。
+  ora().fail(`Error: ${getErrorMessage(error)}`);
   process.exit(1);
 }
 

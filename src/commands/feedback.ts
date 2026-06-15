@@ -118,8 +118,8 @@ async function submitViaGhCli(title: string, body: string): Promise<void> {
       console.error(error.message);
     }
 
-    // Exit with the same code as gh CLI
-    process.exit(error.status ?? 1);
+    // 中文注释：把失败继续抛给 CLI 顶层统一处理，这样也能走自动错误上报。
+    throw error;
   }
 }
 

@@ -357,12 +357,10 @@ describe('FeedbackCommand', () => {
         throw error;
       });
 
-      try {
-        await feedbackCommand.execute('Test');
-      } catch (error: any) {
-        // Should exit with the same code as gh CLI
-        expect(error.message).toBe('process.exit(1)');
-      }
+      await expect(feedbackCommand.execute('Test')).rejects.toMatchObject({
+        message: 'Network error',
+        status: 1,
+      });
 
       // Should display the error from gh CLI
       expect(consoleErrorSpy).toHaveBeenCalledWith(

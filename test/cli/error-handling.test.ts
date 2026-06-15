@@ -59,6 +59,21 @@ describe('cli/error-handling', () => {
     exitSpy.mockRestore();
   });
 
+  it('formats string failures without dropping the message', async () => {
+    const exitSpy = vi.spyOn(process, 'exit').mockImplementation((code?: number | string | null) => {
+      throw new Error(`process.exit(${code})`);
+    });
+
+    await expect(
+      handleCliFailure('boom', {
+        commandPath: 'feedback',
+      })
+    ).rejects.toThrow('process.exit(1)');
+
+    expect(cliErrorHandlingMocks.oraFailSpy).toHaveBeenCalledWith('Error: boom');
+    exitSpy.mockRestore();
+  });
+
   it('registers uncaughtException and unhandledRejection hooks', () => {
     const onSpy = vi.spyOn(process, 'on');
 
