@@ -8,7 +8,7 @@
   </a>
 </p>
 
-<p align="center"><strong>Spec-driven development for AI coding assistants.</strong></p>
+<p align="center"><strong>Spec-driven, workflow-driven development for AI coding assistants.</strong></p>
 
 <p align="center">
   ApeWorkflow keeps intent, specs, and implementation in one fluid workflow.
@@ -36,6 +36,20 @@
 - Agent Skills for AI tools
 - The current ApeWorkflow command surface
 - Project-local workflow files
+
+## Workflow-Driven Methodology
+
+ApeWorkflow is workflow-driven, not just command-driven.
+
+Work moves through a clear path of workflow stages, and each stage carries the right methodology for the job:
+
+- Think through the problem with `explore`
+- Turn intent into a change with `propose`
+- Execute the work with `apply`
+- Check the result with `verify`
+- Close it out with `archive`
+
+The methodology skills stay available as the internal playbook for those stages, so the workflow stays consistent instead of becoming a loose collection of prompts.
 
 ## Why ApeWorkflow
 
