@@ -5,6 +5,7 @@
 
 import chalk from 'chalk';
 import { WELCOME_ANIMATION } from './ascii-patterns.js';
+import { getVisibleCommandEntries } from '../core/templates/visible-command-surface.js';
 
 // Minimum terminal width for side-by-side layout
 const MIN_WIDTH = 60;
@@ -18,23 +19,28 @@ const BRAND_TEXT = chalk.hex('#E2E8F0');
 const BRAND_MUTED = chalk.hex('#94A3B8');
 const BRAND_CYAN = chalk.hex('#5EEAD4');
 
+const visibleCommandEntries = getVisibleCommandEntries();
+
+function renderVisibleCommandLine(commandId: string, description: string): string {
+  return `  ${BRAND_GOLD(`/ape:${commandId}`)} ${BRAND_MUTED(description)}`;
+}
+
 /**
  * Welcome text content (right column)
  */
-function getWelcomeText(): string[] {
+export function getWelcomeText(): string[] {
   return [
     BRAND_GOLD.bold('ApeWorkflow'),
     BRAND_MUTED('Spec-driven workflow for AI coding assistants'),
     '',
     BRAND_TEXT('This setup will configure:'),
+    // 启动页只展示当前可见的工作流能力，不再出现旧的隐藏命令。
     BRAND_MUTED('  • Agent Skills for AI tools'),
-    BRAND_MUTED('  • /ape:* slash commands'),
+    BRAND_MUTED('  • The current ApeWorkflow command surface'),
     BRAND_MUTED('  • Project-local workflow files'),
     '',
     BRAND_TEXT('Quick start after setup:'),
-    `  ${BRAND_GOLD('/ape:new')}      ${BRAND_MUTED('Create a change')}`,
-    `  ${BRAND_GOLD('/ape:continue')} ${BRAND_MUTED('Next artifact')}`,
-    `  ${BRAND_GOLD('/ape:apply')}    ${BRAND_MUTED('Implement tasks')}`,
+    ...visibleCommandEntries.map((command) => renderVisibleCommandLine(command.id, command.description)),
     '',
     BRAND_CYAN('Press Enter to select tools...'),
   ];

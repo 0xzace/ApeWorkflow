@@ -39,6 +39,11 @@ const ADDITIONAL_VISIBLE_COMMAND_IDS: readonly VisibleCommandId[] = VISIBLE_COMM
   .filter((command) => command.group === 'additional')
   .map((command) => command.id);
 
+export function getVisibleCommandEntries(): readonly VisibleCommandEntry[] {
+  // 启动页和引导页都从这里读取同一份可见命令清单，避免文案各自漂移。
+  return VISIBLE_COMMANDS;
+}
+
 function renderCommandRows(commandIds: readonly VisibleCommandId[]): string {
   return commandIds
     .map((commandId) => {
