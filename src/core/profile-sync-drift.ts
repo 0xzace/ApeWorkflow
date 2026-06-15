@@ -5,8 +5,13 @@ import type { Delivery } from './global-config.js';
 import { ALL_WORKFLOWS } from './profiles.js';
 import { CommandAdapterRegistry } from './command-generation/index.js';
 import { COMMAND_IDS, getConfiguredTools } from './shared/index.js';
+import { VISIBLE_COMMAND_IDS } from './templates/visible-command-surface.js';
 
 type WorkflowId = (typeof ALL_WORKFLOWS)[number];
+const INSTALL_COMMAND_IDS = Array.from(new Set<string>([
+  ...COMMAND_IDS,
+  ...VISIBLE_COMMAND_IDS,
+]));
 
 /**
  * Maps workflow IDs to their skill directory names.
@@ -39,7 +44,7 @@ export function toolHasAnyConfiguredCommand(projectPath: string, toolId: string)
   const adapter = CommandAdapterRegistry.get(toolId);
   if (!adapter) return false;
 
-  for (const commandId of COMMAND_IDS) {
+  for (const commandId of INSTALL_COMMAND_IDS) {
     const cmdPath = adapter.getFilePath(commandId);
     const fullPath = path.isAbsolute(cmdPath) ? cmdPath : path.join(projectPath, cmdPath);
     if (fs.existsSync(fullPath)) {
@@ -130,26 +135,28 @@ export function hasToolProfileOrDeliveryDrift(
   }
 
   if (shouldGenerateCommands && adapter) {
-    for (const workflow of knownDesiredWorkflows) {
-      const cmdPath = adapter.getFilePath(workflow);
+    const desiredCommandSet = new Set<string>(VISIBLE_COMMAND_IDS);
+
+    for (const commandId of VISIBLE_COMMAND_IDS) {
+      const cmdPath = adapter.getFilePath(commandId);
       const fullPath = path.isAbsolute(cmdPath) ? cmdPath : path.join(projectPath, cmdPath);
       if (!fs.existsSync(fullPath)) {
         return true;
       }
     }
 
-    // Deselecting workflows in a profile should trigger sync.
-    for (const workflow of ALL_WORKFLOWS) {
-      if (desiredWorkflowSet.has(workflow)) continue;
-      const cmdPath = adapter.getFilePath(workflow);
+    // Extra generated commands outside the visible surface should trigger sync.
+    for (const commandId of INSTALL_COMMAND_IDS) {
+      if (desiredCommandSet.has(commandId)) continue;
+      const cmdPath = adapter.getFilePath(commandId);
       const fullPath = path.isAbsolute(cmdPath) ? cmdPath : path.join(projectPath, cmdPath);
       if (fs.existsSync(fullPath)) {
         return true;
       }
     }
   } else if (!shouldGenerateCommands && adapter) {
-    for (const workflow of ALL_WORKFLOWS) {
-      const cmdPath = adapter.getFilePath(workflow);
+    for (const commandId of INSTALL_COMMAND_IDS) {
+      const cmdPath = adapter.getFilePath(commandId);
       const fullPath = path.isAbsolute(cmdPath) ? cmdPath : path.join(projectPath, cmdPath);
       if (fs.existsSync(fullPath)) {
         return true;
@@ -175,43 +182,6 @@ export function getToolsNeedingProfileSync(
   );
 }
 
-function getInstalledWorkflowsForTool(
-  projectPath: string,
-  toolId: string,
-  options: { includeSkills: boolean; includeCommands: boolean }
-): WorkflowId[] {
-  const tool = AI_TOOLS.find((t) => t.value === toolId);
-  if (!tool?.skillsDir) return [];
-
-  const installed = new Set<WorkflowId>();
-  const skillsDir = path.join(projectPath, tool.skillsDir, 'skills');
-
-  if (options.includeSkills) {
-    for (const workflow of ALL_WORKFLOWS) {
-      const dirName = WORKFLOW_TO_SKILL_DIR[workflow];
-      const skillFile = path.join(skillsDir, dirName, 'SKILL.md');
-      if (fs.existsSync(skillFile)) {
-        installed.add(workflow);
-      }
-    }
-  }
-
-  if (options.includeCommands) {
-    const adapter = CommandAdapterRegistry.get(toolId);
-    if (adapter) {
-      for (const workflow of ALL_WORKFLOWS) {
-        const cmdPath = adapter.getFilePath(workflow);
-        const fullPath = path.isAbsolute(cmdPath) ? cmdPath : path.join(projectPath, cmdPath);
-        if (fs.existsSync(fullPath)) {
-          installed.add(workflow);
-        }
-      }
-    }
-  }
-
-  return [...installed];
-}
-
 /**
  * Detects whether the current project has any profile/delivery drift.
  */
@@ -223,17 +193,6 @@ export function hasProjectConfigDrift(
   const configuredTools = getConfiguredToolsForProfileSync(projectPath);
   if (getToolsNeedingProfileSync(projectPath, desiredWorkflows, delivery, configuredTools).length > 0) {
     return true;
-  }
-
-  const desiredSet = new Set(toKnownWorkflows(desiredWorkflows));
-  const includeSkills = delivery !== 'commands';
-  const includeCommands = delivery !== 'skills';
-
-  for (const toolId of configuredTools) {
-    const installed = getInstalledWorkflowsForTool(projectPath, toolId, { includeSkills, includeCommands });
-    if (installed.some((workflow) => !desiredSet.has(workflow))) {
-      return true;
-    }
   }
 
   return false;

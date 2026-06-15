@@ -17,6 +17,7 @@ import {
   getOnboardSkillTemplate,
   getApeProposeSkillTemplate,
   getFeedbackSkillTemplate,
+  getApeFeedbackCommandTemplate,
   getBrainstormingSkillTemplate,
   getDispatchingParallelAgentsSkillTemplate,
   getExecutingPlansSkillTemplate,
@@ -61,6 +62,7 @@ import {
 } from '../templates/skill-templates.js';
 import type { WorkflowId } from '../profiles.js';
 import type { CommandContent } from '../command-generation/index.js';
+import { VISIBLE_COMMAND_IDS } from '../templates/visible-command-surface.js';
 
 /**
  * Skill template with directory name and workflow ID mapping.
@@ -201,6 +203,28 @@ export function getCommandTemplates(workflowFilter?: readonly string[]): Command
 export function getCommandContents(workflowFilter?: readonly string[]): CommandContent[] {
   const commandTemplates = getCommandTemplates(workflowFilter);
   return commandTemplates.map(({ template, id }) => ({
+    id,
+    name: template.name,
+    description: template.description,
+    category: template.category,
+    tags: template.tags,
+    body: template.content,
+  }));
+}
+
+const VISIBLE_COMMAND_TEMPLATES: Array<{ id: (typeof VISIBLE_COMMAND_IDS)[number]; template: CommandTemplate }> = [
+  { id: 'explore', template: getApeExploreCommandTemplate() },
+  { id: 'propose', template: getApeProposeCommandTemplate() },
+  { id: 'apply', template: getApeApplyCommandTemplate() },
+  { id: 'verify', template: getApeVerifyCommandTemplate() },
+  { id: 'archive', template: getApeArchiveCommandTemplate() },
+  { id: 'onboard', template: getApeOnboardCommandTemplate() },
+  { id: 'bulk-archive', template: getApeBulkArchiveCommandTemplate() },
+  { id: 'feedback', template: getApeFeedbackCommandTemplate() },
+] as const;
+
+export function getVisibleCommandContents(): CommandContent[] {
+  return VISIBLE_COMMAND_TEMPLATES.map(({ id, template }) => ({
     id,
     name: template.name,
     description: template.description,

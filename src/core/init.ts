@@ -18,6 +18,7 @@ import {
   AIToolOption,
 } from './config.js';
 import { PALETTE } from './styles/palette.js';
+import { VISIBLE_COMMAND_IDS } from './templates/visible-command-surface.js';
 import { isInteractive } from '../utils/interactive.js';
 import { serializeConfig } from './config-prompts.js';
 import {
@@ -33,11 +34,12 @@ import {
 } from './legacy-cleanup.js';
 import {
   SKILL_NAMES,
+  COMMAND_IDS,
   getToolsWithSkillsDir,
   getToolSkillStatus,
   getToolStates,
   getSkillTemplates,
-  getCommandContents,
+  getVisibleCommandContents,
   generateSkillContent,
   type ToolSkillStatus,
 } from './shared/index.js';
@@ -73,6 +75,11 @@ const WORKFLOW_TO_SKILL_DIR: Record<string, string> = {
   'onboard': 'apeworkflow-onboard',
   'propose': 'apeworkflow-propose',
 };
+
+const INSTALL_COMMAND_IDS = Array.from(new Set<string>([
+  ...COMMAND_IDS,
+  ...VISIBLE_COMMAND_IDS,
+]));
 
 // -----------------------------------------------------------------------------
 // Types
@@ -519,7 +526,7 @@ export class InitCommand {
     const shouldGenerateSkills = delivery !== 'commands';
     const shouldGenerateCommands = delivery !== 'skills';
     const skillTemplates = shouldGenerateSkills ? getSkillTemplates(workflows) : [];
-    const commandContents = shouldGenerateCommands ? getCommandContents(workflows) : [];
+    const commandContents = shouldGenerateCommands ? getVisibleCommandContents() : [];
 
     // Process each tool
     for (const tool of tools) {
@@ -555,6 +562,11 @@ export class InitCommand {
           const adapter = CommandAdapterRegistry.get(tool.value);
           if (adapter) {
             const generatedCommands = generateCommands(commandContents, adapter);
+            removedCommandCount += await this.removeCommandFiles(
+              projectPath,
+              tool.value,
+              commandContents.map((command) => command.id)
+            );
 
             for (const cmd of generatedCommands) {
               const commandFile = path.isAbsolute(cmd.path) ? cmd.path : path.join(projectPath, cmd.path);
@@ -657,7 +669,7 @@ export class InitCommand {
       const workflows = getProfileWorkflows(profile, globalConfig.workflows);
       const toolDirs = [...new Set(successfulTools.map((t) => t.skillsDir))].join(', ');
       const skillCount = delivery !== 'commands' ? getSkillTemplates(workflows).length : 0;
-      const commandCount = delivery !== 'skills' ? getCommandContents(workflows).length : 0;
+      const commandCount = delivery !== 'skills' ? getVisibleCommandContents().length : 0;
       if (skillCount > 0 && commandCount > 0) {
         console.log(`${skillCount} skills and ${commandCount} commands in ${toolDirs}/`);
       } else if (skillCount > 0) {
@@ -755,13 +767,23 @@ export class InitCommand {
     return removed;
   }
 
-  private async removeCommandFiles(projectPath: string, toolId: string): Promise<number> {
+  private async removeCommandFiles(
+    projectPath: string,
+    toolId: string,
+    desiredCommandIds: readonly string[]
+  ): Promise<number> {
     let removed = 0;
     const adapter = CommandAdapterRegistry.get(toolId);
     if (!adapter) return 0;
 
-    for (const workflow of ALL_WORKFLOWS) {
-      const cmdPath = adapter.getFilePath(workflow);
+    const desiredSet = new Set(desiredCommandIds);
+
+    for (const commandId of INSTALL_COMMAND_IDS) {
+      if (desiredSet.has(commandId)) {
+        continue;
+      }
+
+      const cmdPath = adapter.getFilePath(commandId);
       const fullPath = path.isAbsolute(cmdPath) ? cmdPath : path.join(projectPath, cmdPath);
 
       try {

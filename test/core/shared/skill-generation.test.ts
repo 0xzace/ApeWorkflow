@@ -3,6 +3,7 @@ import {
   getSkillTemplates,
   getCommandTemplates,
   getCommandContents,
+  getVisibleCommandContents,
   generateSkillContent,
 } from '../../../src/core/shared/skill-generation.js';
 
@@ -212,6 +213,25 @@ describe('skill-generation', () => {
       const all = getCommandContents();
       const noFilter = getCommandContents(undefined);
       expect(noFilter).toHaveLength(all.length);
+    });
+  });
+
+  describe('getVisibleCommandContents', () => {
+    it('should return the eight visible command contents', () => {
+      const contents = getVisibleCommandContents();
+      const ids = contents.map((content) => content.id);
+
+      expect(contents).toHaveLength(8);
+      expect(ids).toEqual([
+        'explore',
+        'propose',
+        'apply',
+        'verify',
+        'archive',
+        'onboard',
+        'bulk-archive',
+        'feedback',
+      ]);
     });
   });
 

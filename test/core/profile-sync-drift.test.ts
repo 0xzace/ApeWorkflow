@@ -8,6 +8,7 @@ import {
 } from '../../src/core/profile-sync-drift.js';
 import { CORE_WORKFLOWS } from '../../src/core/profiles.js';
 import { CommandAdapterRegistry } from '../../src/core/command-generation/index.js';
+import { VISIBLE_COMMAND_IDS } from '../../src/core/templates/visible-command-surface.js';
 
 function writeSkill(projectDir: string, workflowId: string): void {
   const skillDirName = WORKFLOW_TO_SKILL_DIR[workflowId as keyof typeof WORKFLOW_TO_SKILL_DIR];
@@ -32,8 +33,9 @@ function setupCoreSkills(projectDir: string): void {
 }
 
 function setupCoreCommands(projectDir: string): void {
-  for (const workflow of CORE_WORKFLOWS) {
-    writeCommand(projectDir, workflow);
+  // 这里按当前“可见命令”口径写入，避免测试仍按旧的 5 个核心工作流命令生成。
+  for (const commandId of VISIBLE_COMMAND_IDS) {
+    writeCommand(projectDir, commandId);
   }
 }
 

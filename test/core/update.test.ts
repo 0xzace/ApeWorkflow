@@ -220,7 +220,7 @@ Old instructions content
       expect(content).toContain('tags:');
     });
 
-    it('should update core profile ape commands when tool is configured', async () => {
+    it('should update the visible command surface when tool is configured', async () => {
       // Set up a configured tool
       const skillsDir = path.join(testDir, '.claude', 'skills');
       await fs.mkdir(path.join(skillsDir, 'apeworkflow-explore'), {
@@ -233,18 +233,18 @@ Old instructions content
 
       await updateCommand.execute(testDir);
 
-      // Verify core profile commands were created (propose, explore, apply, sync, archive)
-      const coreCommandIds = ['explore', 'apply', 'sync', 'archive', 'propose'];
+      // Verify the visible command surface was created
+      const visibleCommandIds = ['explore', 'propose', 'apply', 'verify', 'archive', 'onboard', 'bulk-archive', 'feedback'];
       const commandsDir = path.join(testDir, '.claude', 'commands', 'ape');
-      for (const cmdId of coreCommandIds) {
+      for (const cmdId of visibleCommandIds) {
         const cmdFile = path.join(commandsDir, `${cmdId}.md`);
         const exists = await FileSystemUtils.fileExists(cmdFile);
         expect(exists).toBe(true);
       }
 
-      // Verify non-core commands are NOT created
-      const nonCoreCommandIds = ['new', 'continue', 'ff', 'bulk-archive', 'verify'];
-      for (const cmdId of nonCoreCommandIds) {
+      // Verify hidden commands are NOT created
+      const hiddenCommandIds = ['new', 'continue', 'ff', 'sync'];
+      for (const cmdId of hiddenCommandIds) {
         const cmdFile = path.join(commandsDir, `${cmdId}.md`);
         const exists = await FileSystemUtils.fileExists(cmdFile);
         expect(exists).toBe(false);
@@ -1358,7 +1358,7 @@ More user content after markers.
       expect(exists).toBe(true);
     });
 
-    it('should not inject non-profile workflows when upgrading legacy tools', async () => {
+    it('should keep the visible command surface when upgrading legacy tools', async () => {
       setMockConfig({
         featureFlags: {},
         profile: 'custom',
@@ -1389,7 +1389,7 @@ More user content after markers.
       )).toBe(true);
       expect(await FileSystemUtils.fileExists(
         path.join(commandsDir, 'propose.md')
-      )).toBe(false);
+      )).toBe(true);
     });
   });
 

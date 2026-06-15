@@ -23,6 +23,7 @@ import {
   getApeSyncCommandTemplate,
   getApeProposeCommandTemplate,
   getApeProposeSkillTemplate,
+  getApeFeedbackCommandTemplate,
   getApeVerifyCommandTemplate,
   getSyncSpecsSkillTemplate,
   getVerifyChangeSkillTemplate,
@@ -52,6 +53,7 @@ const EXPECTED_FUNCTION_HASHES: Record<string, string> = {
   getApeVerifyCommandTemplate: '4c666c6452a32a3c53efe225a03e206dfd2362f00a22260124bbea7f7b8a32a9',
   getApeProposeSkillTemplate: '28e57ae4cd5ea155b43b9a971843bb0444ff7fd62155a55009be638780c4778a',
   getApeProposeCommandTemplate: '42b897c1c42e9485ce2318826aeadfe964f0f6e7b685f20c008c123a28cf7a2a',
+  getApeFeedbackCommandTemplate: '64a41ece5a3dcb7f5806af0e178c74e396d2b03c6437ad87c847220f693b207b',
   getFeedbackSkillTemplate: '1062057eab299213fdc18db1922cc0b94030c2db04ce80e0641bf3b920cfb92f',
 };
 
@@ -114,6 +116,7 @@ describe('skill templates split parity', () => {
       getApeVerifyCommandTemplate,
       getApeProposeSkillTemplate,
       getApeProposeCommandTemplate,
+      getApeFeedbackCommandTemplate,
       getFeedbackSkillTemplate,
     };
 

@@ -20,7 +20,8 @@ import {
 import {
   getToolVersionStatus,
   getSkillTemplates,
-  getCommandContents,
+  COMMAND_IDS,
+  getVisibleCommandContents,
   generateSkillContent,
   getToolsWithSkillsDir,
   type ToolVersionStatus,
@@ -37,6 +38,7 @@ import { isInteractive } from '../utils/interactive.js';
 import { getGlobalConfig, type Delivery, type Profile } from './global-config.js';
 import { getProfileWorkflows, ALL_WORKFLOWS } from './profiles.js';
 import { getAvailableTools } from './available-tools.js';
+import { VISIBLE_COMMAND_IDS } from './templates/visible-command-surface.js';
 import {
   WORKFLOW_TO_SKILL_DIR,
   getCommandConfiguredTools,
@@ -51,6 +53,10 @@ import {
 const require = createRequire(import.meta.url);
 const { version: APEWORKFLOW_VERSION } = require('../../package.json');
 const OLD_CORE_WORKFLOWS = ['propose', 'explore', 'apply', 'archive'] as const;
+const INSTALL_COMMAND_IDS = Array.from(new Set<string>([
+  ...COMMAND_IDS,
+  ...VISIBLE_COMMAND_IDS,
+]));
 
 /**
  * Options for the update command.
@@ -170,7 +176,7 @@ export class UpdateCommand {
 
     // 9. Determine what to generate based on delivery
     const skillTemplates = shouldGenerateSkills ? getSkillTemplates(desiredWorkflows) : [];
-    const commandContents = shouldGenerateCommands ? getCommandContents(desiredWorkflows) : [];
+    const commandContents = shouldGenerateCommands ? getVisibleCommandContents() : [];
 
     // 10. Update tools (all if force, otherwise only those needing update)
     const toolsToUpdate = this.force ? configuredTools : [...toolsToUpdateSet];
@@ -215,17 +221,16 @@ export class UpdateCommand {
           const adapter = CommandAdapterRegistry.get(tool.value);
           if (adapter) {
             const generatedCommands = generateCommands(commandContents, adapter);
+            removedDeselectedCommandCount += await this.removeUnselectedCommandFiles(
+              resolvedProjectPath,
+              toolId,
+              commandContents.map((command) => command.id)
+            );
 
             for (const cmd of generatedCommands) {
               const commandFile = path.isAbsolute(cmd.path) ? cmd.path : path.join(resolvedProjectPath, cmd.path);
               await FileSystemUtils.writeFile(commandFile, cmd.fileContent);
             }
-
-            removedDeselectedCommandCount += await this.removeUnselectedCommandFiles(
-              resolvedProjectPath,
-              toolId,
-              desiredWorkflows
-            );
           }
         }
 
@@ -450,7 +455,7 @@ export class UpdateCommand {
   }
 
   /**
-   * Removes command files for workflows when delivery changed to skills-only.
+   * Removes generated command files when delivery changed to skills-only.
    * Returns the number of files removed.
    */
   private async removeCommandFiles(
@@ -462,8 +467,8 @@ export class UpdateCommand {
     const adapter = CommandAdapterRegistry.get(toolId);
     if (!adapter) return 0;
 
-    for (const workflow of ALL_WORKFLOWS) {
-      const cmdPath = adapter.getFilePath(workflow);
+    for (const commandId of INSTALL_COMMAND_IDS) {
+      const cmdPath = adapter.getFilePath(commandId);
       const fullPath = path.isAbsolute(cmdPath) ? cmdPath : path.join(projectPath, cmdPath);
 
       try {
@@ -480,24 +485,24 @@ export class UpdateCommand {
   }
 
   /**
-   * Removes command files for workflows that are no longer selected in the active profile.
+   * Removes generated command files that are no longer part of the desired command surface.
    * Returns the number of files removed.
    */
   private async removeUnselectedCommandFiles(
     projectPath: string,
     toolId: string,
-    desiredWorkflows: readonly (typeof ALL_WORKFLOWS)[number][]
+    desiredCommandIds: readonly string[]
   ): Promise<number> {
     let removed = 0;
 
     const adapter = CommandAdapterRegistry.get(toolId);
     if (!adapter) return 0;
 
-    const desiredSet = new Set(desiredWorkflows);
+    const desiredSet = new Set(desiredCommandIds);
 
-    for (const workflow of ALL_WORKFLOWS) {
-      if (desiredSet.has(workflow)) continue;
-      const cmdPath = adapter.getFilePath(workflow);
+    for (const commandId of INSTALL_COMMAND_IDS) {
+      if (desiredSet.has(commandId)) continue;
+      const cmdPath = adapter.getFilePath(commandId);
       const fullPath = path.isAbsolute(cmdPath) ? cmdPath : path.join(projectPath, cmdPath);
 
       try {
@@ -673,7 +678,7 @@ export class UpdateCommand {
     const shouldGenerateSkills = delivery !== 'commands';
     const shouldGenerateCommands = delivery !== 'skills';
     const skillTemplates = shouldGenerateSkills ? getSkillTemplates(desiredWorkflows) : [];
-    const commandContents = shouldGenerateCommands ? getCommandContents(desiredWorkflows) : [];
+    const commandContents = shouldGenerateCommands ? getVisibleCommandContents() : [];
 
     for (const toolId of selectedTools) {
       const tool = AI_TOOLS.find((t) => t.value === toolId);

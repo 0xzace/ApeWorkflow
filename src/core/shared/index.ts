@@ -34,5 +34,6 @@ export {
   isGlobalEntry,
   getCommandTemplates,
   getCommandContents,
+  getVisibleCommandContents,
   generateSkillContent,
 } from './skill-generation.js';

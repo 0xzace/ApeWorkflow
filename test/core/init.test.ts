@@ -116,35 +116,37 @@ describe('InitCommand', () => {
       }
     });
 
-    it('should create core profile commands for Claude Code by default', async () => {
+    it('should create the visible command surface for Claude Code by default', async () => {
       const initCommand = new InitCommand({ tools: 'claude', force: true });
 
       await initCommand.execute(testDir);
 
-      // Core profile: propose, explore, apply, sync, archive
-      const coreCommandNames = [
-        'ape/propose.md',
+      // Visible command surface: explore, propose, apply, verify, archive, onboard, bulk-archive, feedback
+      const visibleCommandNames = [
         'ape/explore.md',
+        'ape/propose.md',
         'ape/apply.md',
-        'ape/sync.md',
+        'ape/verify.md',
         'ape/archive.md',
+        'ape/onboard.md',
+        'ape/bulk-archive.md',
+        'ape/feedback.md',
       ];
 
-      for (const cmdName of coreCommandNames) {
+      for (const cmdName of visibleCommandNames) {
         const cmdFile = path.join(testDir, '.claude', 'commands', cmdName);
         expect(await fileExists(cmdFile)).toBe(true);
       }
 
-      // Non-core commands should NOT be created
-      const nonCoreCommandNames = [
+      // Hidden commands should NOT be created
+      const hiddenCommandNames = [
         'ape/new.md',
         'ape/continue.md',
         'ape/ff.md',
-        'ape/bulk-archive.md',
-        'ape/verify.md',
+        'ape/sync.md',
       ];
 
-      for (const cmdName of nonCoreCommandNames) {
+      for (const cmdName of hiddenCommandNames) {
         const cmdFile = path.join(testDir, '.claude', 'commands', cmdName);
         expect(await fileExists(cmdFile)).toBe(false);
       }
@@ -650,7 +652,7 @@ describe('InitCommand - profile and detection features', () => {
     expect(await fileExists(proposeSkill)).toBe(false);
   });
 
-  it('should migrate commands-only extend mode to custom profile without injecting propose', async () => {
+  it('should migrate commands-only extend mode to custom profile and keep the visible command surface', async () => {
     await fs.mkdir(path.join(testDir, 'apeworkflow'), { recursive: true });
     await fs.mkdir(path.join(testDir, '.claude', 'commands', 'ape'), { recursive: true });
     await fs.writeFile(path.join(testDir, '.claude', 'commands', 'ape', 'explore.md'), '# explore\n');
@@ -666,7 +668,7 @@ describe('InitCommand - profile and detection features', () => {
     const exploreCommand = path.join(testDir, '.claude', 'commands', 'ape', 'explore.md');
     const proposeCommand = path.join(testDir, '.claude', 'commands', 'ape', 'propose.md');
     expect(await fileExists(exploreCommand)).toBe(true);
-    expect(await fileExists(proposeCommand)).toBe(false);
+    expect(await fileExists(proposeCommand)).toBe(true);
 
     const exploreSkill = path.join(testDir, '.claude', 'skills', 'apeworkflow-explore', 'SKILL.md');
     const proposeSkill = path.join(testDir, '.claude', 'skills', 'apeworkflow-propose', 'SKILL.md');

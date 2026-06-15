@@ -17,7 +17,7 @@ export { getBulkArchiveChangeSkillTemplate, getApeBulkArchiveCommandTemplate } f
 export { getVerifyChangeSkillTemplate, getApeVerifyCommandTemplate } from './workflows/verify-change.js';
 export { getOnboardSkillTemplate, getApeOnboardCommandTemplate } from './workflows/onboard.js';
 export { getApeProposeSkillTemplate, getApeProposeCommandTemplate } from './workflows/propose.js';
-export { getFeedbackSkillTemplate } from './workflows/feedback.js';
+export { getFeedbackSkillTemplate, getApeFeedbackCommandTemplate } from './workflows/feedback.js';
 export { getBrainstormingSkillTemplate } from './workflows/apeworkflow-brainstorming.js';
 export { getDispatchingParallelAgentsSkillTemplate } from './workflows/apeworkflow-dispatching-parallel-agents.js';
 export { getExecutingPlansSkillTemplate } from './workflows/apeworkflow-executing-plans.js';
