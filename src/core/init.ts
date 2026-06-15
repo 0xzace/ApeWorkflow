@@ -577,7 +577,8 @@ export class InitCommand {
           }
         }
         if (!shouldGenerateCommands) {
-          removedCommandCount += await this.removeCommandFiles(projectPath, tool.value);
+          // skills-only 模式下清理所有命令文件，第三个参数用空数组表示不保留任何命令。
+          removedCommandCount += await this.removeCommandFiles(projectPath, tool.value, []);
         }
 
         spinner.succeed(`Setup complete for ${tool.name}`);
