@@ -10,9 +10,10 @@ export function getNewChangeSkillTemplate(): SkillTemplate {
   return {
     name: 'apeworkflow-new-change',
     description: 'Start a new ApeWorkflow change using the experimental artifact workflow. Use when the user wants to create a new feature, fix, or modification with a structured step-by-step approach.',
+    // 这里只保留自然语言引导，不展示隐藏命令。
     instructions: `Start a new change using the experimental artifact-driven approach.
 
-**Input**: The user's request should include a change name (kebab-case) OR a description of what they want to build.
+**Input**: The user's request should include a change name (kebab-case) or a description of what they want to build.
 
 **Steps**
 
@@ -65,13 +66,13 @@ After completing the steps, summarize:
 - Schema/workflow being used and its artifact sequence
 - Current status (0/N artifacts complete)
 - The template for the first artifact
-- Prompt: "Ready to create the first artifact? Just describe what this change is about and I'll draft it, or ask me to continue."
+- Prompt: "Ready to create the first artifact? Just describe what this change is about and I'll draft it."
 
 **Guardrails**
 - Do NOT create any artifacts yet - just show the instructions
 - Do NOT advance beyond showing the first artifact template
 - If the name is invalid (not kebab-case), ask for a valid name
-- If a change with that name already exists, suggest continuing that change instead
+- If a change with that name already exists, suggest resuming that change instead
 - Pass --schema if using a non-default workflow`,
     license: 'MIT',
     compatibility: 'Requires apeworkflow CLI.',
@@ -87,7 +88,7 @@ export function getApeNewCommandTemplate(): CommandTemplate {
     tags: ['workflow', 'artifacts', 'experimental'],
     content: `Start a new change using the experimental artifact-driven approach.
 
-**Input**: The argument after \`/ape:new\` is the change name (kebab-case), OR a description of what the user wants to build.
+**Input**: The user can provide a change name (kebab-case) or a description of what they want to build.
 
 **Steps**
 
@@ -139,13 +140,13 @@ After completing the steps, summarize:
 - Schema/workflow being used and its artifact sequence
 - Current status (0/N artifacts complete)
 - The template for the first artifact
-- Prompt: "Ready to create the first artifact? Run \`/ape:continue\` or just describe what this change is about and I'll draft it."
+- Prompt: "Ready to create the first artifact? Just describe what this change is about and I'll draft it."
 
 **Guardrails**
 - Do NOT create any artifacts yet - just show the instructions
 - Do NOT advance beyond showing the first artifact template
 - If the name is invalid (not kebab-case), ask for a valid name
-- If a change with that name already exists, suggest using \`/ape:continue\` instead
+- If a change with that name already exists, suggest resuming that change instead
 - Pass --schema if using a non-default workflow`
   };
 }

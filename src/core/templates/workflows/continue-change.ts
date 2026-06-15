@@ -10,6 +10,7 @@ export function getContinueChangeSkillTemplate(): SkillTemplate {
   return {
     name: 'apeworkflow-continue-change',
     description: 'Continue working on an ApeWorkflow change by creating the next artifact. Use when the user wants to progress their change, create the next artifact, or continue their workflow.',
+    // 这里只保留自然语言引导，不展示隐藏命令。
     instructions: `Continue working on a change by creating the next artifact.
 
 **Input**: Optionally specify a change name. If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
@@ -132,7 +133,7 @@ export function getApeContinueCommandTemplate(): CommandTemplate {
     tags: ['workflow', 'artifacts', 'experimental'],
     content: `Continue working on a change by creating the next artifact.
 
-**Input**: Optionally specify a change name after \`/ape:continue\` (e.g., \`/ape:continue add-auth\`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
+**Input**: Optionally specify a change name. If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
 **Steps**
 
@@ -167,7 +168,7 @@ export function getApeContinueCommandTemplate(): CommandTemplate {
    **If all artifacts are complete (\`isComplete: true\`)**:
    - Congratulate the user
    - Show final status including the schema used
-   - Suggest: "All artifacts created! You can now implement this change with \`/ape:apply\` or archive it with \`/ape:archive\`."
+   - Suggest: "All artifacts created! You can now implement this change or archive it."
    - STOP
 
    ---
@@ -211,7 +212,7 @@ After each invocation, show:
 - Schema workflow being used
 - Current progress (N/M complete)
 - What artifacts are now unlocked
-- Prompt: "Run \`/ape:continue\` to create the next artifact"
+- Prompt: "Create the next artifact when you're ready"
 
 **Artifact Creation Guidelines**
 

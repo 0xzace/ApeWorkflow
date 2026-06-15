@@ -5,6 +5,10 @@
  * templates file into workflow-focused modules.
  */
 import type { SkillTemplate, CommandTemplate } from '../types.js';
+import {
+  renderVisibleCommandReference,
+  renderVisibleNextStep,
+} from '../visible-command-surface.js';
 
 export function getOnboardSkillTemplate(): SkillTemplate {
   return {
@@ -473,29 +477,13 @@ This same rhythm works for any size change—a small fix or a major feature.
 
 ## Command Reference
 
-**Core workflow:**
-
- | Command           | What it does                               |
- |-------------------|--------------------------------------------|
- | \`/ape:propose\` | Create a change and generate all artifacts |
- | \`/ape:explore\` | Think through problems before/during work  |
- | \`/ape:apply\`   | Implement tasks from a change              |
- | \`/ape:archive\` | Archive a completed change                 |
-
-**Additional commands:**
-
- | Command            | What it does                                             |
- |--------------------|----------------------------------------------------------|
- | \`/ape:new\`      | Start a new change, step through artifacts one at a time |
- | \`/ape:continue\` | Continue working on an existing change                   |
- | \`/ape:ff\`       | Fast-forward: create all artifacts at once               |
- | \`/ape:verify\`   | Verify implementation matches artifacts                  |
+${renderVisibleCommandReference()}
 
 ---
 
 ## What's Next?
 
-Try \`/ape:propose\` on something you actually want to build. You've got the rhythm now!
+Try ${renderVisibleNextStep('propose')} on something you actually want to build. You've got the rhythm now!
 \`\`\`
 
 ---
@@ -510,8 +498,8 @@ If the user says they need to stop, want to pause, or seem disengaged:
 No problem! Your change is saved at the \`changeRoot\` reported by \`apeworkflow status --change "<name>" --json\`.
 
 To pick up where we left off later:
-- \`/ape:continue <name>\` - Resume artifact creation
-- \`/ape:apply <name>\` - Jump to implementation (if tasks exist)
+- Resume artifact creation from the saved change
+- Jump to implementation if tasks already exist
 
 The work won't be lost. Come back whenever you're ready.
 \`\`\`
@@ -525,25 +513,9 @@ If the user says they just want to see the commands or skip the tutorial:
 \`\`\`
 ## ApeWorkflow Quick Reference
 
-**Core workflow:**
+${renderVisibleCommandReference()}
 
- | Command                  | What it does                               |
- |--------------------------|--------------------------------------------|
- | \`/ape:propose <name>\` | Create a change and generate all artifacts |
- | \`/ape:explore\`        | Think through problems (no code changes)   |
- | \`/ape:apply <name>\`   | Implement tasks                            |
- | \`/ape:archive <name>\` | Archive when done                          |
-
-**Additional commands:**
-
- | Command                   | What it does                        |
- |---------------------------|-------------------------------------|
- | \`/ape:new <name>\`      | Start a new change, step by step    |
- | \`/ape:continue <name>\` | Continue an existing change         |
- | \`/ape:ff <name>\`       | Fast-forward: all artifacts at once |
- | \`/ape:verify <name>\`   | Verify implementation               |
-
-Try \`/ape:propose\` to start your first change.
+Try ${renderVisibleNextStep('propose')} to start your first change.
 \`\`\`
 
 Exit gracefully.

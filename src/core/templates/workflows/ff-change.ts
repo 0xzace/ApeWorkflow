@@ -10,9 +10,10 @@ export function getFfChangeSkillTemplate(): SkillTemplate {
   return {
     name: 'apeworkflow-ff-change',
     description: 'Fast-forward through ApeWorkflow artifact creation. Use when the user wants to quickly create all artifacts needed for implementation without stepping through each one individually.',
+    // 这里只保留自然语言引导，不展示隐藏命令。
     instructions: `Fast-forward through artifact creation - generate everything needed to start implementation in one go.
 
-**Input**: The user's request should include a change name (kebab-case) OR a description of what they want to build.
+**Input**: The user's request should include a change name (kebab-case) or a description of what they want to build.
 
 **Steps**
 
@@ -83,7 +84,7 @@ After completing all artifacts, summarize:
 - Change name and location
 - List of artifacts created with brief descriptions
 - What's ready: "All artifacts created! Ready for implementation."
-- Prompt: "Run \`/ape:apply\` or ask me to implement to start working on the tasks."
+- Prompt: "Ask me to implement to start working on the tasks."
 
 **Artifact Creation Guidelines**
 
@@ -115,7 +116,7 @@ export function getApeFfCommandTemplate(): CommandTemplate {
     tags: ['workflow', 'artifacts', 'experimental'],
     content: `Fast-forward through artifact creation - generate everything needed to start implementation.
 
-**Input**: The argument after \`/ape:ff\` is the change name (kebab-case), OR a description of what the user wants to build.
+**Input**: The user can provide a change name (kebab-case) or a description of what they want to build.
 
 **Steps**
 
@@ -186,7 +187,7 @@ After completing all artifacts, summarize:
 - Change name and location
 - List of artifacts created with brief descriptions
 - What's ready: "All artifacts created! Ready for implementation."
-- Prompt: "Run \`/ape:apply\` to start implementing."
+- Prompt: "Start implementing when you're ready."
 
 **Artifact Creation Guidelines**
 

@@ -6,7 +6,7 @@
  */
 import type { SkillTemplate, CommandTemplate } from '../types.js';
 
-// 任务类型路由块，供两个模板复用
+// 任务类型路由块，供两个模板复用；这里不直接展示隐藏命令。
 const taskRoutingBlock = [
   '## 任务类型路由',
   '',
@@ -239,7 +239,7 @@ export function getApeApplyCommandTemplate(): CommandTemplate {
    - Dynamic instruction based on current state
 
    **Handle states:**
-   - If \`state: "blocked"\` (missing artifacts): show message, suggest using \`/ape:continue\`
+   - If \`state: "blocked"\` (missing artifacts): show message, suggest continuing the change through the artifact workflow
    - If \`state: "all_done"\`: congratulate, suggest archive
    - Otherwise: proceed to implementation
 
