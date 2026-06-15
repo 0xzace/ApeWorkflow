@@ -1,201 +1,199 @@
 <p align="center">
   <a href="https://github.com/0xzace/ApeWorkflow">
     <picture>
-      <source srcset="assets/apeworkflow_bg.png">
-      <img src="assets/apeworkflow_bg.png" alt="ApeWorkflow logo">
+      <source srcset="assets/apeworkflow_pixel_dark.svg" media="(prefers-color-scheme: dark)">
+      <source srcset="assets/apeworkflow_pixel_light.svg" media="(prefers-color-scheme: light)">
+      <img src="assets/apeworkflow_pixel_light.svg" alt="ApeWorkflow logo" height="72">
     </picture>
   </a>
+</p>
+
+<p align="center"><strong>Spec-driven development for AI coding assistants.</strong></p>
+
+<p align="center">
+  ApeWorkflow keeps intent, specs, and implementation in one fluid workflow.
+  No API keys required.
 </p>
 
 <p align="center">
   <a href="https://github.com/0xzace/ApeWorkflow/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/0xzace/ApeWorkflow/actions/workflows/ci.yml/badge.svg" /></a>
   <a href="https://www.npmjs.com/package/@0xzace/apeworkflow"><img alt="npm version" src="https://img.shields.io/npm/v/@0xzace/apeworkflow?style=flat-square" /></a>
+  <a href="https://nodejs.org/"><img alt="node version" src="https://img.shields.io/node/v/@0xzace/apeworkflow?style=flat-square" /></a>
   <a href="./LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" /></a>
-  <a href="https://discord.gg/YctCnvvshC"><img alt="Discord" src="https://img.shields.io/discord/1411657095639601154?style=flat-square&logo=discord&logoColor=white&label=Discord&suffix=%20online" /></a>
+  <a href="https://discord.gg/YctCnvvshC"><img alt="Discord" src="https://img.shields.io/badge/Discord-Join%20the%20community-5865F2?logo=discord&logoColor=white&style=flat-square" /></a>
 </p>
 
-<details>
-<summary><strong>The most loved spec framework.</strong></summary>
+<p align="center">
+  <img src="assets/apeworkflow_bg.png" alt="ApeWorkflow banner" width="100%">
+</p>
 
-[![Stars](https://img.shields.io/github/stars/0xzace/ApeWorkflow?style=flat-square&label=Stars)](https://github.com/0xzace/ApeWorkflow/stargazers)
-[![Downloads](https://img.shields.io/npm/dm/@0xzace/apeworkflow?style=flat-square&label=Downloads/mo)](https://www.npmjs.com/package/@0xzace/apeworkflow)
-[![Contributors](https://img.shields.io/github/contributors/0xzace/ApeWorkflow?style=flat-square&label=Contributors)](https://github.com/0xzace/ApeWorkflow/graphs/contributors)
-
-</details>
-<p></p>
-Our philosophy:
-
-```text
-→ fluid not rigid
-→ iterative not waterfall
-→ easy not complex
-→ built for brownfield not just greenfield
-→ scalable from personal projects to enterprises
-```
-
-> [!TIP]
-> **New workflow now available!** We've rebuilt ApeWorkflow with a new artifact-guided workflow.
+> Agree on what to build before any code is written.
 >
-> Run `/ape:propose "your idea"` to get started. → [Learn more here](docs/ape.md)
+> Keep the source of truth in specs, and keep changes explicit.
 
-<p align="center">
-  Follow <a href="https://x.com/0xTab">@0xTab on X</a> for updates · Join the <a href="https://discord.gg/YctCnvvshC">ApeWorkflow Discord</a> for help and questions.
-</p>
+## Why ApeWorkflow
 
-<!-- TODO: Add GIF demo of /ape:propose → /ape:archive workflow -->
+ApeWorkflow gives AI-assisted development a shared contract:
 
-## See it in action
+- **Align before implementation** - capture intent in proposals and specs first
+- **Stay explicit** - keep proposed work in `apeworkflow/changes/` and current truth in `apeworkflow/specs/`
+- **Adapt as you learn** - edit any artifact at any time, without forcing rigid phases
+- **Work across tools** - generate native commands where supported, or use shared `AGENTS.md` guidance everywhere else
 
-```text
-You: /ape:propose add-dark-mode
-AI:  Created apeworkflow/changes/add-dark-mode/
-     ✓ proposal.md — why we're doing this, what's changing
-     ✓ specs/       — requirements and scenarios
-     ✓ design.md    — technical approach
-     ✓ tasks.md     — implementation checklist
-     Ready for implementation!
+## How It Works
 
-You: /ape:apply
-AI:  Implementing tasks...
-     ✓ 1.1 Add theme context provider
-     ✓ 1.2 Create toggle component
-     ✓ 2.1 Add CSS variables
-     ✓ 2.2 Wire up localStorage
-     All tasks complete!
+```mermaid
+flowchart LR
+  A["/ape:explore"] --> B["/ape:propose"]
+  B --> C["/ape:apply"]
+  C --> D["/ape:sync"]
+  D --> E["/ape:archive"]
 
-You: /ape:archive
-AI:  Archived to apeworkflow/changes/archive/2025-01-23-add-dark-mode/
-     Specs updated. Ready for the next feature.
+  B -. "expanded workflow" .-> N["/ape:new"]
+  N --> F["/ape:continue"]
+  F --> G["/ape:ff"]
+  G --> C
+  C --> H["/ape:verify"]
+  H --> E
 ```
 
-<details>
-<summary><strong>ApeWorkflow Dashboard</strong></summary>
+The default `core` profile uses:
 
-<p align="center">
-  <img src="assets/apeworkflow_dashboard.png" alt="ApeWorkflow dashboard preview" width="90%">
-</p>
+```text
+/ape:propose -> /ape:apply -> /ape:sync -> /ape:archive
+```
 
-</details>
+If you enable the expanded workflow profile, you also get:
+
+```text
+/ape:new -> /ape:continue or /ape:ff -> /ape:apply -> /ape:verify -> /ape:archive
+```
+
+## What ApeWorkflow Creates
+
+After `apeworkflow init`, your project gets a local workspace like this:
+
+```text
+apeworkflow/
+├── specs/              # Source of truth
+│   └── <domain>/
+│       └── spec.md
+├── changes/            # Proposed work
+│   └── <change-name>/
+│       ├── proposal.md
+│       ├── design.md
+│       ├── tasks.md
+│       └── specs/
+│           └── <domain>/
+│               └── spec.md
+└── config.yaml         # Optional project configuration
+```
 
 ## Quick Start
 
-**Requires Node.js 20.19.0 or higher.**
+### 1. Prerequisite
 
-Install ApeWorkflow globally:
+**Node.js 20.19.0 or higher**
+
+### 2. Install
 
 ```bash
 npm install -g @0xzace/apeworkflow@latest
 ```
 
-Then navigate to your project directory and initialize:
+Other package managers:
+
+```bash
+pnpm add -g @0xzace/apeworkflow@latest
+yarn global add @0xzace/apeworkflow@latest
+bun add -g @0xzace/apeworkflow@latest
+```
+
+Nix:
+
+```bash
+nix run github:0xzace/ApeWorkflow -- init
+```
+
+### 3. Initialize Your Project
 
 ```bash
 cd your-project
 apeworkflow init
 ```
 
-Now tell your AI: `/ape:propose <what-you-want-to-build>`
+### 4. Start the Workflow
 
-If you want the expanded workflow (`/ape:new`, `/ape:continue`, `/ape:ff`, `/ape:verify`, `/ape:bulk-archive`, `/ape:onboard`), select it with `apeworkflow config profile` and apply with `apeworkflow update`.
-
-> [!NOTE]
-> Not sure if your tool is supported? [View the full list](docs/supported-tools.md) – we support 25+ tools and growing.
->
-> Also works with pnpm, yarn, bun, and nix. [See installation options](docs/installation.md).
-
-## Docs
-
-→ **[Getting Started](docs/getting-started.md)**: first steps<br>
-→ **[Workflows](docs/workflows.md)**: combos and patterns<br>
-→ **[Commands](docs/commands.md)**: slash commands & skills<br>
-→ **[CLI](docs/cli.md)**: terminal reference<br>
-→ **[Supported Tools](docs/supported-tools.md)**: tool integrations & install paths<br>
-→ **[Concepts](docs/concepts.md)**: how it all fits<br>
-→ **[Multi-Language](docs/multi-language.md)**: multi-language support<br>
-→ **[Customization](docs/customization.md)**: make it yours
-
-## Community schemas
-
-Third-party schema bundles distributed via standalone repositories — these provide opinionated workflows that integrate ApeWorkflow with other tools, similar to how [github/spec-kit's community extension catalog](https://github.com/github/spec-kit/tree/main/extensions) handles tool integrations.
-
-→ **[Browse the catalog](docs/customization.md#community-schemas)** in the customization docs.
-
-## Why ApeWorkflow?
-
-AI coding assistants are powerful but unpredictable when requirements live only in chat history. ApeWorkflow adds a lightweight spec layer so you agree on what to build before any code is written.
-
-- **Agree before you build** — human and AI align on specs before code gets written
-- **Stay organized** — each change gets its own folder with proposal, specs, design, and tasks
-- **Work fluidly** — update any artifact anytime, no rigid phase gates
-- **Use your tools** — works with 20+ AI assistants via slash commands
-
-### How we compare
-
-**vs. [Spec Kit](https://github.com/github/spec-kit)** (GitHub) — Thorough but heavyweight. Rigid phase gates, lots of Markdown, Python setup. ApeWorkflow is lighter and lets you iterate freely.
-
-**vs. [Kiro](https://kiro.dev)** (AWS) — Powerful but you're locked into their IDE and limited to Claude models. ApeWorkflow works with the tools you already use.
-
-**vs. nothing** — AI coding without specs means vague prompts and unpredictable results. ApeWorkflow brings predictability without the ceremony.
-
-## Updating ApeWorkflow
-
-**Upgrade the package**
-
-```bash
-npm install -g @0xzace/apeworkflow@latest
+```text
+/ape:propose <what-you-want-to-build>
 ```
 
-**Refresh agent instructions**
-
-Run this inside each project to regenerate AI guidance and ensure the latest slash commands are active:
+If you want the expanded workflow, run:
 
 ```bash
+apeworkflow config profile
 apeworkflow update
 ```
 
-## Usage Notes
+## Supported AI Tools
 
-**Model selection**: ApeWorkflow works best with high-reasoning models. We recommend Codex 5.5 and Opus 4.7 for both planning and implementation.
+ApeWorkflow supports 30+ AI coding assistants, including:
 
-**Context hygiene**: ApeWorkflow benefits from a clean context window. Clear your context before starting implementation and maintain good context hygiene throughout your session.
+`Claude Code`, `Cursor`, `Codex`, `GitHub Copilot`, `Gemini CLI`, `Windsurf`, `Cline`, `Continue`, `OpenCode`, `Qwen Code`, `RooCode`, `Kilo Code`, `Kiro`, `Auggie`, `Amazon Q Developer`, and more.
 
-## Contributing
+See the full list in [Supported Tools](docs/supported-tools.md).
 
-**Small fixes** — Bug fixes, typo corrections, and minor improvements can be submitted directly as PRs.
+## CLI Highlights
 
-**Larger changes** — For new features, significant refactors, or architectural changes, please submit an ApeWorkflow change proposal first so we can align on intent and goals before implementation begins.
+| Command | Purpose |
+| --- | --- |
+| `apeworkflow init` | Initialize ApeWorkflow in a project |
+| `apeworkflow update` | Refresh generated instruction files |
+| `apeworkflow list` | List changes or specs |
+| `apeworkflow view` | Open the interactive dashboard |
+| `apeworkflow show` | Show a change or spec |
+| `apeworkflow validate` | Validate changes and specs |
+| `apeworkflow archive` | Archive a completed change |
+| `apeworkflow status` | Show artifact completion status |
+| `apeworkflow instructions` | Output enriched artifact instructions |
+| `apeworkflow templates` | Show resolved template paths |
+| `apeworkflow schemas` | List available workflow schemas |
 
-When writing proposals, keep the ApeWorkflow philosophy in mind: we serve a wide variety of users across different coding agents, models, and use cases. Changes should work well for everyone.
+Full reference: [docs/cli.md](docs/cli.md)
 
-**AI-generated code is welcome** — as long as it's been tested and verified. PRs containing AI-generated code should mention the coding agent and model used (e.g., "Generated with Claude Code using claude-opus-4-5-20251101").
+## Docs
 
-### Development
+- [Getting Started](docs/getting-started.md)
+- [Workflows](docs/workflows.md)
+- [Commands](docs/commands.md)
+- [CLI](docs/cli.md)
+- [Supported Tools](docs/supported-tools.md)
+- [Concepts](docs/concepts.md)
+- [Customization](docs/customization.md)
+- [Installation](docs/installation.md)
+- [APE Workflow](docs/ape.md)
 
-- Install dependencies: `pnpm install`
-- Build: `pnpm run build`
-- Test: `pnpm test`
-- Develop CLI locally: `pnpm run dev` or `pnpm run dev:cli`
-- Conventional commits (one-line): `type(scope): subject`
+## Development
 
-## Other
+```bash
+pnpm install
+pnpm run build
+pnpm test
+pnpm run dev
+pnpm run dev:cli
+```
 
-<details>
-<summary><strong>Telemetry</strong></summary>
+## Telemetry
 
-ApeWorkflow collects anonymous usage stats.
+Anonymous usage stats are collected for command names and version only.
+No arguments, paths, content, or PII are collected. Telemetry is disabled in CI.
 
-We collect only command names and version to understand usage patterns. No arguments, paths, content, or PII. Automatically disabled in CI.
+Opt out:
 
-**Opt-out:** `export APEWORKFLOW_TELEMETRY=0` or `export DO_NOT_TRACK=1`
-
-</details>
-
-<details>
-<summary><strong>Maintainers & Advisors</strong></summary>
-
-See [MAINTAINERS.md](MAINTAINERS.md) for the list of core maintainers and advisors who help guide the project.
-
-</details>
+```bash
+export APEWORKFLOW_TELEMETRY=0
+export DO_NOT_TRACK=1
+```
 
 ## License
 
