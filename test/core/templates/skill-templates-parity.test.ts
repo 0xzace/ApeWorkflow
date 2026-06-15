@@ -30,10 +30,10 @@ import {
 import { generateSkillContent } from '../../../src/core/shared/skill-generation.js';
 
 const EXPECTED_FUNCTION_HASHES: Record<string, string> = {
-  getExploreSkillTemplate: 'de87aaeb968795c7f82a1582d83c0dde4a864b26d76de4b390597c7d4a58438d',
+  getExploreSkillTemplate: '7f4a2f4ba949f068417e1a5acaf8213f7f1ecefdc3d4008a61a5f8aadbc152a0',
   getNewChangeSkillTemplate: '95ab5fcd6a5b326ad5a507e125fac3c69277eb9d9f4d889f348052043d1dedcc',
   getContinueChangeSkillTemplate: 'bc5991255833f89c37fb4845e6c40a551a33069ccadf783e20d01c0e56cfa848',
-  getApplyChangeSkillTemplate: '2a08a59c59da1c27591be29d0794ab8cfa1721b29e4ff305c41655669833a76e',
+  getApplyChangeSkillTemplate: '7d8151344131a5a915bc49d8e2206e8adfd09e44bc99328fabed8b8688049fad',
   getFfChangeSkillTemplate: 'c43093d05453a380bbc2a721bb0284af932df2515f7f62ba3331ae91e2856894',
   getSyncSpecsSkillTemplate: '494052dee37f5c9434aeb27d0035b5aee646ff6c38ca5fa5350da74f4ea342fc',
   getOnboardSkillTemplate: 'c0e64731f7b6d4c5a3e9fabf3bcb616fdf638a6d11e44f5b1a844c4aa4c96c81',
@@ -42,31 +42,31 @@ const EXPECTED_FUNCTION_HASHES: Record<string, string> = {
   getApeContinueCommandTemplate: 'fcf034a3e8d6ce3d4aeb2e1ae7b9c237648f17528a3418eda8183573b95c9e39',
   getApeApplyCommandTemplate: 'ea299b4748ec8206ffb3c31060700f36f76d251f449afe6c7c277da53a2402ed',
   getApeFfCommandTemplate: '780e67903bb0eb0cd9012ef23c3eb05a0e4b16ba706d262eb3e00eeccd06b434',
-  getArchiveChangeSkillTemplate: 'a76b64311af651d4b98e55bda2c67e8580aec8c6fa85e94ee9d6584ff62a680d',
+  getArchiveChangeSkillTemplate: '8b1c8e84d04d1668841ffed1ae9757bba7adb32a07ccb39ce91f952817229371',
   getBulkArchiveChangeSkillTemplate: 'cde0b69b7592661a2efad7333089c661087417c5e79bf19b8a05f58d5ef43d10',
   getApeSyncCommandTemplate: '3dc761b1a3957c20e734ec5ee1449fda572f73be5884bb8f87a19b36d4859c79',
-  getVerifyChangeSkillTemplate: 'b733dc9ed78407040968c43302ccd0f758d29c90bc1c1caf6862d85b9c951ceb',
+  getVerifyChangeSkillTemplate: '473557ee48fe9a494c9f7d66a2191d32da11ba7a8a317de8bfae4f93ef88a7b1',
   getApeArchiveCommandTemplate: 'b756253420746e04f3d84c8388ed98244ce88ba02e4e867d8e329dac22845607',
   getApeOnboardCommandTemplate: 'bfbaa10f46e783c4e2bf0cf3b0c3cb7d5c55d73151bb0782f39b3bb418f337a3',
   getApeBulkArchiveCommandTemplate: 'a6c3854ae4eb61cf8922f277b6e1dcd58e6fa19f072dbbfd413cf38c19bb65f6',
   getApeVerifyCommandTemplate: '60dfe1dd95eed7ee9be92f9aa51779ca5bd7aa578d6161a180786dea7399f884',
-  getApeProposeSkillTemplate: '7fabe0809175846374676cc2e7ed8946e9d42d1a99159aa20c8c23cbde8b026e',
+  getApeProposeSkillTemplate: '28e57ae4cd5ea155b43b9a971843bb0444ff7fd62155a55009be638780c4778a',
   getApeProposeCommandTemplate: '42b897c1c42e9485ce2318826aeadfe964f0f6e7b685f20c008c123a28cf7a2a',
   getFeedbackSkillTemplate: '1062057eab299213fdc18db1922cc0b94030c2db04ce80e0641bf3b920cfb92f',
 };
 
 const EXPECTED_GENERATED_SKILL_CONTENT_HASHES: Record<string, string> = {
-  'apeworkflow-explore': 'ca1362af2da916e88b11ab34200313aca6c000b8e0fedf5271afdf4ca240da6d',
+  'apeworkflow-explore': '4f691c4ab6edb5f3130ab00e1765c66a76d67ec2a2d6935578f960afecc97e1a',
   'apeworkflow-new-change': 'edb99062c155391fafde9f17b6be19acba2e1df749dc356521b6dab8f9d259fc',
   'apeworkflow-continue-change': '8262d1bb1c408340fb4f29caa71d553c82e02927247a8f84b4aab4c388937ee9',
-  'apeworkflow-apply-change': '98cb79caec3b5ac4f8118a070eb67ce062115785901ee3e025cb29c64c738cf1',
+  'apeworkflow-apply-change': '385381de70676b350d82879d7f026e9fde433a04f3492bf8fc2e057543ecdab4',
   'apeworkflow-ff-change': 'ca0e9c4434810a0c13eb4cd93a33dceedf20e2254feb275dc28cc765738f4668',
   'apeworkflow-sync-specs': '0de8739f01806377482308895decde1095f7d4af03dadb775a95246fb993720a',
-  'apeworkflow-archive-change': 'a8f91d6bfb35c28696bc3804eed0eb736623ae6c3607f4ab6a7bcabc57cd08e0',
+  'apeworkflow-archive-change': 'ab9f0090dad95211e861530280d902b621f6a11e8b5af1ddd89a34aab7a8adf6',
   'apeworkflow-bulk-archive-change': 'c76c4ed42b0c4ceb35132c58b322bae5008705d6f4f911fb57bfde67361bbc2d',
-  'apeworkflow-verify-change': 'd38309e8f2dfd18478398bab0d690af9cb596fd4878677ab2143d63540ef9e95',
+  'apeworkflow-verify-change': '65d91b1062b9df76d1b9072117990da27b698ae592a539d847fb4256a486e723',
   'apeworkflow-onboard': 'da7f4e43257800c35bac2f065046ccf05e192d702897c9ceda70eb74744911b8',
-  'apeworkflow-propose': 'c2f3dfd021550dde7438087923c5ab813a47a953ca117e41a6820bd8e04dc299',
+  'apeworkflow-propose': '3d208d72d62f84fa696635c855ade8b18f78976f68e940a81e8303163e582e24',
 };
 
 function stableStringify(value: unknown): string {

@@ -6,6 +6,36 @@
  */
 import type { SkillTemplate, CommandTemplate } from '../types.js';
 
+// 任务类型路由块，供两个模板复用
+const taskRoutingBlock = [
+  '## 任务类型路由',
+  '',
+  '### `功能开发`',
+  '- `apply`：`executing-plans -> test-driven-development -> subagent-driven-development`',
+  '- `verify`：`verification-before-completion -> requesting-code-review -> receiving-code-review`',
+  '- `archive`：`finishing-a-development-branch -> verification-before-completion`',
+  '',
+  '### `缺陷修复`',
+  '- `apply`：`systematic-debugging -> test-driven-development -> executing-plans`',
+  '- `verify`：`verification-before-completion -> requesting-code-review -> receiving-code-review`',
+  '- `archive`：`finishing-a-development-branch -> verification-before-completion`',
+  '',
+  '### `重构`',
+  '- `apply`：`executing-plans -> test-driven-development -> subagent-driven-development`',
+  '- `verify`：`verification-before-completion -> requesting-code-review -> receiving-code-review`',
+  '- `archive`：`finishing-a-development-branch -> verification-before-completion`',
+  '',
+  '### `文档`',
+  '- `apply`：`writing-skills`',
+  '- `verify`：`verification-before-completion`',
+  '- `archive`：`finishing-a-development-branch -> verification-before-completion`',
+  '',
+  '### 统一规则',
+  '- `apply` 阶段按任务类型选择执行顺序',
+  '- `verify` 阶段先提供验证证据，再进入 review',
+  '- `archive` 阶段先收尾，再确认归档',
+].join('\n');
+
 export function getArchiveChangeSkillTemplate(): SkillTemplate {
   return {
     name: 'apeworkflow-archive-change',
@@ -94,6 +124,8 @@ export function getArchiveChangeSkillTemplate(): SkillTemplate {
    - Archive location
    - Whether specs were synced (if applicable)
    - Note about any warnings (incomplete artifacts/tasks)
+
+${taskRoutingBlock}
 
 **Output On Success**
 
@@ -212,6 +244,8 @@ export function getApeArchiveCommandTemplate(): CommandTemplate {
    - Archive location
    - Spec sync status (synced / sync skipped / no delta specs)
    - Note about any warnings (incomplete artifacts/tasks)
+
+${taskRoutingBlock}
 
 **Output On Success**
 

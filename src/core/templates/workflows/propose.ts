@@ -12,6 +12,28 @@ export function getApeProposeSkillTemplate(): SkillTemplate {
     description: 'Propose a new change with all artifacts generated in one step. Use when the user wants to quickly describe what they want to build and get a complete proposal with design, specs, and tasks ready for implementation.',
     instructions: `Propose a new change - create the change and generate all artifacts in one step.
 
+## 任务类型路由
+
+### \`功能开发\`
+- \`explore\`：\`using-skills -> brainstorming\`
+- \`propose\`：\`writing-plans -> using-git-worktrees -> dispatching-parallel-agents\`
+
+### \`缺陷修复\`
+- \`explore\`：\`using-skills -> brainstorming\`
+- \`propose\`：\`systematic-debugging -> writing-plans -> using-git-worktrees\`
+
+### \`重构\`
+- \`explore\`：\`using-skills -> brainstorming\`
+- \`propose\`：\`writing-plans -> using-git-worktrees -> dispatching-parallel-agents\`
+
+### \`文档\`
+- \`explore\`：\`using-skills -> brainstorming\`
+- \`propose\`：\`writing-plans\`
+
+### 统一规则
+- \`explore\` 阶段先路由，再澄清
+- \`propose\` 阶段先定计划，再选工作区或并行策略
+
 I'll create a change with artifacts:
 - proposal.md (what & why)
 - design.md (how)
