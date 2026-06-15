@@ -1,6 +1,6 @@
 /**
- * Animated welcome screen for the experimental artifact workflow setup.
- * Shows side-by-side layout with animated ASCII art on left and welcome text on right.
+ * 欢迎界面。
+ * 保留左右分栏布局，但把文案和配色统一成 ApeWorkflow 的品牌风格。
  */
 
 import chalk from 'chalk';
@@ -12,24 +12,31 @@ const MIN_WIDTH = 60;
 // Width of the ASCII art column (with padding)
 const ART_COLUMN_WIDTH = 24;
 
+// 品牌强调色：和 README 里的视觉资源保持一致
+const BRAND_GOLD = chalk.hex('#C8A96A');
+const BRAND_TEXT = chalk.hex('#E2E8F0');
+const BRAND_MUTED = chalk.hex('#94A3B8');
+const BRAND_CYAN = chalk.hex('#5EEAD4');
+
 /**
  * Welcome text content (right column)
  */
 function getWelcomeText(): string[] {
   return [
-    chalk.white.bold('Welcome to ApeWorkflow'),
-    chalk.dim('A lightweight spec-driven framework'),
+    BRAND_GOLD.bold('ApeWorkflow'),
+    BRAND_MUTED('Spec-driven workflow for AI coding assistants'),
     '',
-    chalk.white('This setup will configure:'),
-    chalk.dim('  • Agent Skills for AI tools'),
-    chalk.dim('  • /ape:* slash commands'),
+    BRAND_TEXT('This setup will configure:'),
+    BRAND_MUTED('  • Agent Skills for AI tools'),
+    BRAND_MUTED('  • /ape:* slash commands'),
+    BRAND_MUTED('  • Project-local workflow files'),
     '',
-    chalk.white('Quick start after setup:'),
-    `  ${chalk.yellow('/ape:new')}      ${chalk.dim('Create a change')}`,
-    `  ${chalk.yellow('/ape:continue')} ${chalk.dim('Next artifact')}`,
-    `  ${chalk.yellow('/ape:apply')}    ${chalk.dim('Implement tasks')}`,
+    BRAND_TEXT('Quick start after setup:'),
+    `  ${BRAND_GOLD('/ape:new')}      ${BRAND_MUTED('Create a change')}`,
+    `  ${BRAND_GOLD('/ape:continue')} ${BRAND_MUTED('Next artifact')}`,
+    `  ${BRAND_GOLD('/ape:apply')}    ${BRAND_MUTED('Implement tasks')}`,
     '',
-    chalk.cyan('Press Enter to select tools...'),
+    BRAND_CYAN('Press Enter to select tools...'),
   ];
 }
 
@@ -47,8 +54,8 @@ function renderFrame(artLines: string[], textLines: string[]): string {
     // Pad the art column to fixed width
     const paddedArt = artLine.padEnd(ART_COLUMN_WIDTH);
 
-    // Color the ASCII art with cyan for visual appeal
-    const coloredArt = chalk.cyan(paddedArt);
+    // 使用品牌金色渲染左侧徽记，让启动页和资源视觉保持一致
+    const coloredArt = BRAND_GOLD(paddedArt);
 
     // Clear line before writing to prevent residual characters
     lines.push(`\x1b[2K${coloredArt}${textLine}`);
@@ -123,7 +130,7 @@ export async function showWelcomeScreen(): Promise<void> {
 
   if (!canAnimate()) {
     // Fallback: show static welcome
-    const frame = WELCOME_ANIMATION.frames[3]; // Peak frame
+    const frame = WELCOME_ANIMATION.frames[3]; // 静态兜底帧
     process.stdout.write('\n' + renderFrame(frame, textLines) + '\n\n');
     return;
   }
