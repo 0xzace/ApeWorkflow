@@ -45,6 +45,13 @@ describe('apeworkflow CLI e2e basics', () => {
 
   });
 
+  it('shows help output when no arguments are provided', async () => {
+    const result = await runCLI([]);
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain('Usage: apeworkflow');
+    expect(result.stderr).toBe('');
+  });
+
   it('shows dynamic tool ids in init help', async () => {
     const result = await runCLI(['init', '--help']);
     expect(result.exitCode).toBe(0);

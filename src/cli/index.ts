@@ -535,6 +535,12 @@ setCmd
 export { program };
 
 export function runCli(argv = process.argv): void {
+  // 中文注释：没有传入任何子命令时，直接显示帮助并正常退出，避免 commander 默认按错误处理。
+  if (argv.slice(2).length === 0) {
+    program.outputHelp();
+    return;
+  }
+
   program.parse(argv);
 }
 
