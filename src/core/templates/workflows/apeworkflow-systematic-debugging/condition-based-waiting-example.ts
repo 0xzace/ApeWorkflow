@@ -1,9 +1,19 @@
 // Complete implementation of condition-based waiting utilities
 // From: Lace test infrastructure improvements (2025-10-03)
 // Context: Fixed 15 flaky tests by replacing arbitrary timeouts
+// 这里使用 TypeScript 类型注解，和文档中的示例保持一致
 
-import type { ThreadManager } from '~/threads/thread-manager';
-import type { LaceEvent, LaceEventType } from '~/threads/types';
+// 这里定义示例所需的最小类型，避免引用仓库中不存在的外部模块
+export interface LaceEvent {
+  type: string;
+  data: Record<string, unknown>;
+}
+
+export type LaceEventType = string;
+
+export interface ThreadManager {
+  getEvents(threadId: string): LaceEvent[];
+}
 
 /**
  * Wait for a specific event type to appear in thread

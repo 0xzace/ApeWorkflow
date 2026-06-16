@@ -8,17 +8,34 @@ import { ZshInstaller } from '../../../../src/core/completions/installers/zsh-in
 describe('ZshInstaller', () => {
   let testHomeDir: string;
   let installer: ZshInstaller;
+  let originalZshEnv: string | undefined;
+  let originalAutoConfigEnv: string | undefined;
 
   beforeEach(async () => {
     // Create a temporary home directory for testing
     testHomeDir = path.join(os.tmpdir(), `apeworkflow-zsh-test-${randomUUID()}`);
     await fs.mkdir(testHomeDir, { recursive: true });
     installer = new ZshInstaller(testHomeDir);
+    // 这里隔离宿主机的 Zsh/自动配置环境，避免测试被本机 shell 配置污染
+    originalZshEnv = process.env.ZSH;
+    originalAutoConfigEnv = process.env.APEWORKFLOW_NO_AUTO_CONFIG;
+    delete process.env.ZSH;
+    delete process.env.APEWORKFLOW_NO_AUTO_CONFIG;
   });
 
   afterEach(async () => {
     // Clean up test directory
     await fs.rm(testHomeDir, { recursive: true, force: true });
+    if (originalZshEnv === undefined) {
+      delete process.env.ZSH;
+    } else {
+      process.env.ZSH = originalZshEnv;
+    }
+    if (originalAutoConfigEnv === undefined) {
+      delete process.env.APEWORKFLOW_NO_AUTO_CONFIG;
+    } else {
+      process.env.APEWORKFLOW_NO_AUTO_CONFIG = originalAutoConfigEnv;
+    }
   });
 
   describe('isOhMyZshInstalled', () => {

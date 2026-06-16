@@ -687,8 +687,8 @@ Old version content
         'utf-8'
       );
 
-      // Should contain generatedBy field
-      expect(updatedContent).toMatch(/generatedBy:\s*["']\d+\.\d+\.\d+["']/);
+      // 这里兼容四段版本号（例如 25.6.15.1），避免把发布版本格式写死成三段。
+      expect(updatedContent).toMatch(/generatedBy:\s*["']\d+(?:\.\d+)+["']/);
     });
   });
 

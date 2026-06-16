@@ -39,6 +39,29 @@ describe('ListCommand', () => {
       );
     });
 
+    it('should output changes as JSON when requested', async () => {
+      const changesDir = path.join(tempDir, 'apeworkflow', 'changes');
+      await fs.mkdir(path.join(changesDir, 'json-change'), { recursive: true });
+      await fs.writeFile(
+        path.join(changesDir, 'json-change', 'tasks.md'),
+        '- [x] Done\n- [ ] Pending\n'
+      );
+
+      const listCommand = new ListCommand();
+      await listCommand.execute(tempDir, 'changes', { json: true });
+
+      const payload = JSON.parse(logOutput.at(-1) ?? '{}');
+      expect(payload.changes).toHaveLength(1);
+      expect(payload.changes[0]).toEqual(
+        expect.objectContaining({
+          name: 'json-change',
+          completedTasks: 1,
+          totalTasks: 2,
+          status: 'in-progress',
+        })
+      );
+    });
+
     it('should handle empty changes directory', async () => {
       const changesDir = path.join(tempDir, 'apeworkflow', 'changes');
       await fs.mkdir(changesDir, { recursive: true });
@@ -160,6 +183,43 @@ Regular text that should be ignored
       expect(logOutput.some(line => line.includes('completed') && line.includes('✓ Complete'))).toBe(true);
       expect(logOutput.some(line => line.includes('partial') && line.includes('1/3 tasks'))).toBe(true);
       expect(logOutput.some(line => line.includes('no-tasks') && line.includes('No tasks'))).toBe(true);
+    });
+
+    it('should list specs and fall back to zero requirements for unreadable specs', async () => {
+      const specsDir = path.join(tempDir, 'apeworkflow', 'specs');
+      await fs.mkdir(path.join(specsDir, 'auth'), { recursive: true });
+      await fs.mkdir(path.join(specsDir, 'broken'), { recursive: true });
+      await fs.writeFile(
+        path.join(specsDir, 'auth', 'spec.md'),
+        [
+          '## Purpose',
+          'Describe authentication.',
+          '',
+          '## Requirements',
+          '',
+          '### Requirement: Login',
+          'Login must work.',
+        ].join('\n')
+      );
+      await fs.writeFile(
+        path.join(specsDir, 'broken', 'spec.md'),
+        '# Broken spec without required sections\n'
+      );
+
+      const listCommand = new ListCommand();
+      await listCommand.execute(tempDir, 'specs');
+
+      expect(logOutput[0]).toBe('Specs:');
+      expect(logOutput.some((line) => line.includes('auth') && line.includes('requirements 1'))).toBe(true);
+      expect(logOutput.some((line) => line.includes('broken') && line.includes('requirements 0'))).toBe(true);
+    });
+
+    it('should handle missing specs directory', async () => {
+      const listCommand = new ListCommand();
+
+      await listCommand.execute(tempDir, 'specs');
+
+      expect(logOutput).toEqual(['No specs found.']);
     });
   });
 });

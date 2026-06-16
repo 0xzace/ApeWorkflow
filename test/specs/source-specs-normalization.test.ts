@@ -10,7 +10,8 @@ import {
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const projectRoot = path.resolve(__dirname, '..', '..');
+// 这里指向 tmp-init 夹具中的真实 spec.md 结构，避免把仓库根目录下的设计文档当成规范样本。
+const projectRoot = path.resolve(__dirname, '..', 'fixtures', 'tmp-init');
 const specsRoot = path.join(projectRoot, 'apeworkflow', 'specs');
 
 const PURPOSE_PLACEHOLDER_PATTERN = /TBD - created by archiving change .*?\. Update Purpose after archive\./;

@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import fs from 'node:fs';
+import fsp from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import {
@@ -46,5 +47,35 @@ describe('error-reporting/config', () => {
     const config = await readErrorReportingConfig();
     expect(config.enabled).toBe(false);
     expect(config.repository).toBe('0xzace/ApeWorkflow');
+  });
+
+  it('reads a partial config file and merges missing defaults', async () => {
+    const configPath = getErrorReportingConfigPath();
+    await fsp.mkdir(path.dirname(configPath), { recursive: true });
+    await fsp.writeFile(
+      configPath,
+      JSON.stringify({ repository: 'acme/alerts', enabled: false }) + '\n',
+      'utf-8'
+    );
+
+    const config = await readErrorReportingConfig();
+    expect(config.enabled).toBe(false);
+    expect(config.repository).toBe('acme/alerts');
+    expect(config.statePath).toBe(
+      path.join(tempDir, 'xdg-config', 'apeworkflow', 'error-reporting-state.json')
+    );
+  });
+
+  it('falls back to defaults when the config file is invalid', async () => {
+    const configPath = getErrorReportingConfigPath();
+    await fsp.mkdir(path.dirname(configPath), { recursive: true });
+    await fsp.writeFile(configPath, '{ invalid json', 'utf-8');
+
+    const config = await readErrorReportingConfig();
+    expect(config).toEqual({
+      enabled: true,
+      repository: '0xzace/ApeWorkflow',
+      statePath: path.join(tempDir, 'xdg-config', 'apeworkflow', 'error-reporting-state.json'),
+    });
   });
 });

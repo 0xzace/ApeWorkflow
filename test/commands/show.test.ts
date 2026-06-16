@@ -1,123 +1,109 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { promises as fs } from 'fs';
-import path from 'path';
-import { execSync } from 'child_process';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-describe('top-level show command', () => {
-  const projectRoot = process.cwd();
-  const testDir = path.join(projectRoot, 'test-show-command-tmp');
-  const changesDir = path.join(testDir, 'apeworkflow', 'changes');
-  const specsDir = path.join(testDir, 'apeworkflow', 'specs');
-  const apeworkflowBin = path.join(projectRoot, 'bin', 'apeworkflow.js');
+import { ShowCommand } from '../../src/commands/show.js';
+import { ChangeCommand } from '../../src/commands/change.js';
+import { SpecCommand } from '../../src/commands/spec.js';
+import * as itemDiscovery from '../../src/utils/item-discovery.js';
 
+vi.mock('../../src/utils/item-discovery.js', () => ({
+  // 中文注释：这里固定候选集合，方便覆盖 show 命令的查找、歧义和提示分支。
+  getActiveChangeIds: vi.fn(),
+  getSpecIds: vi.fn(),
+}));
 
-  beforeEach(async () => {
-    await fs.mkdir(changesDir, { recursive: true });
-    await fs.mkdir(specsDir, { recursive: true });
+describe('show command entrypoint', () => {
+  let errorSpy: ReturnType<typeof vi.spyOn>;
+  let logSpy: ReturnType<typeof vi.spyOn>;
+  let originalExitCode: typeof process.exitCode;
+  let originalEnv: NodeJS.ProcessEnv;
+  const restoreSpies: Array<() => void> = [];
 
-    const changeContent = `# Change: Demo\n\n## Why\nBecause reasons.\n\n## What Changes\n- **auth:** Add requirement\n`;
-    await fs.mkdir(path.join(changesDir, 'demo'), { recursive: true });
-    await fs.writeFile(path.join(changesDir, 'demo', 'proposal.md'), changeContent, 'utf-8');
-
-    const specContent = `## Purpose\nAuth spec.\n\n## Requirements\n\n### Requirement: User Authentication\nText\n`;
-    await fs.mkdir(path.join(specsDir, 'auth'), { recursive: true });
-    await fs.writeFile(path.join(specsDir, 'auth', 'spec.md'), specContent, 'utf-8');
+  beforeEach(() => {
+    // 中文注释：这里只覆盖最稳定的空参数分支，确保提示文本不会回退。
+    originalExitCode = process.exitCode;
+    originalEnv = { ...process.env };
+    process.exitCode = undefined;
+    errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
   });
 
-  afterEach(async () => {
-    await fs.rm(testDir, { recursive: true, force: true });
-  });
-
-  it('prints hint and non-zero exit when no args and non-interactive', () => {
-    const originalCwd = process.cwd();
-    const originalEnv = { ...process.env };
-    try {
-      process.chdir(testDir);
-      process.env.OPEN_SPEC_INTERACTIVE = '0';
-      let err: any;
-      try {
-        execSync(`node ${apeworkflowBin} show`, { encoding: 'utf-8' });
-      } catch (e) { err = e; }
-      expect(err).toBeDefined();
-      expect(err.status).not.toBe(0);
-      const stderr = err.stderr.toString();
-      expect(stderr).toContain('Nothing to show.');
-      expect(stderr).toContain('apeworkflow show <item>');
-      expect(stderr).toContain('apeworkflow change show');
-      expect(stderr).toContain('apeworkflow spec show');
-    } finally {
-      process.chdir(originalCwd);
-      process.env = originalEnv;
+  afterEach(() => {
+    errorSpy.mockRestore();
+    logSpy.mockRestore();
+    while (restoreSpies.length > 0) {
+      restoreSpies.pop()?.();
     }
+    process.exitCode = originalExitCode;
+    process.env = originalEnv;
   });
 
-  it('auto-detects change id and supports --json', () => {
-    const originalCwd = process.cwd();
-    try {
-      process.chdir(testDir);
-      const output = execSync(`node ${apeworkflowBin} show demo --json`, { encoding: 'utf-8' });
-      const json = JSON.parse(output);
-      expect(json.id).toBe('demo');
-      expect(Array.isArray(json.deltas)).toBe(true);
-    } finally {
-      process.chdir(originalCwd);
-    }
+  it('在非交互模式且没有参数时输出帮助提示', async () => {
+    process.env.OPEN_SPEC_INTERACTIVE = '0';
+
+    await new ShowCommand().execute(undefined, {});
+
+    expect(errorSpy).toHaveBeenCalledWith('Nothing to show. Try one of:');
+    expect(process.exitCode).toBe(1);
   });
 
-  it('auto-detects spec id and supports spec-only flags', () => {
-    const originalCwd = process.cwd();
-    try {
-      process.chdir(testDir);
-      const output = execSync(`node ${apeworkflowBin} show auth --json --requirements`, { encoding: 'utf-8' });
-      const json = JSON.parse(output);
-      expect(json.id).toBe('auth');
-      expect(Array.isArray(json.requirements)).toBe(true);
-    } finally {
-      process.chdir(originalCwd);
-    }
+  it('在显式指定 change 类型时会直接调用 change show', async () => {
+    vi.mocked(itemDiscovery.getActiveChangeIds).mockResolvedValue(['alpha']);
+    const spy = vi.spyOn(ChangeCommand.prototype, 'show').mockResolvedValue();
+    restoreSpies.push(() => spy.mockRestore());
+
+    await new ShowCommand().execute('alpha', { type: 'change' });
+
+    expect(spy).toHaveBeenCalledWith('alpha', { type: 'change' });
+    expect(process.exitCode).toBeUndefined();
   });
 
-  it('handles ambiguity and suggests --type', async () => {
-    // create matching spec and change named 'foo'
-    await fs.mkdir(path.join(changesDir, 'foo'), { recursive: true });
-    await fs.writeFile(path.join(changesDir, 'foo', 'proposal.md'), '# Change: Foo\n\n## Why\n\n## What Changes\n', 'utf-8');
-    await fs.mkdir(path.join(specsDir, 'foo'), { recursive: true });
-    await fs.writeFile(path.join(specsDir, 'foo', 'spec.md'), '## Purpose\n\n## Requirements\n\n### Requirement: R\nX', 'utf-8');
+  it('在显式指定 spec 类型时会直接调用 spec show', async () => {
+    vi.mocked(itemDiscovery.getSpecIds).mockResolvedValue(['spec-a']);
+    const spy = vi.spyOn(SpecCommand.prototype, 'show').mockResolvedValue();
+    restoreSpies.push(() => spy.mockRestore());
 
-    const originalCwd = process.cwd();
-    try {
-      process.chdir(testDir);
-      let err: any;
-      try {
-        execSync(`node ${apeworkflowBin} show foo`, { encoding: 'utf-8' });
-      } catch (e) { err = e; }
-      expect(err).toBeDefined();
-      expect(err.status).not.toBe(0);
-      const stderr = err.stderr.toString();
-      expect(stderr).toContain('Ambiguous item');
-      expect(stderr).toContain('--type change|spec');
-    } finally {
-      process.chdir(originalCwd);
-    }
+    await new ShowCommand().execute('spec-a', { type: 'spec', json: true });
+
+    expect(spy).toHaveBeenCalledWith('spec-a', { type: 'spec', json: true });
+    expect(process.exitCode).toBeUndefined();
   });
 
-  it('prints nearest matches when not found', () => {
-    const originalCwd = process.cwd();
-    try {
-      process.chdir(testDir);
-      let err: any;
-      try {
-        execSync(`node ${apeworkflowBin} show unknown-item`, { encoding: 'utf-8' });
-      } catch (e) { err = e; }
-      expect(err).toBeDefined();
-      expect(err.status).not.toBe(0);
-      const stderr = err.stderr.toString();
-      expect(stderr).toContain("Unknown item 'unknown-item'");
-      expect(stderr).toContain('Did you mean:');
-    } finally {
-      process.chdir(originalCwd);
-    }
+  it('当 item 同时命中 change 和 spec 时会报歧义错误', async () => {
+    vi.mocked(itemDiscovery.getActiveChangeIds).mockResolvedValue(['shared']);
+    vi.mocked(itemDiscovery.getSpecIds).mockResolvedValue(['shared']);
+
+    await new ShowCommand().execute('shared', {});
+
+    expect(errorSpy).toHaveBeenCalledWith(
+      "Ambiguous item 'shared' matches both a change and a spec."
+    );
+    expect(errorSpy).toHaveBeenCalledWith(
+      'Pass --type change|spec, or use: apeworkflow change show / apeworkflow spec show'
+    );
+    expect(process.exitCode).toBe(1);
+  });
+
+  it('当 item 不存在时会给出相似项提示', async () => {
+    vi.mocked(itemDiscovery.getActiveChangeIds).mockResolvedValue(['alpha']);
+    vi.mocked(itemDiscovery.getSpecIds).mockResolvedValue(['beta']);
+
+    await new ShowCommand().execute('alpah', {});
+
+    expect(errorSpy).toHaveBeenCalledWith("Unknown item 'alpah'");
+    expect(errorSpy).toHaveBeenCalledWith('Did you mean: alpha, beta?');
+    expect(process.exitCode).toBe(1);
+  });
+
+  it('会忽略与当前类型无关的 flags', async () => {
+    vi.mocked(itemDiscovery.getActiveChangeIds).mockResolvedValue(['alpha']);
+    const spy = vi.spyOn(ChangeCommand.prototype, 'show').mockResolvedValue();
+    restoreSpies.push(() => spy.mockRestore());
+
+    await new ShowCommand().execute('alpha', { type: 'change', requirements: true });
+
+    expect(errorSpy).toHaveBeenCalledWith(
+      'Warning: Ignoring flags not applicable to change: requirements'
+    );
+    expect(spy).toHaveBeenCalledWith('alpha', { type: 'change', requirements: true });
   });
 });
-
-

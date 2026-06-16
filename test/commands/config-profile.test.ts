@@ -4,6 +4,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
 import { execSync } from 'node:child_process';
+import { VISIBLE_COMMAND_IDS } from '../../src/core/templates/visible-command-surface.js';
 
 vi.mock('node:child_process', async () => {
   const actual = await vi.importActual<typeof import('node:child_process')>('node:child_process');
@@ -113,8 +114,8 @@ describe('config profile interactive flow', () => {
       fs.writeFileSync(skillPath, `name: ${dirName}\n`, 'utf-8');
     }
 
-    const coreCommands = ['propose', 'explore', 'apply', 'sync', 'archive'];
-    for (const commandId of coreCommands) {
+    // 这里按当前“可见命令”口径写入，和漂移检测逻辑保持一致。
+    for (const commandId of VISIBLE_COMMAND_IDS) {
       const commandPath = path.join(projectDir, '.claude', 'commands', 'ape', `${commandId}.md`);
       fs.mkdirSync(path.dirname(commandPath), { recursive: true });
       fs.writeFileSync(commandPath, `# ${commandId}\n`, 'utf-8');

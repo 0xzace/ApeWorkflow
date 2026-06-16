@@ -1,10 +1,17 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { CompletionCommand } from '../../src/commands/completion.js';
+import { CompletionProvider } from '../../src/core/completions/completion-provider.js';
 import * as shellDetection from '../../src/utils/shell-detection.js';
+import * as itemDiscovery from '../../src/utils/item-discovery.js';
 
 // Mock the shell detection module
 vi.mock('../../src/utils/shell-detection.js', () => ({
   detectShell: vi.fn(),
+}));
+
+// 中文注释：completion 命令会直接读取 archived changes，这里固定数据方便覆盖各个分支。
+vi.mock('../../src/utils/item-discovery.js', () => ({
+  getArchivedChangeIds: vi.fn(),
 }));
 
 // Mock the ZshInstaller
@@ -32,6 +39,7 @@ describe('CompletionCommand', () => {
   let command: CompletionCommand;
   let consoleLogSpy: any;
   let consoleErrorSpy: any;
+  const restoreSpies: Array<() => void> = [];
 
   beforeEach(() => {
     command = new CompletionCommand();
@@ -43,6 +51,10 @@ describe('CompletionCommand', () => {
   afterEach(() => {
     consoleLogSpy.mockRestore();
     consoleErrorSpy.mockRestore();
+    // 中文注释：只恢复本文件里临时挂上的原型桩，保留模块级 mock。
+    while (restoreSpies.length > 0) {
+      restoreSpies.pop()?.();
+    }
     vi.clearAllMocks();
   });
 
@@ -250,6 +262,53 @@ describe('CompletionCommand', () => {
 
       expect(consoleLogSpy).toHaveBeenCalledWith('spec-driven\tschema');
       expect(process.exitCode).toBe(0);
+    });
+
+    it('should output active change ids for shell completion', async () => {
+      const spy = vi.spyOn(CompletionProvider.prototype, 'getChangeIds').mockResolvedValue(['change-a', 'change-b']);
+      restoreSpies.push(() => spy.mockRestore());
+
+      await command.complete({ type: 'changes' });
+
+      expect(consoleLogSpy).toHaveBeenNthCalledWith(1, 'change-a\tactive change');
+      expect(consoleLogSpy).toHaveBeenNthCalledWith(2, 'change-b\tactive change');
+      expect(process.exitCode).toBe(0);
+    });
+
+    it('should output spec ids for shell completion', async () => {
+      const spy = vi.spyOn(CompletionProvider.prototype, 'getSpecIds').mockResolvedValue(['spec-a']);
+      restoreSpies.push(() => spy.mockRestore());
+
+      await command.complete({ type: 'specs' });
+
+      expect(consoleLogSpy).toHaveBeenCalledWith('spec-a\tspecification');
+      expect(process.exitCode).toBe(0);
+    });
+
+    it('should output archived change ids for shell completion', async () => {
+      vi.mocked(itemDiscovery.getArchivedChangeIds).mockResolvedValue(['archived-a']);
+
+      await command.complete({ type: 'archived-changes' });
+
+      expect(consoleLogSpy).toHaveBeenCalledWith('archived-a\tarchived change');
+      expect(process.exitCode).toBe(0);
+    });
+
+    it('should exit with an error for unsupported completion types', async () => {
+      await command.complete({ type: 'unknown' });
+
+      expect(consoleLogSpy).not.toHaveBeenCalled();
+      expect(process.exitCode).toBe(1);
+    });
+
+    it('should exit with an error when completion data lookup fails', async () => {
+      const spy = vi.spyOn(CompletionProvider.prototype, 'getSchemaNames').mockRejectedValue(new Error('boom'));
+      restoreSpies.push(() => spy.mockRestore());
+
+      await command.complete({ type: 'schemas' });
+
+      expect(consoleLogSpy).not.toHaveBeenCalled();
+      expect(process.exitCode).toBe(1);
     });
   });
 

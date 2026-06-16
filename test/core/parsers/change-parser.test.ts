@@ -49,4 +49,122 @@ describe('ChangeParser', () => {
       expect(change.deltas[0].requirement).toBeDefined();
     });
   });
+
+  it('会在缺少 Why 或 What Changes 时拒绝解析 change', async () => {
+    await expect(
+      new ChangeParser(
+        `# Missing Why\n\n## What Changes\n- **spec-a:** Add a requirement`,
+        process.cwd()
+      ).parseChangeWithDeltas('missing-why')
+    ).rejects.toThrow('Change must have a Why section');
+
+    await expect(
+      new ChangeParser(
+        `# Missing What Changes\n\n## Why\nBecause the plan needs a change.`,
+        process.cwd()
+      ).parseChangeWithDeltas('missing-what-changes')
+    ).rejects.toThrow('Change must have a What Changes section');
+  });
+
+  it('会在 spec 目录存在但缺少 spec.md 时回退到简单 delta', async () => {
+    await withTempDir(async (dir) => {
+      const changeDir = dir;
+      await fs.mkdir(path.join(changeDir, 'specs', 'auth'), { recursive: true });
+
+      const content = `# Test Change\n\n## Why\nWe need it because reasons that are sufficiently long.\n\n## What Changes\n- **auth:** Add a new requirement to auth`;
+      const parser = new ChangeParser(content, changeDir);
+      const change = await parser.parseChangeWithDeltas('test-change');
+
+      expect(change.deltas).toEqual([
+        expect.objectContaining({
+          spec: 'auth',
+          operation: 'ADDED',
+        }),
+      ]);
+    });
+  });
+
+  it('会解析 delta spec、rename 和 fenced code block 中的标题', async () => {
+    const parser = new ChangeParser('', process.cwd());
+    const anyParser = parser as unknown as {
+      parseSpecDeltas(specName: string, content: string): unknown[];
+      parseSectionsFromContent(content: string): Array<{ title: string; content: string }>;
+      parseRenames(content: string): Array<{ from: string; to: string }>;
+    };
+
+    const specDeltas = anyParser.parseSpecDeltas(
+      'auth',
+      [
+        '## ADDED Requirements',
+        '',
+        '### Requirement: Login',
+        'Login requirement text.',
+        '',
+        '#### Scenario: successful login',
+        'Given a user',
+        '',
+        '## MODIFIED Requirements',
+        '',
+        '### Requirement: Logout',
+        'Logout requirement text.',
+        '',
+        '## REMOVED Requirements',
+        '',
+        '### Requirement: Legacy login',
+        'Legacy requirement text.',
+        '',
+        '## RENAMED Requirements',
+        '',
+        '- FROM: ### Requirement: Old login',
+        '  TO: ### Requirement: New login',
+      ].join('\n')
+    ) as Array<{ spec: string; operation: string; description: string; requirement?: { text: string }; rename?: { from: string; to: string } }>;
+
+      expect(specDeltas).toEqual([
+        expect.objectContaining({
+          spec: 'auth',
+          operation: 'ADDED',
+          description: 'Add requirement: Login requirement text.',
+      }),
+        expect.objectContaining({
+          spec: 'auth',
+          operation: 'MODIFIED',
+          description: 'Modify requirement: Logout requirement text.',
+        }),
+        expect.objectContaining({
+          spec: 'auth',
+          operation: 'REMOVED',
+          description: 'Remove requirement: Legacy requirement text.',
+        }),
+        expect.objectContaining({
+          spec: 'auth',
+          operation: 'RENAMED',
+          description: 'Rename requirement from "Old login" to "New login"',
+      }),
+    ]);
+
+    expect(anyParser.parseRenames('- FROM: ### Requirement: Old login\n  TO: ### Requirement: New login')).toEqual([
+      { from: 'Old login', to: 'New login' },
+    ]);
+
+    const sections = anyParser.parseSectionsFromContent([
+      '# Test Change',
+      '',
+      '## Why',
+      'Because the parser should ignore code fences.',
+      '',
+      '## What Changes',
+      '```md',
+      '### Not a real section',
+      '```',
+      '- **auth:** Add a new requirement',
+    ].join('\n'));
+
+    expect(sections).toHaveLength(1);
+    expect(sections[0].title).toBe('Test Change');
+    expect(sections[0].children.map((section) => section.title)).toEqual(['Why', 'What Changes']);
+    expect(sections[0].children.find((section) => section.title === 'What Changes')?.content).toContain(
+      '### Not a real section'
+    );
+  });
 });

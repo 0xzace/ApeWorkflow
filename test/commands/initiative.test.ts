@@ -773,6 +773,28 @@ describe('initiative command', () => {
       })
     );
 
+    const missingId = await runCLI(
+      [
+        'initiative',
+        'create',
+        '--store',
+        'team-context',
+        '--title',
+        'Launch Billing Flow',
+        '--summary',
+        'Coordinate billing launch work.',
+        '--json',
+      ],
+      { cwd: tempDir, env }
+    );
+    expect(missingId.exitCode).toBe(1);
+    expect(parseJson(missingId).status[0]).toEqual(
+      expect.objectContaining({
+        code: 'initiative_id_required',
+        target: 'initiative.id',
+      })
+    );
+
     const conflict = await runCLI(
       ['initiative', 'list', '--store', 'team-context', '--store-path', storeRoot, '--json'],
       { cwd: tempDir, env }
@@ -824,6 +846,27 @@ describe('initiative command', () => {
       expect.objectContaining({
         code: 'initiative_title_required',
         target: 'initiative.title',
+      })
+    );
+
+    const missingSummary = await runCLI(
+      [
+        'initiative',
+        'create',
+        'summary-less',
+        '--store',
+        'team-context',
+        '--title',
+        'Summary Less',
+        '--json',
+      ],
+      { cwd: tempDir, env }
+    );
+    expect(missingSummary.exitCode).toBe(1);
+    expect(parseJson(missingSummary).status[0]).toEqual(
+      expect.objectContaining({
+        code: 'initiative_summary_required',
+        target: 'initiative.summary',
       })
     );
 
