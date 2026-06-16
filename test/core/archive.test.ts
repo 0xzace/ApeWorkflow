@@ -76,6 +76,28 @@ describe('ArchiveCommand', () => {
       await expect(fs.access(changeDir)).rejects.toThrow();
     });
 
+    it('should archive plan files together with the change directory', async () => {
+      const changeName = 'plan-feature';
+      const changeDir = path.join(tempDir, 'apeworkflow', 'changes', changeName);
+      await fs.mkdir(changeDir, { recursive: true });
+
+      const today = new Date().toISOString().split('T')[0];
+      const planFileName = `${today}-plan-feature.md`;
+      const planFilePath = path.join(changeDir, 'plans', planFileName);
+      await fs.mkdir(path.dirname(planFilePath), { recursive: true });
+      await fs.writeFile(planFilePath, '# plan');
+
+      await archiveCommand.execute(changeName, { yes: true });
+
+      const archiveDir = path.join(tempDir, 'apeworkflow', 'changes', 'archive');
+      const archives = await fs.readdir(archiveDir);
+      const archiveName = archives[0];
+      const archivedPlanPath = path.join(archiveDir, archiveName, 'plans', planFileName);
+
+      await expect(fs.access(archivedPlanPath)).resolves.toBeUndefined();
+      await expect(fs.access(planFilePath)).rejects.toThrow();
+    });
+
     it('should warn about incomplete tasks', async () => {
       const changeName = 'incomplete-feature';
       const changeDir = path.join(tempDir, 'apeworkflow', 'changes', changeName);

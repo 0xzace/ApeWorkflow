@@ -30,6 +30,8 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 **Save plans to:** \`apeworkflow/changes/<name>/plans/YYYY-MM-DD-<feature-name>.md\`
 - (User preferences for plan location override this default)
 
+**If one file is not enough:** split the work into additional task card files in the same \`plans/\` directory. Use a consistent name such as \`apeworkflow/changes/<name>/plans/YYYY-MM-DD-<feature-name>-task-<n>.md\`, and keep the primary plan file as the entry point.
+
 ## Scope Check
 
 If the spec covers multiple independent subsystems, it should have been broken into sub-project specs during brainstorming. If it wasn't, suggest breaking this into separate plans — one per subsystem. Each plan should produce working, testable software on its own.
@@ -44,6 +46,14 @@ Before defining tasks, map out which files will be created or modified and what 
 - In existing codebases, follow established patterns. If the codebase uses large files, don't unilaterally restructure - but if a file you're modifying has grown unwieldy, including a split in the plan is reasonable.
 
 This structure informs the task decomposition. Each task should produce self-contained changes that make sense independently.
+
+## Plan Detail and Task Cards
+
+- The primary plan file must be detailed enough for an engineer with no context to execute it end to end
+- Order tasks by dependency, not by convenience
+- If Task B depends on Task A, write Task A first and state the dependency explicitly in Task B
+- If a single plan file becomes too dense, split the work into multiple task card files so each card stays focused and independently executable
+- Keep any task card files in the same \`plans/\` directory and reference them from the primary plan file
 
 ## Bite-Sized Task Granularity
 
@@ -124,6 +134,7 @@ Every step must contain the actual content an engineer needs. These are **plan f
 - "Similar to Task N" (repeat the code — the engineer may be reading tasks out of order)
 - Steps that describe what to do without showing how (code blocks required for code steps)
 - References to types, functions, or methods not defined in any task
+- Task card files must follow the same standard: each one needs real steps, real commands, and real file paths
 
 ## Remember
 - Exact file paths always

@@ -6,7 +6,7 @@ import type { SkillTemplate, CommandTemplate } from '../types.js';
 export function getUsingSkillsSkillTemplate(): SkillTemplate {
   return {
     name: 'apeworkflow-using-skills',
-    description: 'Use when starting any conversation - establishes how to find and use skills, requiring Skill tool invocation before ANY response including clarifying questions',
+    description: 'Use when starting any conversation - establishes how to find and use the relevant skills before responding',
     instructions: `# Using Skills
 
 ## Instruction Priority
@@ -42,9 +42,6 @@ Skills use Claude Code tool names. Non-CC platforms: see \`references/copilot-to
 \`\`\`dot
 digraph skill_flow {
     "User message received" [shape=doublecircle];
-    "About to EnterPlanMode?" [shape=doublecircle];
-    "Already brainstormed?" [shape=diamond];
-    "Invoke brainstorming skill" [shape=box];
     "Might any skill apply?" [shape=diamond];
     "Invoke Skill tool" [shape=box];
     "Announce: 'Using [skill] to [purpose]'" [shape=box];
@@ -52,11 +49,6 @@ digraph skill_flow {
     "Create TodoWrite todo per item" [shape=box];
     "Follow skill exactly" [shape=box];
     "Respond (including clarifications)" [shape=doublecircle];
-
-    "About to EnterPlanMode?" -> "Already brainstormed?";
-    "Already brainstormed?" -> "Invoke brainstorming skill" [label="no"];
-    "Already brainstormed?" -> "Might any skill apply?" [label="yes"];
-    "Invoke brainstorming skill" -> "Might any skill apply?";
 
     "User message received" -> "Might any skill apply?";
     "Might any skill apply?" -> "Invoke Skill tool" [label="yes, even 1%"];
@@ -92,10 +84,10 @@ These thoughts mean STOP--you're rationalizing:
 
 When multiple skills could apply, use this order:
 
-1. **Process skills first** (brainstorming, debugging) - these determine HOW to approach the task
+1. **Process skills first** - these determine HOW to approach the task
 2. **Implementation skills second** (frontend-design, mcp-builder) - these guide execution
 
-"Let's build X" -> brainstorming first, then implementation skills.
+"Let's build X" -> use the relevant process skill first, then implementation skills.
 "Fix this bug" -> debugging first, then domain-specific skills.
 
 ## Skill Types

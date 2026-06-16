@@ -204,15 +204,17 @@
 
 这三个会话没有把 `apeworkflow-brainstorming`、`apeworkflow-writing-plans`、`apeworkflow-test-driven-development` 做成清晰的独立调用链，根本原因是：
 
-1. `/ape:explore` 的设计让“思考”和“澄清”天然覆盖了 brainstorming。
-2. 规划阶段被直接写 artifact 的流程替代，导致 writing-plans 没有显式出现。
+1. 当时的 `explore` 入口把思考和澄清吸收掉了，导致 `brainstorming` 没有作为独立的补充阶段出现。
+2. 规划阶段被直接写 artifact 的流程替代，导致 `writing-plans` 没有作为独立的详细计划阶段出现。
 3. 实现阶段被构建错误修复牵引，导致 TDD 没有作为独立工作方式出现。
 4. `6e354` 还叠加了运行时异常和中断，进一步削弱了流程连续性。
 
-如果后续要让方法论技能在日志里更明确，关键不是“多说几次技能名”，而是把阶段切换做清楚：
+如果后续要让方法论技能在日志里更明确，主流程应当写清楚：
 
-- explore 只负责探索
-- 在 `ape:explore` 原有的思考和澄清结束之后，再补一轮 `brainstorming`，进一步补充思考和澄清
-- brainstorming 只负责梳理问题
-- writing-plans 只负责落计划
-- TDD 只负责实现验证
+- explore 只负责探索与澄清
+- propose 负责生成 `proposal.md`、`design.md`、`tasks.md`
+- propose 中嵌入 `brainstorming`，用来补充需求探索和澄清，并回写到 `proposal.md`、`design.md`、`tasks.md`
+- `brainstorming` 的最后一步是 `writing-plans`
+- `writing-plans` 负责产出 `apeworkflow/changes/<name>/plans/YYYY-MM-DD-<feature-name>.md`
+- `apply` 负责按 `plans/` 文件执行开发任务
+- `verify` 和 `archive` 继续走后段主流程

@@ -12,28 +12,6 @@ export function getExploreSkillTemplate(): SkillTemplate {
     description: 'Enter explore mode - a thinking partner for exploring ideas, investigating problems, and clarifying requirements. Use when the user wants to think through something before or during a change.',
     instructions: `Enter explore mode. Think deeply. Visualize freely. Follow the conversation wherever it goes.
 
-## 任务类型路由
-
-### \`功能开发\`
-- \`explore\`：\`using-skills -> brainstorming\`
-- \`propose\`：\`writing-plans -> using-git-worktrees -> dispatching-parallel-agents\`
-
-### \`缺陷修复\`
-- \`explore\`：\`using-skills -> brainstorming\`
-- \`propose\`：\`systematic-debugging -> writing-plans -> using-git-worktrees\`
-
-### \`重构\`
-- \`explore\`：\`using-skills -> brainstorming\`
-- \`propose\`：\`writing-plans -> using-git-worktrees -> dispatching-parallel-agents\`
-
-### \`文档\`
-- \`explore\`：\`using-skills -> brainstorming\`
-- \`propose\`：\`writing-plans\`
-
-### 统一规则
-- \`explore\` 阶段先路由，再澄清
-- \`propose\` 阶段先定计划，再选工作区或并行策略
-
 **IMPORTANT: Explore mode is for thinking, not implementing.** You may read files, search code, and investigate the codebase, but you must NEVER write code or implement features. If the user asks you to implement something, remind them to exit explore mode first and create a change proposal. You MAY create ApeWorkflow artifacts (proposals, designs, specs) if the user asks—that's capturing thinking, not implementing.
 
 **This is a stance, not a workflow.** There are no fixed steps, no required sequence, no mandatory outputs. You're a thinking partner helping the user explore.
