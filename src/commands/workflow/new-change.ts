@@ -54,14 +54,14 @@ interface NewChangeOutput {
 // Command Implementation
 // -----------------------------------------------------------------------------
 
-function parseAffectedAreas(value: string | undefined): string[] {
+export function parseAffectedAreas(value: string | undefined): string[] {
   return (value ?? '')
     .split(',')
     .map((area) => area.trim())
     .filter((area) => area.length > 0);
 }
 
-function validateWorkspaceAffectedAreas(planningHome: PlanningHome, affectedAreas: string[]): void {
+export function validateWorkspaceAffectedAreas(planningHome: PlanningHome, affectedAreas: string[]): void {
   if (affectedAreas.length === 0) {
     return;
   }
@@ -83,7 +83,7 @@ function validateWorkspaceAffectedAreas(planningHome: PlanningHome, affectedArea
   }
 }
 
-function outputForCreatedChange(
+export function outputForCreatedChange(
   id: string,
   changeDir: string,
   schema: string,

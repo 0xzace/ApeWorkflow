@@ -46,7 +46,7 @@ interface SetChangeOutput {
   updated?: boolean;
 }
 
-function outputForSetChange(
+export function outputForSetChange(
   id: string,
   changeDir: string,
   schema: string,

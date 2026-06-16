@@ -50,7 +50,7 @@ export async function directoryExists(dirPath: string): Promise<boolean> {
   }
 }
 
-function normalizeExistingPathForStorage(existingPath: string): string {
+export function normalizeExistingPathForStorage(existingPath: string): string {
   return FileSystemUtils.canonicalizeExistingPath(existingPath);
 }
 
@@ -87,7 +87,7 @@ export function inferLinkName(absolutePath: string): string {
   return path.basename(absolutePath);
 }
 
-function normalizeLinksForOutput(
+export function normalizeLinksForOutput(
   viewState: WorkspaceViewState
 ): WorkspaceLinkOutput[] {
   return Object.keys(viewState.links)

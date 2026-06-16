@@ -349,6 +349,67 @@ describe('BashGenerator', () => {
       expect(script).toContain('apeworkflow __complete schemas 2>/dev/null');
     });
 
+    it('should handle indexed positional arguments', () => {
+      const commands: CommandDefinition[] = [
+        {
+          name: 'change',
+          description: 'Manage changes',
+          flags: [],
+          subcommands: [
+            {
+              name: 'update',
+              description: 'Update a change',
+              flags: [
+                { name: 'schema', takesValue: true, description: 'Schema name' },
+                { name: 'json', description: 'JSON output' },
+              ],
+              positionals: [
+                { name: 'name', type: 'change-id' },
+                { name: 'schema', type: 'schema-name' },
+              ],
+            },
+          ],
+        },
+      ];
+
+      const script = generator.generate(commands);
+
+      // Should contain value flag skipping logic
+      expect(script).toContain('skip_next=0');
+      expect(script).toContain('positional_index');
+      // Should reference the value flags
+      expect(script).toContain('--schema');
+    });
+
+    it('should generate indexed positional completions with multiple types', () => {
+      const commands: CommandDefinition[] = [
+        {
+          name: 'change',
+          description: 'Manage changes',
+          flags: [],
+          subcommands: [
+            {
+              name: 'apply',
+              description: 'Apply a change',
+              positionals: [
+                { name: 'change', type: 'change-id' },
+                { name: 'schema', type: 'schema-name' },
+              ],
+              flags: [],
+            },
+          ],
+        },
+      ];
+
+      const script = generator.generate(commands);
+
+      // Should have indexed positional case
+      expect(script).toContain('positional_index=0');
+      // Should reference both completion types
+      expect(script).toContain('_apeworkflow_complete_changes');
+      expect(script).toContain('_apeworkflow_complete_schemas');
+    });
+
     it('should generate dynamic completion helper for changes', () => {
       const commands: CommandDefinition[] = [
         {
