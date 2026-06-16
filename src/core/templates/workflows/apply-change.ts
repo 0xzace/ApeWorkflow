@@ -6,32 +6,32 @@
  */
 import type { SkillTemplate, CommandTemplate } from '../types.js';
 
-// 任务类型路由块，供两个模板复用；这里不直接展示隐藏命令。
+// 任务类型路由块，保留为外壳层的技能分发说明，不展开具体开发动作。
 const taskRoutingBlock = [
   '## 任务类型路由',
   '',
   '### `功能开发`',
-  '- `apply`：`executing-plans -> test-driven-development -> subagent-driven-development`',
-  '- `verify`：`verification-before-completion -> requesting-code-review -> receiving-code-review`',
-  '- `archive`：`finishing-a-development-branch -> verification-before-completion`',
+  '- `apply`：调用 `executing-plans -> test-driven-development -> subagent-driven-development`',
+  '- `verify`：调用 `verification-before-completion -> requesting-code-review -> receiving-code-review`',
+  '- `archive`：调用 `finishing-a-development-branch -> verification-before-completion`',
   '',
   '### `缺陷修复`',
-  '- `apply`：`systematic-debugging -> test-driven-development -> executing-plans`',
-  '- `verify`：`verification-before-completion -> requesting-code-review -> receiving-code-review`',
-  '- `archive`：`finishing-a-development-branch -> verification-before-completion`',
+  '- `apply`：调用 `systematic-debugging -> test-driven-development -> executing-plans`',
+  '- `verify`：调用 `verification-before-completion -> requesting-code-review -> receiving-code-review`',
+  '- `archive`：调用 `finishing-a-development-branch -> verification-before-completion`',
   '',
   '### `重构`',
-  '- `apply`：`executing-plans -> test-driven-development -> subagent-driven-development`',
-  '- `verify`：`verification-before-completion -> requesting-code-review -> receiving-code-review`',
-  '- `archive`：`finishing-a-development-branch -> verification-before-completion`',
+  '- `apply`：调用 `executing-plans -> test-driven-development -> subagent-driven-development`',
+  '- `verify`：调用 `verification-before-completion -> requesting-code-review -> receiving-code-review`',
+  '- `archive`：调用 `finishing-a-development-branch -> verification-before-completion`',
   '',
   '### `文档`',
-  '- `apply`：`writing-skills`',
-  '- `verify`：`verification-before-completion`',
-  '- `archive`：`finishing-a-development-branch -> verification-before-completion`',
+  '- `apply`：调用 `writing-skills`',
+  '- `verify`：调用 `verification-before-completion`',
+  '- `archive`：调用 `finishing-a-development-branch -> verification-before-completion`',
   '',
   '### 统一规则',
-  '- `apply` 阶段按任务类型选择执行顺序',
+  '- `apply` 阶段只负责根据任务类型分发到对应方法论 Skill',
   '- `verify` 阶段先提供验证证据，再进入 review',
   '- `archive` 阶段先收尾，再确认归档',
 ].join('\n');
@@ -39,8 +39,8 @@ const taskRoutingBlock = [
 export function getApplyChangeSkillTemplate(): SkillTemplate {
   return {
     name: 'apeworkflow-apply-change',
-    description: 'Implement plans from an ApeWorkflow change using the detailed plan file(s) under plans/. Use when the user wants to start implementing, continue implementation, or work through tasks.',
-    instructions: `Implement plans from an ApeWorkflow change.
+    description: 'Keep the ApeWorkflow apply shell and route task execution through methodology skills.',
+    instructions: `Keep the ApeWorkflow apply shell and route task execution through methodology skills.
 
 **Input**: Optionally specify a change name. If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
@@ -55,7 +55,7 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
 
    Always announce: "Using change: <name>" and how to override (e.g., \`/ape:apply <other>\`).
 
-2. **Check status to understand the schema**
+2. **Check status to understand the shell context**
    \`\`\`bash
    apeworkflow status --change "<name>" --json
    \`\`\`
@@ -64,7 +64,7 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
    - \`planningHome\`, \`changeRoot\`, and \`actionContext\`: planning scope and edit constraints
    - Which artifact contains the tasks and detailed plan file(s) (typically "tasks" plus the files under \`plans/\` for spec-driven, check status for others)
 
-3. **Get apply instructions**
+3. **Get apply instructions and load the task list**
 
    \`\`\`bash
    apeworkflow instructions apply --change "<name>" --json
@@ -92,28 +92,23 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
 
    The detailed plan file(s) under \`plans/\` are the implementation source of truth.
 
-5. **Show current progress**
+5. **Dispatch by task type**
+
+   For each pending task, use the task type to choose the methodology Skill chain, then let that Skill chain do the concrete implementation work.
+
+   **Task type routing**
+
+${taskRoutingBlock}
+
+   **Shell rule**: this command only owns selection, loading, routing, progress tracking, and pause/completion output. It does not describe or perform the detailed development steps itself.
+
+6. **Show current progress**
 
    Display:
    - Schema being used
    - Progress: "N/M tasks complete"
    - Remaining tasks overview
    - Dynamic instruction from CLI
-
-6. **Implement tasks (loop until done or blocked)**
-
-   For each pending task:
-   - Show which task is being worked on
-   - Make the code changes required
-   - Keep changes minimal and focused
-   - Mark task complete in the tasks file: \`- [ ]\` → \`- [x]\`
-   - Continue to next task
-
-   **Pause if:**
-   - Task is unclear → ask for clarification
-   - Implementation reveals a design issue → suggest updating artifacts
-   - Error or blocker encountered → report and wait for guidance
-   - User interrupts
 
 7. **On completion or pause, show status**
 
@@ -184,8 +179,6 @@ What would you like to do?
 - Pause on errors, blockers, or unclear requirements - don't guess
 - Use contextFiles from CLI output, don't assume specific file names
 
-${taskRoutingBlock}
-
 **Fluid Workflow Integration**
 
 This skill supports the "actions on a change" model:
@@ -201,7 +194,7 @@ This skill supports the "actions on a change" model:
 export function getApeApplyCommandTemplate(): CommandTemplate {
   return {
     name: 'APE: Apply',
-    description: 'Implement plans from an ApeWorkflow change using the detailed plan file(s) under plans/ (Experimental)',
+    description: 'Keep the ApeWorkflow apply shell and route task execution through methodology skills (Experimental)',
     category: 'Workflow',
     tags: ['workflow', 'artifacts', 'experimental'],
     content: getApplyChangeSkillTemplate().instructions,
