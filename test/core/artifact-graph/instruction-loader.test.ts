@@ -25,6 +25,7 @@ describe('instruction-loader', () => {
 
       expect(template).toContain('Implementation Plan');
       expect(template).toContain('- [ ] Step 1: Write the failing test');
+      expect(template).not.toContain('**Step 1:');
     });
 
     it('should throw TemplateLoadError for non-existent template', () => {

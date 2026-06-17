@@ -458,14 +458,18 @@ program
   .option('--json', 'Output as JSON')
   .action(async (artifactId: string | undefined, options: InstructionsOptions) => {
     try {
-      // Special case: "apply" is not an artifact, but a command to get apply instructions
+      // 中文注释：把 apply / verify / archive 这类“非 artifact”入口统一在这里分发，避免重复注册 instructions 父命令。
       if (artifactId === 'apply') {
         await applyInstructionsCommand(options);
+      } else if (artifactId === 'verify') {
+        await verifyInstructionsCommand(options);
+      } else if (artifactId === 'archive') {
+        await archiveInstructionsCommand(options);
       } else {
         await instructionsCommand(artifactId, options);
       }
     } catch (error) {
-      await handleCliFailure(error, { commandPath: 'schemas' });
+      await handleCliFailure(error, { commandPath: 'instructions' });
     }
   });
 
@@ -493,36 +497,6 @@ program
       await schemasCommand(options);
     } catch (error) {
       await handleCliFailure(error, { commandPath: 'schemas' });
-    }
-  });
-
-// Verify instructions command
-program
-  .command('instructions verify')
-  .description('Get verification instructions for a change')
-  .option('--change <id>', 'Change name')
-  .option('--schema <name>', 'Schema override')
-  .option('--json', 'Output as JSON')
-  .action(async (options: VerifyInstructionsOptions) => {
-    try {
-      await verifyInstructionsCommand(options);
-    } catch (error) {
-      await handleCliFailure(error, { commandPath: 'instructions:verify' });
-    }
-  });
-
-// Archive instructions command
-program
-  .command('instructions archive')
-  .description('Get archive instructions for a change')
-  .option('--change <id>', 'Change name')
-  .option('--schema <name>', 'Schema override')
-  .option('--json', 'Output as JSON')
-  .action(async (options: ArchiveInstructionsOptions) => {
-    try {
-      await archiveInstructionsCommand(options);
-    } catch (error) {
-      await handleCliFailure(error, { commandPath: 'instructions:archive' });
     }
   });
 

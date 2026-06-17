@@ -15,6 +15,7 @@ export function getWritingPlansSkillTemplate(): SkillTemplate {
 }
 
 function getWritingPlansInstructions(): string {
+  // 中文注释：步骤标题保持普通文本，不要加粗，避免生成的 plans/*.md 和 apply 阶段读取格式不一致。
   return `# Writing Plans
 
 ## Overview
@@ -92,7 +93,7 @@ This structure informs the task decomposition. Each task should produce self-con
 - Modify: \`exact/path/to/existing.py:123-145\`
 - Test: \`tests/exact/path/to/test.py\`
 
-- [ ] **Step 1: Write the failing test**
+- [ ] Step 1: Write the failing test
 
 \`\`\`python
 def test_specific_behavior():
@@ -100,24 +101,24 @@ def test_specific_behavior():
     assert result == expected
 \`\`\`
 
-- [ ] **Step 2: Run test to verify it fails**
+- [ ] Step 2: Run test to verify it fails
 
 Run: \`pytest tests/path/test.py::test_name -v\`
 Expected: FAIL with "function not defined"
 
-- [ ] **Step 3: Write minimal implementation**
+- [ ] Step 3: Write minimal implementation
 
 \`\`\`python
 def function(input):
     return expected
 \`\`\`
 
-- [ ] **Step 4: Run test to verify it passes**
+- [ ] Step 4: Run test to verify it passes
 
 Run: \`pytest tests/path/test.py::test_name -v\`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [ ] Step 5: Commit
 
 \`\`\`bash
 git add tests/path/test.py src/path/file.py

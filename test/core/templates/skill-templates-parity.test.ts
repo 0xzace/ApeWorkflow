@@ -59,8 +59,8 @@ const EXPECTED_FUNCTION_HASHES: Record<string, string> = {
   getApeBrainstormingCommandTemplate: '8e2b8c4cc2a33e7326844ed152d05dd9b0ae354bcbc41442d7346cd1fb24edff',
   getApeProposeSkillTemplate: 'c384340885af9a28f7bd76ddbd2324f2e67c08405a9e9bac043613233df37ec0',
   getApeProposeCommandTemplate: '558cf11e8e59da7c93d634b0ca90a7947b8da0f22eca5123084940c352666356',
-  getWritingPlansSkillTemplate: 'e91fe7cd624d33e43945ddfcc18f10cd8e58eb6babd81f6f6418743b160c5fdd',
-  getApeWritingPlansCommandTemplate: '79412dda33151030852e1dbde46582b3d776a4eae037c16d46a1f419cea7aff8',
+  getWritingPlansSkillTemplate: '77e91046fa6f275f91e85c05f1cd063d74d496660ceeef154decfc150967cf17',
+  getApeWritingPlansCommandTemplate: '10a3b5d25027f8e7b33b87e8f2f03430f2ceb802ba7191a79a0b12fe804f22b3',
   getApeFeedbackCommandTemplate: '64a41ece5a3dcb7f5806af0e178c74e396d2b03c6437ad87c847220f693b207b',
   getFeedbackSkillTemplate: '1062057eab299213fdc18db1922cc0b94030c2db04ce80e0641bf3b920cfb92f',
 };
@@ -78,7 +78,7 @@ const EXPECTED_GENERATED_SKILL_CONTENT_HASHES: Record<string, string> = {
   'apeworkflow-onboard': '6004a8279cd631fc69f9d7d0ca4c7f9860050b69b03e063920c130f025866912',
   'apeworkflow-brainstorming': '400c3a443a599c5aeb2b5e81f0e386f74f98d55e9b899b2aafea52ef9ec13d8a',
   'apeworkflow-propose': 'f94ec5b3f3b28132eb759c2eb88f2ed62572b15105d649842507c95a24818add',
-  'apeworkflow-writing-plans': '86846a7a4f8fb20ac84b31b75241b3b049db3dfce04299a2167785f12052274a',
+  'apeworkflow-writing-plans': 'e82fce5ad552b5481fc51c82ba359ab2c6260ac4850b62c9bfd3a5398c0b16a6',
 };
 
 function stableStringify(value: unknown): string {
