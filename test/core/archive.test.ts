@@ -16,6 +16,15 @@ describe('ArchiveCommand', () => {
   let archiveCommand: ArchiveCommand;
   const originalConsoleLog = console.log;
 
+  async function writePlan(changeName: string, content: string): Promise<string> {
+    const changeDir = path.join(tempDir, 'apeworkflow', 'changes', changeName);
+    const plansDir = path.join(changeDir, 'plans');
+    await fs.mkdir(plansDir, { recursive: true });
+    const planPath = path.join(plansDir, `2026-06-17-${changeName}.md`);
+    await fs.writeFile(planPath, content);
+    return planPath;
+  }
+
   beforeEach(async () => {
     // Create temp directory
     tempDir = path.join(os.tmpdir(), `apeworkflow-archive-test-${Date.now()}`);
@@ -58,9 +67,8 @@ describe('ArchiveCommand', () => {
       const changeDir = path.join(tempDir, 'apeworkflow', 'changes', changeName);
       await fs.mkdir(changeDir, { recursive: true });
       
-      // Create tasks.md with completed tasks
-      const tasksContent = '- [x] Task 1\n- [x] Task 2';
-      await fs.writeFile(path.join(changeDir, 'tasks.md'), tasksContent);
+      // Create a plan file with completed tasks
+      await writePlan(changeName, '- [x] Task 1\n- [x] Task 2');
       
       // Execute archive with --yes flag
       await archiveCommand.execute(changeName, { yes: true });
@@ -103,9 +111,8 @@ describe('ArchiveCommand', () => {
       const changeDir = path.join(tempDir, 'apeworkflow', 'changes', changeName);
       await fs.mkdir(changeDir, { recursive: true });
       
-      // Create tasks.md with incomplete tasks
-      const tasksContent = '- [x] Task 1\n- [ ] Task 2\n- [ ] Task 3';
-      await fs.writeFile(path.join(changeDir, 'tasks.md'), tasksContent);
+      // Create a plan file with incomplete tasks
+      await writePlan(changeName, '- [x] Task 1\n- [ ] Task 2\n- [ ] Task 3');
       
       // Execute archive with --yes flag
       await archiveCommand.execute(changeName, { yes: true });
@@ -298,12 +305,12 @@ New feature description.
       ).rejects.toThrow(`Archive '${date}-${changeName}' already exists.`);
     });
 
-    it('should handle changes without tasks.md', async () => {
+    it('should handle changes without plan files', async () => {
       const changeName = 'no-tasks-feature';
       const changeDir = path.join(tempDir, 'apeworkflow', 'changes', changeName);
       await fs.mkdir(changeDir, { recursive: true });
       
-      // Execute archive without tasks.md
+      // Execute archive without plan files
       await archiveCommand.execute(changeName, { yes: true });
       
       // Should complete without warnings
@@ -384,7 +391,7 @@ The system will log all events.
 - **WHEN** an event occurs
 - **THEN** it is captured`;
       await fs.writeFile(path.join(changeSpecDir, 'spec.md'), deltaSpec);
-      await fs.writeFile(path.join(changeDir, 'tasks.md'), '- [x] Task 1\n');
+      await writePlan(changeName, '- [x] Task 1\n');
 
       const deltaSpy = vi.spyOn(Validator.prototype, 'validateChangeDeltaSpecs');
       const specContentSpy = vi.spyOn(Validator.prototype, 'validateSpecContent');
@@ -844,9 +851,8 @@ E1 updated`);
       const changeDir = path.join(tempDir, 'apeworkflow', 'changes', changeName);
       await fs.mkdir(changeDir, { recursive: true });
       
-      // Create tasks.md with incomplete tasks
-      const tasksContent = '- [ ] Task 1';
-      await fs.writeFile(path.join(changeDir, 'tasks.md'), tasksContent);
+      // Create a plan file with incomplete tasks
+      await writePlan(changeName, '- [ ] Task 1');
       
       // Mock confirm to return true (proceed)
       mockConfirm.mockResolvedValueOnce(true);
@@ -869,9 +875,8 @@ E1 updated`);
       const changeDir = path.join(tempDir, 'apeworkflow', 'changes', changeName);
       await fs.mkdir(changeDir, { recursive: true });
       
-      // Create tasks.md with incomplete tasks
-      const tasksContent = '- [ ] Task 1';
-      await fs.writeFile(path.join(changeDir, 'tasks.md'), tasksContent);
+      // Create a plan file with incomplete tasks
+      await writePlan(changeName, '- [ ] Task 1');
       
       // Mock confirm to return false (cancel) for validation skip
       mockConfirm.mockResolvedValueOnce(false);

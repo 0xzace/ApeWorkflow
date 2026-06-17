@@ -20,6 +20,13 @@ describe('instruction-loader', () => {
       expect(template).toContain('## What Changes');
     });
 
+    it('should load plans template from schema directory', () => {
+      const template = loadTemplate('spec-driven', 'plans.md');
+
+      expect(template).toContain('Implementation Plan');
+      expect(template).toContain('- [ ] Step 1: Write the failing test');
+    });
+
     it('should throw TemplateLoadError for non-existent template', () => {
       expect(() => loadTemplate('spec-driven', 'nonexistent.md')).toThrow(
         TemplateLoadError
@@ -180,6 +187,19 @@ describe('instruction-loader', () => {
       // proposal unlocks specs and design
       expect(instructions.unlocks).toContain('specs');
       expect(instructions.unlocks).toContain('design');
+    });
+
+    it('should show plans depends on tasks', () => {
+      const context = loadChangeContext(tempDir, 'my-change');
+      const instructions = generateInstructions(context, 'plans');
+
+      expect(instructions.dependencies.map((dep) => dep.id)).toEqual([
+        'proposal',
+        'specs',
+        'design',
+        'tasks',
+      ]);
+      expect(instructions.outputPath).toBe('plans/*.md');
     });
 
     it('should have empty dependencies for root artifact', () => {
@@ -573,6 +593,8 @@ rules:
       fs.writeFileSync(path.join(changeDir, 'specs', 'test.md'), '# Spec');
       fs.writeFileSync(path.join(changeDir, 'design.md'), '# Design');
       fs.writeFileSync(path.join(changeDir, 'tasks.md'), '# Tasks');
+      fs.mkdirSync(path.join(changeDir, 'plans'), { recursive: true });
+      fs.writeFileSync(path.join(changeDir, 'plans', '2026-06-17-my-change.md'), '# Plan\n\n- [x] Task 1');
 
       const context = loadChangeContext(tempDir, 'my-change');
       const status = formatChangeStatus(context);
@@ -590,6 +612,15 @@ rules:
       expect(tasks?.status).toBe('blocked');
       expect(tasks?.missingDeps).toContain('specs');
       expect(tasks?.missingDeps).toContain('design');
+
+      const plans = status.artifacts.find(a => a.id === 'plans');
+      expect(plans?.status).toBe('blocked');
+      expect(plans?.missingDeps).toEqual([
+        'design',
+        'proposal',
+        'specs',
+        'tasks',
+      ]);
     });
 
     it('should sort artifacts in build order', () => {
@@ -600,10 +631,12 @@ rules:
       const proposalIdx = ids.indexOf('proposal');
       const specsIdx = ids.indexOf('specs');
       const tasksIdx = ids.indexOf('tasks');
+      const plansIdx = ids.indexOf('plans');
 
-      // proposal must come before specs, specs before tasks
+      // proposal must come before specs, specs before tasks, tasks before plans
       expect(proposalIdx).toBeLessThan(specsIdx);
       expect(specsIdx).toBeLessThan(tasksIdx);
+      expect(tasksIdx).toBeLessThan(plansIdx);
     });
   });
 });

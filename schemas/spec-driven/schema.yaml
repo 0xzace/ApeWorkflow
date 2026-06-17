@@ -1,6 +1,6 @@
 name: spec-driven
 version: 1
-description: Default ApeWorkflow workflow - proposal → specs → design → tasks
+description: Default ApeWorkflow workflow - proposal → specs → design → tasks → plans
 artifacts:
   - id: proposal
     generates: proposal.md
@@ -112,17 +112,17 @@ artifacts:
 
   - id: tasks
     generates: tasks.md
-    description: Implementation checklist with trackable tasks
+    description: Task outline that seeds plan files
     template: tasks.md
     instruction: |
-      Create the task list that breaks down the implementation work.
+      Create the task outline that breaks down the implementation work.
 
-      **IMPORTANT: Follow the template below exactly.** The apply phase parses
-      checkbox format to track progress. Tasks not using `- [ ]` won't be tracked.
+      This file is for brainstorming and planning only. The apply phase uses
+      the detailed plan files under `plans/` for checkbox tracking.
 
       Guidelines:
       - Group related tasks under ## numbered headings
-      - Each task MUST be a checkbox: `- [ ] X.Y Task description`
+      - Each task MUST be a plain bullet or numbered item without checkbox markers
       - Tasks should be small enough to complete in one session
       - Order tasks by dependency (what must be done first?)
 
@@ -130,24 +130,49 @@ artifacts:
       ```
       ## 1. Setup
 
-      - [ ] 1.1 Create new module structure
-      - [ ] 1.2 Add dependencies to package.json
+      - 1.1 Create new module structure
+      - 1.2 Add dependencies to package.json
 
       ## 2. Core Implementation
 
-      - [ ] 2.1 Implement data export function
-      - [ ] 2.2 Add CSV formatting utilities
+      - 2.1 Implement data export function
+      - 2.2 Add CSV formatting utilities
       ```
 
       Reference specs for what needs to be built, design for how to build it.
-      Each task should be verifiable - you know when it's done.
+      Each task should be concrete enough that writing-plans can expand it into
+      checkboxed execution steps.
     requires:
       - specs
       - design
 
+  - id: plans
+    generates: "plans/*.md"
+    description: Implementation plan files with checkbox tracking
+    template: plans.md
+    instruction: |
+      Create the implementation plan file(s) that will be executed by apply.
+
+      This is the real execution source of truth. Keep tasks in checkbox format
+      and make the plan concrete enough that apply can work through it directly.
+
+      Guidelines:
+      - Save plan files under `plans/`
+      - Use `- [ ]` / `- [x]` checkboxes for execution tracking
+      - Group work into clear, ordered steps
+      - Keep the plan aligned with proposal, specs, and design
+      - If multiple files are needed, split them by focus area or stage
+
+      Writing-plans expands the task outline into these files.
+    requires:
+      - proposal
+      - specs
+      - design
+      - tasks
+
 apply:
-  requires: [tasks]
-  tracks: tasks.md
+  requires: [plans]
+  tracks: plans/*.md
   instruction: |
-    Read context files, work through pending tasks, mark complete as you go.
+    Read the plan files, work through pending tasks, mark complete as you go.
     Pause if you hit blockers or need clarification.

@@ -55,7 +55,7 @@ describe('workflow apply instructions', () => {
   }
 
   it('在必需产物缺失时返回 blocked', async () => {
-    writeSchema('apply-demo', 'tasks.md');
+    writeSchema('apply-demo', 'plans/*.md');
     fs.mkdirSync(path.join(tempDir, 'apeworkflow', 'changes', 'missing-artifacts'), {
       recursive: true,
     });
@@ -69,7 +69,7 @@ describe('workflow apply instructions', () => {
   });
 
   it('在 tracking 文件缺失时返回 blocked', async () => {
-    writeSchema('apply-demo', 'tasks.md');
+    writeSchema('apply-demo', 'plans/*.md');
     writeChange('missing-tracks', {
       'proposal.md': '# Proposal body\n',
     });
@@ -77,15 +77,15 @@ describe('workflow apply instructions', () => {
     const result = await generateApplyInstructions(tempDir, 'missing-tracks', 'apply-demo');
 
     expect(result.state).toBe('blocked');
-    expect(result.instruction).toContain('tasks.md file is missing');
+    expect(result.instruction).toContain('plans/*.md');
     expect(result.missingArtifacts).toBeUndefined();
   });
 
   it('在任务全部完成时返回 all_done', async () => {
-    writeSchema('apply-demo', 'tasks.md');
+    writeSchema('apply-demo', 'plans/*.md');
     writeChange('all-done', {
       'proposal.md': '# Proposal body\n',
-      'tasks.md': ['- [x] First task', '* [X] Second task'].join('\n'),
+      'plans/2026-06-17-apply-demo.md': ['- [x] First task', '* [X] Second task'].join('\n'),
     });
 
     const result = await generateApplyInstructions(tempDir, 'all-done', 'apply-demo');

@@ -15,6 +15,11 @@ import {
   resolveArtifactOutputs,
   type ArtifactInstructions,
 } from '../../core/artifact-graph/index.js';
+import {
+  parseChecklistItems,
+  resolvePlanFiles,
+  resolvePlanningTrackingFiles,
+} from '../../core/planning-files.js';
 import { getChangeDir, resolveCurrentPlanningHomeSync } from '../../core/planning-home.js';
 import {
   validateChangeExists,
@@ -228,32 +233,6 @@ export function printInstructionsText(instructions: ArtifactInstructions, isBloc
 // -----------------------------------------------------------------------------
 
 /**
- * Parses tasks.md content and extracts task items with their completion status.
- */
-function parseTasksFile(content: string): TaskItem[] {
-  const tasks: TaskItem[] = [];
-  const lines = content.split('\n');
-  let taskIndex = 0;
-
-  for (const line of lines) {
-    // Match checkbox patterns: - [ ] or - [x] or - [X]
-    const checkboxMatch = line.match(/^[-*]\s*\[([ xX])\]\s*(.+)\s*$/);
-    if (checkboxMatch) {
-      taskIndex++;
-      const done = checkboxMatch[1].toLowerCase() === 'x';
-      const description = checkboxMatch[2].trim();
-      tasks.push({
-        id: `${taskIndex}`,
-        description,
-        done,
-      });
-    }
-  }
-
-  return tasks;
-}
-
-/**
  * Generates apply instructions for implementing tasks from a change.
  * Schema-aware: reads apply phase configuration from schema to determine
  * required artifacts, tracking file, and instruction.
@@ -293,23 +272,45 @@ export async function generateApplyInstructions(
   // Build context files from all existing artifacts in schema
   const contextFiles: Record<string, string[]> = {};
   for (const artifact of schema.artifacts) {
+    if (artifact.id === 'tasks') {
+      continue;
+    }
     const outputs = resolveArtifactOutputs(changeDir, artifact.generates);
     if (outputs.length > 0) {
       contextFiles[artifact.id] = outputs;
     }
   }
 
-  // Parse tasks if tracking file exists
+  // 中文注释：优先把 plans/ 里的计划文件暴露给 apply，让下游直接读主计划。
+  const planningFiles = resolvePlanFiles(changeDir);
+  if (planningFiles.length > 0) {
+    contextFiles.plans = planningFiles;
+  }
+
+  // 中文注释：apply 只暴露实现所需的核心上下文，不再把 tasks.md 当作执行输入。
   let tasks: TaskItem[] = [];
   let tracksFileExists = false;
   if (tracksFile) {
-    const tracksPath = path.join(changeDir, tracksFile);
-    tracksFileExists = fs.existsSync(tracksPath);
+    const trackingFiles = resolvePlanningTrackingFiles(changeDir, tracksFile);
+    tracksFileExists = trackingFiles.length > 0;
     if (tracksFileExists) {
-      const tasksContent = await fs.promises.readFile(tracksPath, 'utf-8');
-      tasks = parseTasksFile(tasksContent);
+      for (const trackingFile of trackingFiles) {
+        const tasksContent = await fs.promises.readFile(trackingFile, 'utf-8');
+        const parsed = parseChecklistItems(tasksContent);
+        for (const item of parsed) {
+          tasks.push({
+            id: `${tasks.length + 1}`,
+            description: item.description,
+            done: item.done,
+          });
+        }
+      }
     }
   }
+
+  const tracksLabel = tracksFile
+    ? (tracksFile.includes('*') ? tracksFile : path.basename(tracksFile))
+    : '';
 
   // Calculate progress
   const total = tasks.length;
@@ -325,14 +326,12 @@ export async function generateApplyInstructions(
     instruction = `Cannot apply this change yet. Missing artifacts: ${missingArtifacts.join(', ')}.\nUse the apeworkflow-continue-change skill to create the missing artifacts first.`;
   } else if (tracksFile && !tracksFileExists) {
     // Tracking file configured but doesn't exist yet
-    const tracksFilename = path.basename(tracksFile);
     state = 'blocked';
-    instruction = `The ${tracksFilename} file is missing and must be created.\nUse apeworkflow-continue-change to generate the tracking file.`;
+    instruction = `The ${tracksLabel} file is missing and must be created.\nUse apeworkflow-continue-change to generate the tracking file.`;
   } else if (tracksFile && tracksFileExists && total === 0) {
     // Tracking file exists but contains no tasks
-    const tracksFilename = path.basename(tracksFile);
     state = 'blocked';
-    instruction = `The ${tracksFilename} file exists but contains no tasks.\nAdd tasks to ${tracksFilename} or regenerate it with apeworkflow-continue-change.`;
+    instruction = `The ${tracksLabel} file exists but contains no tasks.\nAdd tasks to ${tracksLabel} or regenerate it with apeworkflow-continue-change.`;
   } else if (tracksFile && remaining === 0 && total > 0) {
     state = 'all_done';
     instruction = 'All tasks are complete! This change is ready to be archived.\nConsider running tests and reviewing the changes before archiving.';
@@ -342,7 +341,7 @@ export async function generateApplyInstructions(
     instruction = schemaInstruction?.trim() ?? 'All required artifacts complete. Proceed with implementation.';
   } else {
     state = 'ready';
-    instruction = schemaInstruction?.trim() ?? 'Read context files, work through pending tasks, mark complete as you go.\nPause if you hit blockers or need clarification.';
+    instruction = schemaInstruction?.trim() ?? 'Read the plan files, work through pending tasks, mark complete as you go.\nPause if you hit blockers or need clarification.';
   }
 
   return {

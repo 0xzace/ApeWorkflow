@@ -73,7 +73,7 @@ export function getArchiveChangeSkillTemplate(): SkillTemplate {
 
 3. **Check task completion status**
 
-   Read the tasks file (typically \`tasks.md\`) to check for incomplete tasks.
+   Read the plan files under \`plans/\` to check for incomplete tasks.
 
    Count tasks marked with \`- [ ]\` (incomplete) vs \`- [x]\` (complete).
 
@@ -82,7 +82,7 @@ export function getArchiveChangeSkillTemplate(): SkillTemplate {
    - Use **AskUserQuestion tool** to confirm user wants to proceed
    - Proceed if user confirms
 
-   **If no tasks file exists:** Proceed without task-related warning.
+   **If no plan files exist:** Proceed without task-related warning.
 
 4. **Assess delta spec sync state**
 
@@ -123,7 +123,7 @@ export function getArchiveChangeSkillTemplate(): SkillTemplate {
    - Schema that was used
    - Archive location
    - Whether specs were synced (if applicable)
-   - Note about any warnings (incomplete artifacts/tasks)
+   - Note about any warnings (incomplete artifacts / plan tasks)
 
 ${taskRoutingBlock}
 
@@ -193,7 +193,7 @@ export function getApeArchiveCommandTemplate(): CommandTemplate {
 
 3. **Check task completion status**
 
-   Read the tasks file (typically \`tasks.md\`) to check for incomplete tasks.
+   Read the plan files under \`plans/\` to check for incomplete tasks.
 
    Count tasks marked with \`- [ ]\` (incomplete) vs \`- [x]\` (complete).
 
@@ -202,7 +202,7 @@ export function getApeArchiveCommandTemplate(): CommandTemplate {
    - Prompt user for confirmation to continue
    - Proceed if user confirms
 
-   **If no tasks file exists:** Proceed without task-related warning.
+   **If no plan files exist:** Proceed without task-related warning.
 
 4. **Assess delta spec sync state**
 

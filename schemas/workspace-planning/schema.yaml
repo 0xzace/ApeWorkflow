@@ -1,6 +1,6 @@
 name: workspace-planning
 version: 1
-description: Workspace planning workflow for cross-area changes
+description: Workspace planning workflow for cross-area changes with tasks → plans
 artifacts:
   - id: proposal
     generates: proposal.md
@@ -53,19 +53,35 @@ artifacts:
 
   - id: tasks
     generates: tasks.md
-    description: Coordination checklist for workspace planning and later affected-area implementation
+    description: Coordination task outline for workspace planning and later affected-area implementation
     template: tasks.md
     instruction: |
-      Create the workspace coordination task list.
+      Create the workspace coordination task outline.
 
-      Group tasks by phase or affected area as useful. Each actionable item must be a checkbox using `- [ ]`. When implementation tasks are area-specific, name the affected area and keep the task at planning granularity until a later implementation workflow selects an allowed edit root.
+      Group tasks by phase or affected area as useful. Each actionable item must be a plain bullet or numbered item without checkbox markers. When implementation tasks are area-specific, name the affected area and keep the task at planning granularity until a later implementation workflow selects an allowed edit root.
     requires:
       - specs
       - design
 
+  - id: plans
+    generates: "plans/*.md"
+    description: Workspace implementation plan files with checkbox tracking
+    template: plans.md
+    instruction: |
+      Create the implementation plan file(s) for the selected affected area.
+
+      This is the execution source of truth for apply. Keep the plan concrete,
+      checkbox-based, and scoped to the allowed edit root for the selected area.
+      If multiple files are needed, split them by area or stage.
+    requires:
+      - proposal
+      - specs
+      - design
+      - tasks
+
 apply:
-  requires: [tasks]
-  tracks: tasks.md
+  requires: [plans]
+  tracks: plans/*.md
   instruction: |
     Read the workspace planning context from status and instructions output before applying.
     Select an affected area and confirm an allowed edit root before making implementation edits.

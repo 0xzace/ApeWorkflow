@@ -200,7 +200,7 @@ The folder structure:
 ├── proposal.md    ← Why we're doing this (empty, we'll fill it)
 ├── design.md      ← How we'll build it (empty)
 ├── specs/         ← Detailed requirements (empty)
-└── tasks.md       ← Implementation checklist (empty)
+└── tasks.md       ← Task outline for brainstorming (plain bullets only)
 \`\`\`
 
 Now let's fill in the first artifact—the proposal.
@@ -364,9 +364,9 @@ Save to the \`resolvedOutputPath\` from \`apeworkflow instructions design --chan
 \`\`\`
 ## Tasks
 
-Finally, we break the work into implementation tasks—checkboxes that drive the apply phase.
+Finally, we break the work into a plain task outline for brainstorming.
 
-These should be small, clear, and in logical order.
+These should be small, clear, and in logical order so writing-plans can turn them into plan files.
 \`\`\`
 
 **DO:** Generate tasks based on specs and design:
@@ -378,16 +378,16 @@ Here are the implementation tasks:
 
 ## 1. [Category or file]
 
-- [ ] 1.1 [Specific task]
-- [ ] 1.2 [Specific task]
+- 1.1 [Specific task]
+- 1.2 [Specific task]
 
 ## 2. Verify
 
-- [ ] 2.1 [Verification step]
+- 2.1 [Verification step]
 
 ---
 
-Each checkbox becomes a unit of work in the apply phase. Ready to implement?
+These are plain outline items in \`tasks.md\`. Writing-plans turns them into checkboxed steps in the plan file. Ready to implement?
 \`\`\`
 
 **PAUSE** - Wait for user to confirm they're ready to implement.
@@ -410,7 +410,7 @@ Now we implement each task, checking them off as we go. I'll announce each one a
 1. Announce: "Working on task N: [description]"
 2. Implement the change in the codebase
 3. Reference specs/design naturally: "The spec says X, so I'm doing Y"
-4. Mark complete in tasks.md: \`- [ ]\` → \`- [x]\`
+4. Expand the task outline into \`plans/YYYY-MM-DD-<feature-name>.md\` with \`- [ ]\` checkbox tracking
 5. Brief status: "✓ Task N complete"
 
 Keep narration light—don't over-explain every line of code.
@@ -420,7 +420,7 @@ After all tasks:
 \`\`\`
 ## Implementation Complete
 
-All tasks done:
+All tasks done in the plan file:
 - [x] Task 1
 - [x] Task 2
 - [x] ...

@@ -278,9 +278,15 @@ const DEFAULT_ARTIFACTS: Array<{
   },
   {
     id: 'tasks',
-    description: 'Implementation checklist with trackable tasks',
+    description: 'Task outline that seeds plan files',
     generates: 'tasks.md',
     template: 'tasks.md',
+  },
+  {
+    id: 'plans',
+    description: 'Implementation plan files with checkbox tracking',
+    generates: 'plans/*.md',
+    template: 'plans.md',
   },
 ];
 
@@ -815,7 +821,7 @@ export function registerSchemaCommand(program: Command): void {
             requires: [],
           };
 
-          // Set up dependencies based on typical workflow
+          // Set up dependencies based on the normal workflow chain.
           if (id === 'specs' && selectedArtifactIds.includes('proposal')) {
             artifact.requires = ['proposal'];
           } else if (id === 'design' && selectedArtifactIds.includes('specs')) {
@@ -825,6 +831,9 @@ export function registerSchemaCommand(program: Command): void {
             if (selectedArtifactIds.includes('design')) requires.push('design');
             else if (selectedArtifactIds.includes('specs')) requires.push('specs');
             artifact.requires = requires;
+          } else if (id === 'plans') {
+            // 中文注释：plans 是真正的执行计划文件，必须先有 tasks 草稿。
+            artifact.requires = selectedArtifactIds.includes('tasks') ? ['tasks'] : [];
           }
 
           return artifact;
@@ -838,11 +847,11 @@ export function registerSchemaCommand(program: Command): void {
           artifacts: selectedArtifacts,
         };
 
-        // Add apply phase if tasks is included
-        if (selectedArtifactIds.includes('tasks')) {
+        // Add apply phase if plans is included
+        if (selectedArtifactIds.includes('plans')) {
           schema.apply = {
-            requires: ['tasks'],
-            tracks: 'tasks.md',
+            requires: ['plans'],
+            tracks: 'plans/*.md',
           };
         }
 
@@ -989,11 +998,40 @@ Description and rationale.
 `;
 
     case 'tasks':
-      return `## Implementation Tasks
+      // 中文注释：tasks.md 只保存脑暴阶段的任务草稿，不包含 checkbox。
+      return `## Tasks
 
-- [ ] Task 1
-- [ ] Task 2
-- [ ] Task 3
+- Task 1
+- Task 2
+- Task 3
+`;
+
+    case 'plans':
+      // 中文注释：plans.md 提供执行计划的默认骨架，真正的任务跟踪放在 plans/ 计划文件里。
+      return `# Implementation Plan
+
+> For agentic workers: use apeworkflow-subagent-driven-development or apeworkflow-executing-plans.
+
+**Goal:** 
+
+**Architecture:** 
+
+**Tech Stack:** 
+
+---
+
+### Task 1: 
+
+**Files:**
+- Create: \`path/to/new-file.ts\`
+- Modify: \`path/to/existing-file.ts\`
+- Test: \`test/path/to/test.ts\`
+
+- [ ] Step 1: Write the failing test
+- [ ] Step 2: Run the test to verify it fails
+- [ ] Step 3: Write the minimal implementation
+- [ ] Step 4: Run the test to verify it passes
+- [ ] Step 5: Commit
 `;
 
     default:

@@ -15,7 +15,7 @@ export function getApeProposeSkillTemplate(): SkillTemplate {
 I'll create a change with artifacts first:
 - proposal.md (what & why)
 - design.md (how)
-- tasks.md (implementation steps)
+- tasks.md (task outline for plan generation, outline only)
 
 After those artifacts are in place, I'll run brainstorming to refine requirements, patch the artifacts, and then hand off to writing-plans. When ready to implement, run /ape:apply.
 
@@ -45,7 +45,7 @@ After those artifacts are in place, I'll run brainstorming to refine requirement
    apeworkflow status --change "<name>" --json
    \`\`\`
    Parse the JSON to get:
-   - \`applyRequires\`: array of artifact IDs needed before implementation (e.g., \`["tasks"]\`)
+   - \`applyRequires\`: array of artifact IDs needed before implementation (for this schema it is \`plans\`)
    - \`artifacts\`: list of all artifacts with their status and dependencies
    - \`planningHome\`, \`changeRoot\`, \`artifactPaths\`, and \`actionContext\`: path and scope context. Use these instead of assuming repo-local paths.
 
@@ -82,7 +82,7 @@ After those artifacts are in place, I'll run brainstorming to refine requirement
       - Then continue with creation
 
    d. **Run brainstorming before implementation**
-      - Re-read \`proposal.md\`, \`design.md\`, and \`tasks.md\`
+      - Re-read \`proposal.md\`, \`design.md\`, and \`tasks.md\` (the outline only)
       - Use \`brainstorming\` to fill any remaining requirement gaps, update the artifacts in place, and reconcile the three files
       - Hand off to \`writing-plans\` to create the detailed implementation plan file(s) under \`plans/\`
 

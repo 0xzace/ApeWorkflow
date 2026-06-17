@@ -17,7 +17,8 @@ describe('ChangeCommand.list', () => {
     await fs.mkdir(changeDir, { recursive: true });
     const proposal = `# Change: Demo\n\n## Why\nTest list.\n\n## What Changes\n- **auth:** Add requirement`;
     await fs.writeFile(path.join(changeDir, 'proposal.md'), proposal, 'utf-8');
-    await fs.writeFile(path.join(changeDir, 'tasks.md'), '- [x] Task 1\n- [ ] Task 2\n', 'utf-8');
+    await fs.mkdir(path.join(changeDir, 'plans'), { recursive: true });
+    await fs.writeFile(path.join(changeDir, 'plans', '2026-06-17-demo.md'), '- [x] Task 1\n- [ ] Task 2\n', 'utf-8');
     process.chdir(tempRoot);
   });
 

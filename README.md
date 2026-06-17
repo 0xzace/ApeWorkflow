@@ -96,7 +96,8 @@ apeworkflow/
 │   └── <change-name>/
 │       ├── proposal.md
 │       ├── design.md
-│       ├── tasks.md
+│       ├── tasks.md    # Plain task outline
+│       ├── plans/      # Execution plan files
 │       └── specs/
 │           └── <domain>/
 │               └── spec.md

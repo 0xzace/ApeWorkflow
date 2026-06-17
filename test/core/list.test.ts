@@ -9,6 +9,12 @@ describe('ListCommand', () => {
   let originalLog: typeof console.log;
   let logOutput: string[] = [];
 
+  async function writePlan(changeName: string, content: string): Promise<void> {
+    const plansDir = path.join(tempDir, 'apeworkflow', 'changes', changeName, 'plans');
+    await fs.mkdir(plansDir, { recursive: true });
+    await fs.writeFile(path.join(plansDir, `2026-06-17-${changeName}.md`), content);
+  }
+
   beforeEach(async () => {
     // Create temp directory
     tempDir = path.join(os.tmpdir(), `apeworkflow-list-test-${Date.now()}`);
@@ -42,10 +48,7 @@ describe('ListCommand', () => {
     it('should output changes as JSON when requested', async () => {
       const changesDir = path.join(tempDir, 'apeworkflow', 'changes');
       await fs.mkdir(path.join(changesDir, 'json-change'), { recursive: true });
-      await fs.writeFile(
-        path.join(changesDir, 'json-change', 'tasks.md'),
-        '- [x] Done\n- [ ] Pending\n'
-      );
+      await writePlan('json-change', '- [x] Done\n- [ ] Pending\n');
 
       const listCommand = new ListCommand();
       await listCommand.execute(tempDir, 'changes', { json: true });
@@ -77,11 +80,8 @@ describe('ListCommand', () => {
       await fs.mkdir(path.join(changesDir, 'archive'), { recursive: true });
       await fs.mkdir(path.join(changesDir, 'my-change'), { recursive: true });
       
-      // Create tasks.md with some tasks
-      await fs.writeFile(
-        path.join(changesDir, 'my-change', 'tasks.md'),
-        '- [x] Task 1\n- [ ] Task 2\n'
-      );
+      // Create a plan file with some tasks
+      await writePlan('my-change', '- [x] Task 1\n- [ ] Task 2\n');
 
       const listCommand = new ListCommand();
       await listCommand.execute(tempDir, 'changes');
@@ -95,8 +95,8 @@ describe('ListCommand', () => {
       const changesDir = path.join(tempDir, 'apeworkflow', 'changes');
       await fs.mkdir(path.join(changesDir, 'test-change'), { recursive: true });
       
-      await fs.writeFile(
-        path.join(changesDir, 'test-change', 'tasks.md'),
+      await writePlan(
+        'test-change',
         `# Tasks
 - [x] Completed task 1
 - [x] Completed task 2
@@ -117,10 +117,7 @@ Regular text that should be ignored
       const changesDir = path.join(tempDir, 'apeworkflow', 'changes');
       await fs.mkdir(path.join(changesDir, 'completed-change'), { recursive: true });
       
-      await fs.writeFile(
-        path.join(changesDir, 'completed-change', 'tasks.md'),
-        '- [x] Task 1\n- [x] Task 2\n- [x] Task 3\n'
-      );
+      await writePlan('completed-change', '- [x] Task 1\n- [x] Task 2\n- [x] Task 3\n');
 
       const listCommand = new ListCommand();
       await listCommand.execute(tempDir, 'changes');
@@ -128,7 +125,7 @@ Regular text that should be ignored
       expect(logOutput.some(line => line.includes('✓ Complete'))).toBe(true);
     });
 
-    it('should handle changes without tasks.md', async () => {
+    it('should handle changes without plan files', async () => {
       const changesDir = path.join(tempDir, 'apeworkflow', 'changes');
       await fs.mkdir(path.join(changesDir, 'no-tasks'), { recursive: true });
 
@@ -161,17 +158,11 @@ Regular text that should be ignored
       
       // Complete change
       await fs.mkdir(path.join(changesDir, 'completed'), { recursive: true });
-      await fs.writeFile(
-        path.join(changesDir, 'completed', 'tasks.md'),
-        '- [x] Task 1\n- [x] Task 2\n'
-      );
+      await writePlan('completed', '- [x] Task 1\n- [x] Task 2\n');
 
       // Partial change
       await fs.mkdir(path.join(changesDir, 'partial'), { recursive: true });
-      await fs.writeFile(
-        path.join(changesDir, 'partial', 'tasks.md'),
-        '- [x] Done\n- [ ] Not done\n- [ ] Also not done\n'
-      );
+      await writePlan('partial', '- [x] Done\n- [ ] Not done\n- [ ] Also not done\n');
 
       // No tasks
       await fs.mkdir(path.join(changesDir, 'no-tasks'), { recursive: true });

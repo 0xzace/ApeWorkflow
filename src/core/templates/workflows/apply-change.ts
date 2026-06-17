@@ -62,7 +62,7 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
    Parse the JSON to understand:
    - \`schemaName\`: The workflow being used (e.g., "spec-driven")
    - \`planningHome\`, \`changeRoot\`, and \`actionContext\`: planning scope and edit constraints
-   - Which artifact contains the tasks and detailed plan file(s) (typically "tasks" plus the files under \`plans/\` for spec-driven, check status for others)
+   - Which artifact contains the implementation plan and detailed plan file(s) (typically the files under \`plans/\`; check status for others)
 
 3. **Get apply instructions and load the task list**
 
@@ -87,7 +87,7 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
 
    Read every file path listed under \`contextFiles\` from the apply instructions output.
    The files depend on the schema being used:
-   - **spec-driven**: proposal, specs, design, tasks, and the detailed plan file(s) under \`plans/\`
+   - **spec-driven**: proposal, specs, design, and the detailed plan file(s) under \`plans/\`
    - Other schemas: follow the contextFiles from CLI output
 
    The detailed plan file(s) under \`plans/\` are the implementation source of truth.

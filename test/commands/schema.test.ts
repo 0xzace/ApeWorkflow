@@ -313,6 +313,12 @@ artifacts:
     template: tasks.md
     requires:
       - design
+  - id: plans
+    generates: plans/*.md
+    description: Plans
+    template: plans.md
+    requires:
+      - tasks
 `;
 
       const schema = parseSchema(content);
@@ -320,6 +326,7 @@ artifacts:
       expect(schema.artifacts[1].requires).toEqual(['proposal']);
       expect(schema.artifacts[2].requires).toEqual(['specs']);
       expect(schema.artifacts[3].requires).toEqual(['design']);
+      expect(schema.artifacts[4].requires).toEqual(['tasks']);
     });
   });
 

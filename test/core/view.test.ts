@@ -11,6 +11,12 @@ describe('ViewCommand', () => {
   let originalLog: typeof console.log;
   let logOutput: string[] = [];
 
+  async function writePlan(changeName: string, content: string): Promise<void> {
+    const plansDir = path.join(tempDir, 'apeworkflow', 'changes', changeName, 'plans');
+    await fs.mkdir(plansDir, { recursive: true });
+    await fs.writeFile(path.join(plansDir, `2026-06-17-${changeName}.md`), content);
+  }
+
   beforeEach(async () => {
     tempDir = path.join(os.tmpdir(), `apeworkflow-view-test-${Date.now()}`);
     await fs.mkdir(tempDir, { recursive: true });
@@ -32,19 +38,16 @@ describe('ViewCommand', () => {
     const changesDir = path.join(tempDir, 'apeworkflow', 'changes');
     await fs.mkdir(changesDir, { recursive: true });
 
-    // Empty change (no tasks.md) - should show in Draft
+    // Empty change (no plan file) - should show in Draft
     await fs.mkdir(path.join(changesDir, 'empty-change'), { recursive: true });
 
-    // Change with tasks.md but no tasks - should show in Draft
+    // Change with a plan file but no tasks - should show in Draft
     await fs.mkdir(path.join(changesDir, 'no-tasks-change'), { recursive: true });
-    await fs.writeFile(path.join(changesDir, 'no-tasks-change', 'tasks.md'), '# Tasks\n\nNo tasks yet.');
+    await writePlan('no-tasks-change', '# Tasks\n\nNo tasks yet.');
 
     // Change with all tasks complete - should show in Completed
     await fs.mkdir(path.join(changesDir, 'completed-change'), { recursive: true });
-    await fs.writeFile(
-      path.join(changesDir, 'completed-change', 'tasks.md'),
-      '- [x] Done task\n'
-    );
+    await writePlan('completed-change', '- [x] Done task\n');
 
     const viewCommand = new ViewCommand();
     await viewCommand.execute(tempDir);
@@ -83,28 +86,16 @@ describe('ViewCommand', () => {
     await fs.mkdir(changesDir, { recursive: true });
 
     await fs.mkdir(path.join(changesDir, 'gamma-change'), { recursive: true });
-    await fs.writeFile(
-      path.join(changesDir, 'gamma-change', 'tasks.md'),
-      '- [x] Done\n- [x] Also done\n- [ ] Not done\n'
-    );
+    await writePlan('gamma-change', '- [x] Done\n- [x] Also done\n- [ ] Not done\n');
 
     await fs.mkdir(path.join(changesDir, 'beta-change'), { recursive: true });
-    await fs.writeFile(
-      path.join(changesDir, 'beta-change', 'tasks.md'),
-      '- [x] Task 1\n- [ ] Task 2\n'
-    );
+    await writePlan('beta-change', '- [x] Task 1\n- [ ] Task 2\n');
 
     await fs.mkdir(path.join(changesDir, 'delta-change'), { recursive: true });
-    await fs.writeFile(
-      path.join(changesDir, 'delta-change', 'tasks.md'),
-      '- [x] Task 1\n- [ ] Task 2\n'
-    );
+    await writePlan('delta-change', '- [x] Task 1\n- [ ] Task 2\n');
 
     await fs.mkdir(path.join(changesDir, 'alpha-change'), { recursive: true });
-    await fs.writeFile(
-      path.join(changesDir, 'alpha-change', 'tasks.md'),
-      '- [ ] Task 1\n- [ ] Task 2\n'
-    );
+    await writePlan('alpha-change', '- [ ] Task 1\n- [ ] Task 2\n');
 
     const viewCommand = new ViewCommand();
     await viewCommand.execute(tempDir);
@@ -126,4 +117,3 @@ describe('ViewCommand', () => {
     ]);
   });
 });
-

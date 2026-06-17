@@ -120,7 +120,7 @@ If the user mentions a change or you detect one is relevant:
     | Requirement changed        | \`specs/<capability>/spec.md\` |
     | Design decision made       | \`design.md\`                  |
     | Scope changed              | \`proposal.md\`                |
-    | New work identified        | \`tasks.md\`                   |
+    | New work identified        | \`tasks.md\` (outline only)    |
     | Assumption invalidated     | Relevant artifact              |
 
    Example offers:
@@ -417,7 +417,7 @@ If the user mentions a change or you detect one is relevant:
     | Requirement changed        | \`specs/<capability>/spec.md\` |
     | Design decision made       | \`design.md\`                  |
     | Scope changed              | \`proposal.md\`                |
-    | New work identified        | \`tasks.md\`                   |
+    | New work identified        | \`tasks.md\` (outline only)    |
     | Assumption invalidated     | Relevant artifact              |
 
    Example offers:

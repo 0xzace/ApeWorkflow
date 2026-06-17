@@ -72,7 +72,7 @@ digraph process {
         "Mark task complete in TodoWrite" [shape=box];
     }
 
-    "Read plan, extract all tasks with full text, note context, create TodoWrite" [shape=box];
+    "Read plan file, extract all tasks with full text, note context, create TodoWrite" [shape=box];
     "More tasks remain?" [shape=diamond];
     "Dispatch final code reviewer subagent for entire implementation" [shape=box];
     "Use apeworkflow-finishing-a-development-branch" [shape=box style=filled fillcolor=lightgreen];
@@ -142,7 +142,7 @@ Implementer subagents report one of four statuses. Handle each appropriately:
 \`\`\`
 You: I'm using Subagent-Driven Development to execute this plan.
 
-[Read plan file once: apeworkflow/changes/<name>/plans/feature-plan.md]
+[Read plan file once: apeworkflow/changes/<name>/plans/YYYY-MM-DD-<feature-name>.md]
 [Extract all 5 tasks with full text and context]
 [Create TodoWrite with all tasks]
 

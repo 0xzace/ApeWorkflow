@@ -105,7 +105,7 @@ Common artifact patterns:
   - The Capabilities section is critical - each capability listed will need a spec file.
 - **specs/<capability>/spec.md**: Create one spec per capability listed in the proposal's Capabilities section (use the capability name, not the change name).
 - **design.md**: Document technical decisions, architecture, and implementation approach.
-- **tasks.md**: Break down implementation into checkboxed tasks.
+- **tasks.md**: Break down the implementation into a plain task outline for brainstorming and plan generation (outline only).
 
 For other schemas, follow the \`instruction\` field from the CLI output.
 
@@ -225,7 +225,7 @@ Common artifact patterns:
   - The Capabilities section is critical - each capability listed will need a spec file.
 - **specs/<capability>/spec.md**: Create one spec per capability listed in the proposal's Capabilities section (use the capability name, not the change name).
 - **design.md**: Document technical decisions, architecture, and implementation approach.
-- **tasks.md**: Break down implementation into checkboxed tasks.
+- **tasks.md**: Break down the implementation into a plain task outline for brainstorming and plan generation (outline only).
 
 For other schemas, follow the \`instruction\` field from the CLI output.
 

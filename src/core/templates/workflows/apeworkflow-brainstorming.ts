@@ -6,10 +6,11 @@ import type { SkillTemplate, CommandTemplate } from '../types.js';
 export function getBrainstormingSkillTemplate(): SkillTemplate {
   return {
     name: 'apeworkflow-brainstorming',
-    description: 'Use when you need to refine proposal.md, design.md, and tasks.md through collaborative dialogue before writing the implementation plan.',
+    description: 'Use when you need to refine proposal.md, design.md, and tasks.md (outline only) through collaborative dialogue before writing the implementation plan files.',
     instructions: `# Brainstorming Ideas Into Refinements
 
 Refine \`proposal.md\`, \`design.md\`, and \`tasks.md\` through collaborative dialogue, then hand off to \`writing-plans\`.
+Treat \`tasks.md\` as the task outline only; the checkboxed execution steps live in \`plans/YYYY-MM-DD-<feature-name>.md\`.
 
 Start by reading the current change artifacts and project context. Ask questions one at a time to fill gaps, surface trade-offs, and capture any requirement updates back into the artifacts. When the artifact set is coherent, invoke \`writing-plans\`.
 
@@ -25,7 +26,7 @@ You MUST create a task for each of these items and complete them in order:
 2. **Offer visual companion** (if topic will involve visual questions) - this is its own message, not combined with a clarifying question. See the Visual Companion section below
 3. **Ask clarifying questions** - one at a time, understand purpose, constraints, and success criteria
 4. **Propose 2-3 approaches** - with trade-offs and your recommendation when there is still a meaningful choice
-5. **Update the change artifacts** - patch \`proposal.md\`, \`design.md\`, and \`tasks.md\` with the clarified requirements, dependencies, and scope changes
+5. **Update the change artifacts** - patch \`proposal.md\`, \`design.md\`, and \`tasks.md\` with the clarified requirements, dependencies, and scope changes; keep \`tasks.md\` as a plain task outline
 6. **Reconcile the artifacts** - make sure the three files agree with each other and with the current understanding
 7. **Transition to implementation planning** - invoke \`writing-plans\` to create the detailed implementation plan
 
@@ -77,7 +78,7 @@ digraph brainstorming {
 
 - Patch \`proposal.md\` with the clarified what/why and any scope changes
 - Patch \`design.md\` with the clarified how, dependencies, and boundaries
-- Patch \`tasks.md\` with the corrected execution order, dependencies, and task breakdown
+- Patch \`tasks.md\` with the corrected execution order, dependencies, and task breakdown as plain bullets or numbered items
 - If a clarification changes one artifact, update the others so they stay consistent
 
 **Reconciliation:**

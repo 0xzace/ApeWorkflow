@@ -50,7 +50,7 @@ export function getVerifyChangeSkillTemplate(): SkillTemplate {
 
    Run \`apeworkflow list --json\` to get available changes. Use the **AskUserQuestion tool** to let the user select.
 
-   Show changes that have implementation tasks (tasks artifact exists).
+   Show changes that have implementation tasks (plan files under \`plans/\` exist).
    Include the schema used for each change if available.
    Mark changes with incomplete tasks as "(In Progress)".
 
@@ -187,12 +187,12 @@ export function getVerifyChangeSkillTemplate(): SkillTemplate {
 
 ${taskRoutingBlock}
 
-**Graceful Degradation**
+   **Graceful Degradation**
 
-- If only tasks.md exists: verify task completion only, skip spec/design checks
-- If tasks + specs exist: verify completeness and correctness, skip design
-- If full artifacts: verify all three dimensions
-- Always note which checks were skipped and why
+   - If only plan files under \`plans/\` exist: verify task completion only, skip spec/design checks
+   - If tasks + specs exist: verify completeness and correctness, skip design
+   - If full artifacts: verify all three dimensions
+   - Always note which checks were skipped and why
 
 **Output Format**
 
@@ -224,7 +224,7 @@ export function getApeVerifyCommandTemplate(): CommandTemplate {
 
    Run \`apeworkflow list --json\` to get available changes. Use the **AskUserQuestion tool** to let the user select.
 
-   Show changes that have implementation tasks (tasks artifact exists).
+   Show changes that have implementation tasks (plan files under \`plans/\` exist).
    Include the schema used for each change if available.
    Mark changes with incomplete tasks as "(In Progress)".
 
@@ -361,12 +361,12 @@ export function getApeVerifyCommandTemplate(): CommandTemplate {
 
 ${taskRoutingBlock}
 
-**Graceful Degradation**
+   **Graceful Degradation**
 
-- If only tasks.md exists: verify task completion only, skip spec/design checks
-- If tasks + specs exist: verify completeness and correctness, skip design
-- If full artifacts: verify all three dimensions
-- Always note which checks were skipped and why
+   - If only plan files under \`plans/\` exist: verify task completion only, skip spec/design checks
+   - If tasks + specs exist: verify completeness and correctness, skip design
+   - If full artifacts: verify all three dimensions
+   - Always note which checks were skipped and why
 
 **Output Format**
 

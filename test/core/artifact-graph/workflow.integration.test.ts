@@ -42,7 +42,7 @@ describe('artifact-graph workflow integration', () => {
 
       // Verify schema structure
       expect(graph.getName()).toBe('spec-driven');
-      expect(graph.getAllArtifacts()).toHaveLength(4);
+      expect(graph.getAllArtifacts()).toHaveLength(5);
 
       // 2. Initial state - nothing complete, only proposal is ready
       let completed = detectCompleted(graph, tempDir);
@@ -53,6 +53,7 @@ describe('artifact-graph workflow integration', () => {
         specs: ['proposal'],
         design: ['proposal'],
         tasks: ['design', 'specs'],
+        plans: ['design', 'proposal', 'specs', 'tasks'],
       });
 
       // 3. Create proposal.md - now specs and design become ready
@@ -62,6 +63,7 @@ describe('artifact-graph workflow integration', () => {
       expect(graph.getNextArtifacts(completed).sort()).toEqual(['design', 'specs']);
       expect(normalizeBlocked(graph.getBlocked(completed))).toEqual({
         tasks: ['design', 'specs'],
+        plans: ['design', 'specs', 'tasks'],
       });
 
       // 4. Create design.md - specs still needed for tasks
@@ -71,6 +73,7 @@ describe('artifact-graph workflow integration', () => {
       expect(graph.getNextArtifacts(completed)).toEqual(['specs']);
       expect(graph.getBlocked(completed)).toEqual({
         tasks: ['specs'],
+        plans: ['specs', 'tasks'],
       });
 
       // 5. Create specs directory with a spec file - tasks becomes ready
@@ -80,12 +83,23 @@ describe('artifact-graph workflow integration', () => {
       completed = detectCompleted(graph, tempDir);
       expect(completed).toEqual(new Set(['proposal', 'design', 'specs']));
       expect(graph.getNextArtifacts(completed)).toEqual(['tasks']);
-      expect(graph.getBlocked(completed)).toEqual({});
+      expect(graph.getBlocked(completed)).toEqual({
+        plans: ['tasks'],
+      });
 
-      // 6. Create tasks.md - workflow complete
+      // 6. Create tasks.md - plans becomes ready
       fs.writeFileSync(path.join(tempDir, 'tasks.md'), '# Tasks\n\n- [ ] Implement feature');
       completed = detectCompleted(graph, tempDir);
       expect(completed).toEqual(new Set(['proposal', 'design', 'specs', 'tasks']));
+      expect(graph.getNextArtifacts(completed)).toEqual(['plans']);
+      expect(graph.getBlocked(completed)).toEqual({});
+
+      // 7. Create plans file - workflow complete
+      const plansDir = path.join(tempDir, 'plans');
+      fs.mkdirSync(plansDir, { recursive: true });
+      fs.writeFileSync(path.join(plansDir, '2026-06-17-feature.md'), '# Plan\n\n- [ ] Implement feature');
+      completed = detectCompleted(graph, tempDir);
+      expect(completed).toEqual(new Set(['proposal', 'design', 'specs', 'tasks', 'plans']));
       expect(graph.getNextArtifacts(completed)).toEqual([]);
       expect(graph.isComplete(completed)).toBe(true);
       expect(graph.getBlocked(completed)).toEqual({});
