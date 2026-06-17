@@ -5,9 +5,23 @@ import {
   getCommandContents,
   getVisibleCommandContents,
   generateSkillContent,
+  isGlobalEntry,
+  isWorkflowEntry,
 } from '../../../src/core/shared/skill-generation.js';
 
 describe('skill-generation', () => {
+  describe('entry type guards', () => {
+    it('should identify workflow entries by workflowId', () => {
+      expect(isWorkflowEntry({ template: {} as never, dirName: 'apeworkflow-explore', workflowId: 'explore' })).toBe(true);
+      expect(isWorkflowEntry({ template: {} as never, dirName: 'apeworkflow-feedback' })).toBe(false);
+    });
+
+    it('should identify global entries without workflowId', () => {
+      expect(isGlobalEntry({ template: {} as never, dirName: 'apeworkflow-feedback' })).toBe(true);
+      expect(isGlobalEntry({ template: {} as never, dirName: 'apeworkflow-explore', workflowId: 'explore' })).toBe(false);
+    });
+  });
+
   describe('getSkillTemplates', () => {
     it('should return all skill templates (workflow + global)', () => {
       const templates = getSkillTemplates();

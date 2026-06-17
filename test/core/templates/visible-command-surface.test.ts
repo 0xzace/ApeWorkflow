@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   VISIBLE_COMMAND_IDS,
+  getVisibleCommandEntries,
   renderVisibleAdditionalCommandTable,
   renderVisibleCommandReference,
   renderVisibleCoreCommandTable,
@@ -19,6 +20,29 @@ describe('visible-command-surface', () => {
       'onboard',
       'bulk-archive',
       'feedback',
+    ]);
+  });
+
+  it('exports the visible command entries in the same order', () => {
+    expect(getVisibleCommandEntries().map((entry) => entry.id)).toEqual([
+      'explore',
+      'propose',
+      'apply',
+      'archive',
+      'verify',
+      'onboard',
+      'bulk-archive',
+      'feedback',
+    ]);
+    expect(getVisibleCommandEntries().map((entry) => entry.description)).toEqual([
+      'Think through problems before or during work',
+      'Create a change and generate all artifacts',
+      'Implement tasks from a change',
+      'Archive a completed change',
+      'Verify implementation matches artifacts',
+      'Learn the ApeWorkflow workflow',
+      'Archive multiple completed changes',
+      'Submit feedback about ApeWorkflow',
     ]);
   });
 
