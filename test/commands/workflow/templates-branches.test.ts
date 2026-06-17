@@ -10,6 +10,7 @@ const templatesMocks = vi.hoisted(() => ({
   getProjectSchemasDir: vi.fn(),
   getUserSchemasDir: vi.fn(),
   canonicalizeExistingPath: vi.fn((value: string) => value),
+  toPosixPath: vi.fn((value: string) => value),
 }));
 
 vi.mock('ora', () => ({
@@ -39,6 +40,7 @@ vi.mock('../../../src/core/artifact-graph/resolver.js', () => ({
 vi.mock('../../../src/utils/file-system.js', () => ({
   FileSystemUtils: {
     canonicalizeExistingPath: templatesMocks.canonicalizeExistingPath,
+    toPosixPath: templatesMocks.toPosixPath,
   },
 }));
 
@@ -62,6 +64,7 @@ describe('workflow templates command branches', () => {
     templatesMocks.getProjectSchemasDir.mockReturnValue('/workspace/apeworkflow/schemas');
     templatesMocks.getUserSchemasDir.mockReturnValue('/users/acez/.local/share/apeworkflow/schemas');
     templatesMocks.canonicalizeExistingPath.mockImplementation((value: string) => value);
+    templatesMocks.toPosixPath.mockImplementation((value: string) => value);
   });
 
   afterEach(() => {

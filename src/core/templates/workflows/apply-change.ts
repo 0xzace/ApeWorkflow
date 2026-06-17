@@ -6,36 +6,6 @@
  */
 import type { SkillTemplate, CommandTemplate } from '../types.js';
 
-// 任务类型路由块，保留为外壳层的技能分发说明，不展开具体开发动作。
-const taskRoutingBlock = [
-  '## 任务类型路由',
-  '',
-  '### `功能开发`',
-  '- `apply`：调用 `executing-plans -> test-driven-development -> subagent-driven-development`',
-  '- `verify`：调用 `verification-before-completion -> requesting-code-review -> receiving-code-review`',
-  '- `archive`：调用 `finishing-a-development-branch -> verification-before-completion`',
-  '',
-  '### `缺陷修复`',
-  '- `apply`：调用 `systematic-debugging -> test-driven-development -> executing-plans`',
-  '- `verify`：调用 `verification-before-completion -> requesting-code-review -> receiving-code-review`',
-  '- `archive`：调用 `finishing-a-development-branch -> verification-before-completion`',
-  '',
-  '### `重构`',
-  '- `apply`：调用 `executing-plans -> test-driven-development -> subagent-driven-development`',
-  '- `verify`：调用 `verification-before-completion -> requesting-code-review -> receiving-code-review`',
-  '- `archive`：调用 `finishing-a-development-branch -> verification-before-completion`',
-  '',
-  '### `文档`',
-  '- `apply`：调用 `writing-skills`',
-  '- `verify`：调用 `verification-before-completion`',
-  '- `archive`：调用 `finishing-a-development-branch -> verification-before-completion`',
-  '',
-  '### 统一规则',
-  '- `apply` 阶段只负责根据任务类型分发到对应方法论 Skill',
-  '- `verify` 阶段先提供验证证据，再进入 review',
-  '- `archive` 阶段先收尾，再确认归档',
-].join('\n');
-
 export function getApplyChangeSkillTemplate(): SkillTemplate {
   return {
     name: 'apeworkflow-apply-change',
@@ -97,8 +67,7 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
    For each pending task, use the task type to choose the methodology Skill chain, then let that Skill chain do the concrete implementation work.
 
    **Task type routing**
-
-${taskRoutingBlock}
+   Route selection is controlled by the active schema's taskTypeRouting. Do not inline a static task route table here.
 
    **Shell rule**: this command only owns selection, loading, routing, progress tracking, and pause/completion output. It does not describe or perform the detailed development steps itself.
 

@@ -21,6 +21,7 @@ import {
   resolvePlanningTrackingFiles,
 } from '../../core/planning-files.js';
 import { getChangeDir, resolveCurrentPlanningHomeSync } from '../../core/planning-home.js';
+import { FileSystemUtils } from '../../utils/file-system.js';
 import {
   validateChangeExists,
   validateSchemaExists,
@@ -184,7 +185,7 @@ export function printInstructionsText(instructions: ArtifactInstructions, isBloc
     console.log();
     for (const dep of dependencies) {
       const status = dep.done ? 'done' : 'missing';
-      const fullPath = path.join(changeDir, dep.path);
+      const fullPath = FileSystemUtils.toPosixPath(path.join(changeDir, dep.path));
       console.log(`<dependency id="${dep.id}" status="${status}">`);
       console.log(`  <path>${fullPath}</path>`);
       console.log(`  <description>${dep.description}</description>`);
@@ -195,10 +196,13 @@ export function printInstructionsText(instructions: ArtifactInstructions, isBloc
   }
 
   // Output location
-  console.log('<output>');
-  console.log(`Write to: ${resolvedOutputPath}`);
-  console.log('</output>');
-  console.log();
+  if (resolvedOutputPath) {
+    console.log('<output>');
+    // 中文注释：输出路径是给人看的，因此统一用 POSIX 斜杠，避免跨平台差异。
+    console.log(`Write to: ${FileSystemUtils.toPosixPath(resolvedOutputPath)}`);
+    console.log('</output>');
+    console.log();
+  }
 
   // Instruction (guidance)
   if (instruction) {

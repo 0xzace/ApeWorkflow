@@ -7,6 +7,7 @@
 import ora from 'ora';
 import path from 'path';
 import { createChange, validateChangeName } from '../../utils/change-utils.js';
+import { FileSystemUtils } from '../../utils/file-system.js';
 import {
   formatChangeLocation,
   resolveCurrentPlanningHomeSync,
@@ -93,7 +94,8 @@ export function outputForCreatedChange(
     change: {
       id,
       path: changeDir,
-      metadataPath: path.join(changeDir, '.apeworkflow.yaml'),
+      // 中文注释：对外输出统一转成 POSIX 分隔符，避免不同平台的 JSON/文本结果不一致。
+      metadataPath: FileSystemUtils.toPosixPath(path.join(changeDir, '.apeworkflow.yaml')),
       schema,
     },
     ...(initiative ? { initiative } : {}),

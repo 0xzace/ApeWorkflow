@@ -24,6 +24,8 @@ describe('printInstructionsText', () => {
       changeName: 'test-change',
       schemaName: 'default',
       changeDir: '/tmp/test',
+      // 中文注释：这里补齐输出路径，避免打印函数在最小对象上拿到空值。
+      resolvedOutputPath: '/tmp/test/proposal.md',
       description: 'Write a proposal',
       instruction: 'Follow the template',
       template: '# Template',

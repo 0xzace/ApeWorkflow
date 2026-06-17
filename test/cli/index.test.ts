@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { Command } from 'commander';
 import { getCommandPath, runCli } from '../../src/cli/index.js';
 
@@ -52,14 +52,23 @@ describe('getCommandPath', () => {
 
 describe('runCli', () => {
   it('should not throw when called with no arguments', () => {
-    // When no subcommands, runCli calls program.outputHelp() and returns
+    // 中文注释：这里只验证无参数时会走 help 分支，不触发真正的命令执行。
+    const helpSpy = vi.spyOn(Command.prototype, 'outputHelp').mockImplementation(() => undefined);
+
     expect(() => runCli(['node', 'apeworkflow'])).not.toThrow();
+    expect(helpSpy).toHaveBeenCalled();
+
+    helpSpy.mockRestore();
   });
 
   it('should not throw when called with a known subcommand', () => {
-    // 'list' is a known command; it should parse without error
-    // (the action may fail due to missing workspace, but parse should work)
+    // 中文注释：这里只验证 runCli 会把 argv 交给 Commander 解析，不触发真实子命令动作。
+    const parseSpy = vi.spyOn(Command.prototype, 'parse').mockImplementation(() => undefined as never);
+
     expect(() => runCli(['node', 'apeworkflow', 'list'])).not.toThrow();
+    expect(parseSpy).toHaveBeenCalledWith(['node', 'apeworkflow', 'list']);
+
+    parseSpy.mockRestore();
   });
 
   // Note: Commander's unknown command handling calls process.exit(),

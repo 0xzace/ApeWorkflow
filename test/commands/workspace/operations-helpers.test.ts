@@ -18,7 +18,12 @@ import { WorkspaceCliError } from '../../../src/commands/workspace/types.js';
 
 describe('directoryExists', () => {
   it('现有目录返回 true', async () => {
-    expect(await directoryExists('/tmp')).toBe(true);
+    const dirPath = fs.mkdtempSync(path.join(os.tmpdir(), 'apeworkflow-directory-exists-'));
+    try {
+      expect(await directoryExists(dirPath)).toBe(true);
+    } finally {
+      fs.rmSync(dirPath, { recursive: true, force: true });
+    }
   });
 
   it('不存在的目录返回 false', async () => {
@@ -49,9 +54,14 @@ describe('inferLinkName', () => {
 // ---------------------------------------------------------------------------
 
 describe('normalizeExistingPathForStorage', () => {
-  it('返回规范化的路径', () => {
-    const result = normalizeExistingPathForStorage('/tmp/test');
-    expect(result).toBe('/tmp/test');
+  it('返回现有路径的规范化结果', () => {
+    const existingPath = fs.mkdtempSync(path.join(os.tmpdir(), 'apeworkflow-normalize-path-'));
+    try {
+      const result = normalizeExistingPathForStorage(existingPath);
+      expect(result).toBe(fs.realpathSync.native(existingPath));
+    } finally {
+      fs.rmSync(existingPath, { recursive: true, force: true });
+    }
   });
 });
 

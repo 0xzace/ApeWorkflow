@@ -332,7 +332,8 @@ export function generateInstructions(
     planningHome: summarizePlanningHome(context.planningHome),
     ...(context.initiative ? { initiative: context.initiative } : {}),
     outputPath: artifact.generates,
-    resolvedOutputPath: path.join(context.changeDir, artifact.generates),
+    // 中文注释：解析后的输出路径用于 CLI/JSON 展示，统一转成 POSIX 便于跨平台比较。
+    resolvedOutputPath: FileSystemUtils.toPosixPath(path.join(context.changeDir, artifact.generates)),
     existingOutputPaths: resolveArtifactOutputs(context.changeDir, artifact.generates),
     description: artifact.description,
     instruction: artifact.instruction,
@@ -397,7 +398,8 @@ export function formatChangeStatus(context: ChangeContext): ChangeStatus {
   const artifactStatuses: ArtifactStatus[] = artifacts.map(artifact => {
     artifactPaths[artifact.id] = {
       outputPath: artifact.generates,
-      resolvedOutputPath: path.join(context.changeDir, artifact.generates),
+      // 中文注释：状态输出中的解析路径也统一使用 POSIX，避免 Windows 反斜杠影响断言。
+      resolvedOutputPath: FileSystemUtils.toPosixPath(path.join(context.changeDir, artifact.generates)),
       existingOutputPaths: resolveArtifactOutputs(context.changeDir, artifact.generates),
     };
 

@@ -40,8 +40,9 @@ export default defineConfig({
         'test/**'
       ]
     },
-    testTimeout: 10000,
-    hookTimeout: 10000,
+    // 中文注释：CLI 覆盖率用例在慢环境（尤其是 Windows/coverage）下会超过默认 10 秒，这里统一放宽。
+    testTimeout: 30000,
+    hookTimeout: 30000,
     teardownTimeout: 3000
   }
 });

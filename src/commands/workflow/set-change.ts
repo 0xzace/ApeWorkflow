@@ -14,6 +14,7 @@ import {
   resolveSchemaForChange,
   writeChangeMetadata,
 } from '../../utils/change-metadata.js';
+import { FileSystemUtils } from '../../utils/file-system.js';
 import { validateChangeExists } from './shared.js';
 import {
   resolveInitiativeLinkReference,
@@ -57,7 +58,8 @@ export function outputForSetChange(
     change: {
       id,
       path: changeDir,
-      metadataPath: path.join(changeDir, '.apeworkflow.yaml'),
+      // 中文注释：对外输出统一转成 POSIX 分隔符，避免不同平台的 JSON/文本结果不一致。
+      metadataPath: FileSystemUtils.toPosixPath(path.join(changeDir, '.apeworkflow.yaml')),
       schema,
     },
     initiative,

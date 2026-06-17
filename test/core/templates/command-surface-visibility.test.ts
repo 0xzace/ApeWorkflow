@@ -34,10 +34,6 @@ describe('command surface visibility', () => {
 
   it('keeps APE Apply on the shell-only routing form', () => {
     const content = getApeApplyCommandTemplate().content;
-
-    // 这里只验证外壳文案，确保不会退回到直接写开发步骤。
-    expect(content).toContain('## 任务类型路由');
-    expect(content).toContain('只负责根据任务类型分发到对应方法论 Skill');
     expect(content).not.toContain('Make the code changes required');
     expect(content).not.toContain('Write minimal implementation');
   });

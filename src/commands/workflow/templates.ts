@@ -69,8 +69,11 @@ export async function templatesCommand(options: TemplatesOptions): Promise<void>
 
     const templates: TemplateInfo[] = graph.getAllArtifacts().map((artifact) => ({
       artifactId: artifact.id,
-      templatePath: FileSystemUtils.canonicalizeExistingPath(
-        path.join(schemaDir, 'templates', artifact.template)
+      // 中文注释：模板路径用于 CLI/JSON 展示，统一转成 POSIX 便于跨平台断言。
+      templatePath: FileSystemUtils.toPosixPath(
+        FileSystemUtils.canonicalizeExistingPath(
+          path.join(schemaDir, 'templates', artifact.template)
+        )
       ),
       source,
     }));
