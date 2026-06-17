@@ -41,6 +41,9 @@ export function parseSchema(yamlContent: string): SchemaYaml {
   // Check for cycles
   validateNoCycles(schema.artifacts);
 
+  // Validate phases consistency
+  validatePhasesConsistency(schema);
+
   return schema;
 }
 
@@ -118,6 +121,26 @@ function validateNoCycles(artifacts: Artifact[]): void {
       const cycle = dfs(artifact.id);
       if (cycle) {
         throw new SchemaValidationError(`Cyclic dependency detected: ${cycle}`);
+      }
+    }
+  }
+}
+
+/**
+ * Validates that phases configuration has valid artifact references.
+ */
+function validatePhasesConsistency(schema: SchemaYaml): void {
+  if (!schema.phases) return;
+
+  const validArtifactIds = new Set(schema.artifacts.map(a => a.id));
+
+  for (const [phaseName, config] of Object.entries(schema.phases)) {
+    if (!config.requires) continue;
+    for (const req of config.requires) {
+      if (!validArtifactIds.has(req)) {
+        throw new SchemaValidationError(
+          `Invalid dependency reference in phase '${phaseName}': '${req}' does not exist`
+        );
       }
     }
   }

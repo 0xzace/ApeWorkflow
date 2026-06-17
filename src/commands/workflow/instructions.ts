@@ -26,6 +26,11 @@ import {
   validateSchemaExists,
   type TaskItem,
   type ApplyInstructions,
+  type VerifyInstructions,
+  type ArchiveInstructions,
+  type VerifyInstructionsOptions,
+  type ArchiveInstructionsOptions,
+  type TaskTypeRouting,
 } from './shared.js';
 
 // -----------------------------------------------------------------------------
@@ -252,13 +257,26 @@ export async function generateApplyInstructions(
 
   // Get the full schema to access the apply phase configuration
   const schema = resolveSchema(context.schemaName, projectRoot);
-  const applyConfig = schema.apply;
+
+  // Prefer phases.apply (new) over top-level apply (legacy)
+  const applyConfig = schema.phases?.apply ?? schema.apply;
 
   // Determine required artifacts and tracking file from schema
   // Fallback: if no apply block, require all artifacts
   const requiredArtifactIds = applyConfig?.requires ?? schema.artifacts.map((a) => a.id);
   const tracksFile = applyConfig?.tracks ?? null;
   const schemaInstruction = applyConfig?.instruction ?? null;
+
+  // Extract taskTypeRouting from phases.apply or top-level apply
+  const routingSource = schema.phases?.apply ?? schema.apply;
+  let taskTypeRouting: ApplyInstructions['taskTypeRouting'] | undefined;
+  if (routingSource?.taskTypeRouting) {
+    const rt = routingSource.taskTypeRouting;
+    taskTypeRouting = {
+      default: rt.default,
+      taskTypes: rt.taskTypes ?? {},
+    };
+  }
 
   // Check which required artifacts are missing
   const missingArtifacts: string[] = [];
@@ -355,6 +373,7 @@ export async function generateApplyInstructions(
     state,
     missingArtifacts: missingArtifacts.length > 0 ? missingArtifacts : undefined,
     instruction,
+    taskTypeRouting,
   };
 }
 
@@ -452,4 +471,323 @@ export function printApplyInstructionsText(instructions: ApplyInstructions): voi
   // Instruction
   console.log('### Instruction');
   console.log(instruction);
+
+  // Task type routing (if present)
+  if (instructions.taskTypeRouting) {
+    console.log();
+    console.log('### Task Type Routing');
+    console.log(JSON.stringify(instructions.taskTypeRouting, null, 2));
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Verify Instructions Command
+// -----------------------------------------------------------------------------
+
+/**
+ * Generates verify instructions for a change.
+ */
+export async function generateVerifyInstructions(
+  projectRoot: string,
+  changeName: string,
+  schemaName?: string,
+  planningHome = resolveCurrentPlanningHomeSync({ startPath: projectRoot })
+): Promise<VerifyInstructions> {
+  const context = loadChangeContext(projectRoot, changeName, schemaName, {
+    changeDir: getChangeDir(planningHome, changeName),
+    planningHome,
+  });
+  const changeDir = context.changeDir;
+
+  const schema = resolveSchema(context.schemaName, projectRoot);
+  const verifyPhase = schema.phases?.verify;
+
+  // Check required artifacts (same pattern as apply)
+  const requiredArtifactIds = verifyPhase?.requires ?? schema.artifacts.map((a) => a.id);
+  const missingArtifacts: string[] = [];
+  for (const artifactId of requiredArtifactIds) {
+    const artifact = schema.artifacts.find((a) => a.id === artifactId);
+    if (artifact && resolveArtifactOutputs(changeDir, artifact.generates).length === 0) {
+      missingArtifacts.push(artifactId);
+    }
+  }
+
+  // Build context files from existing artifacts
+  const contextFiles: Record<string, string[]> = {};
+  for (const artifact of schema.artifacts) {
+    if (artifact.id === 'tasks') continue;
+    const outputs = resolveArtifactOutputs(changeDir, artifact.generates);
+    if (outputs.length > 0) {
+      contextFiles[artifact.id] = outputs;
+    }
+  }
+
+  // Check plans for incomplete tasks
+  const planningFiles = resolvePlanFiles(changeDir);
+  let hasIncompleteTasks = false;
+  for (const pf of planningFiles) {
+    const content = await fs.promises.readFile(pf, 'utf-8');
+    const items = parseChecklistItems(content);
+    if (items.some(i => !i.done)) {
+      hasIncompleteTasks = true;
+      break;
+    }
+  }
+
+  // Extract taskTypeRouting
+  let taskTypeRouting: VerifyInstructions['taskTypeRouting'] | undefined;
+  if (verifyPhase?.taskTypeRouting) {
+    const rt = verifyPhase.taskTypeRouting;
+    taskTypeRouting = { default: rt.default, taskTypes: rt.taskTypes ?? {} };
+  }
+
+  const state: VerifyInstructions['state'] = missingArtifacts.length > 0 ? 'blocked' : 'ready';
+
+  return {
+    changeName,
+    changeDir,
+    schemaName: context.schemaName,
+    ...(context.initiative ? { initiative: context.initiative } : {}),
+    contextFiles,
+    taskTypeRouting,
+    state,
+    missingArtifacts: missingArtifacts.length > 0 ? missingArtifacts : undefined,
+    hasIncompleteTasks,
+    instruction: verifyPhase?.instruction ?? 'Verify the implementation.',
+  };
+}
+
+/**
+ * Print verify instructions in text format.
+ */
+export function printVerifyInstructionsText(instructions: VerifyInstructions): void {
+  const { changeName, schemaName, initiative, contextFiles, state, missingArtifacts, hasIncompleteTasks, instruction, taskTypeRouting } = instructions;
+
+  console.log(`## Verify: ${changeName}`);
+  console.log(`Schema: ${schemaName}`);
+  if (initiative) {
+    console.log(`Initiative: ${initiative.store}/${initiative.id}`);
+  }
+  console.log();
+
+  if (state === 'blocked' && missingArtifacts) {
+    console.log('### Blocked');
+    console.log(`Missing artifacts: ${missingArtifacts.join(', ')}`);
+    console.log();
+  }
+
+  if (hasIncompleteTasks) {
+    console.log('### Warning');
+    console.log('Change has incomplete tasks.');
+    console.log();
+  }
+
+  const contextFileEntries = Object.entries(contextFiles);
+  if (contextFileEntries.length > 0) {
+    console.log('### Context Files');
+    for (const [artifactId, filePaths] of contextFileEntries) {
+      for (const filePath of filePaths) {
+        console.log(`- ${artifactId}: ${filePath}`);
+      }
+    }
+    console.log();
+  }
+
+  console.log('### Instruction');
+  console.log(instruction);
+
+  if (taskTypeRouting) {
+    console.log();
+    console.log('### Task Type Routing');
+    console.log(JSON.stringify(taskTypeRouting, null, 2));
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Archive Instructions Command
+// -----------------------------------------------------------------------------
+
+/**
+ * Generates archive instructions for a change.
+ */
+export async function generateArchiveInstructions(
+  projectRoot: string,
+  changeName: string,
+  schemaName?: string,
+  planningHome = resolveCurrentPlanningHomeSync({ startPath: projectRoot })
+): Promise<ArchiveInstructions> {
+  const context = loadChangeContext(projectRoot, changeName, schemaName, {
+    changeDir: getChangeDir(planningHome, changeName),
+    planningHome,
+  });
+  const changeDir = context.changeDir;
+
+  const schema = resolveSchema(context.schemaName, projectRoot);
+  const archivePhase = schema.phases?.archive;
+
+  // Check artifact completion status
+  const artifacts: Array<{ id: string; status: string }> = [];
+  let hasIncompleteArtifacts = false;
+  for (const artifact of schema.artifacts) {
+    const outputs = resolveArtifactOutputs(changeDir, artifact.generates);
+    const status = outputs.length > 0 ? 'done' : 'pending';
+    artifacts.push({ id: artifact.id, status });
+    if (status !== 'done') {
+      hasIncompleteArtifacts = true;
+    }
+  }
+
+  // Check plans for incomplete tasks
+  const planningFiles = resolvePlanFiles(changeDir);
+  let hasIncompleteTasks = false;
+  for (const pf of planningFiles) {
+    const content = await fs.promises.readFile(pf, 'utf-8');
+    const items = parseChecklistItems(content);
+    if (items.some(i => !i.done)) {
+      hasIncompleteTasks = true;
+      break;
+    }
+  }
+
+  // Check for delta specs
+  const specsOutputs = resolveArtifactOutputs(changeDir, 'specs/**/*.md');
+  const hasDeltaSpecs = specsOutputs.length > 0;
+
+  // Extract taskTypeRouting
+  let taskTypeRouting: ArchiveInstructions['taskTypeRouting'] | undefined;
+  if (archivePhase?.taskTypeRouting) {
+    const rt = archivePhase.taskTypeRouting;
+    taskTypeRouting = { default: rt.default, taskTypes: rt.taskTypes ?? {} };
+  }
+
+  return {
+    changeName,
+    changeDir,
+    schemaName: context.schemaName,
+    ...(context.initiative ? { initiative: context.initiative } : {}),
+    taskTypeRouting,
+    instruction: archivePhase?.instruction ?? 'Archive the completed change.',
+    hasDeltaSpecs,
+    hasIncompleteTasks,
+    hasIncompleteArtifacts,
+    artifacts,
+  };
+}
+
+/**
+ * Print archive instructions in text format.
+ */
+export function printArchiveInstructionsText(instructions: ArchiveInstructions): void {
+  const { changeName, schemaName, initiative, taskTypeRouting, instruction, hasDeltaSpecs, hasIncompleteTasks, hasIncompleteArtifacts, artifacts } = instructions;
+
+  console.log(`## Archive: ${changeName}`);
+  console.log(`Schema: ${schemaName}`);
+  if (initiative) {
+    console.log(`Initiative: ${initiative.store}/${initiative.id}`);
+  }
+  console.log();
+
+  // Warnings
+  if (hasIncompleteArtifacts) {
+    const incomplete = artifacts.filter(a => a.status !== 'done').map(a => a.id);
+    console.log(`### Warning: Incomplete artifacts: ${incomplete.join(', ')}`);
+    console.log();
+  }
+  if (hasIncompleteTasks) {
+    console.log('### Warning: Incomplete tasks');
+    console.log();
+  }
+
+  // Artifact status summary
+  console.log('### Artifact Status');
+  for (const a of artifacts) {
+    const mark = a.status === 'done' ? '[x]' : '[ ]';
+    console.log(`- ${mark} ${a.id} (${a.status})`);
+  }
+  console.log();
+
+  console.log('### Instruction');
+  console.log(instruction);
+
+  if (taskTypeRouting) {
+    console.log();
+    console.log('### Task Type Routing');
+    console.log(JSON.stringify(taskTypeRouting, null, 2));
+  }
+}
+
+// CLI handler for verify instructions
+export async function verifyInstructionsCommand(options: VerifyInstructionsOptions): Promise<void> {
+  const spinner = options.json ? undefined : ora('Generating verify instructions...').start();
+
+  try {
+    const planningHome = resolveCurrentPlanningHomeSync();
+    const projectRoot = planningHome.root;
+    const changeName = await validateChangeExists(
+      options.change,
+      projectRoot,
+      planningHome.changesDir
+    );
+
+    if (options.schema) {
+      validateSchemaExists(options.schema, projectRoot);
+    }
+
+    const instructions = await generateVerifyInstructions(
+      projectRoot,
+      changeName,
+      options.schema,
+      planningHome
+    );
+
+    spinner?.stop();
+
+    if (options.json) {
+      console.log(JSON.stringify(instructions, null, 2));
+      return;
+    }
+
+    printVerifyInstructionsText(instructions);
+  } catch (error) {
+    spinner?.stop();
+    throw error;
+  }
+}
+
+// CLI handler for archive instructions
+export async function archiveInstructionsCommand(options: ArchiveInstructionsOptions): Promise<void> {
+  const spinner = options.json ? undefined : ora('Generating archive instructions...').start();
+
+  try {
+    const planningHome = resolveCurrentPlanningHomeSync();
+    const projectRoot = planningHome.root;
+    const changeName = await validateChangeExists(
+      options.change,
+      projectRoot,
+      planningHome.changesDir
+    );
+
+    if (options.schema) {
+      validateSchemaExists(options.schema, projectRoot);
+    }
+
+    const instructions = await generateArchiveInstructions(
+      projectRoot,
+      changeName,
+      options.schema,
+      planningHome
+    );
+
+    spinner?.stop();
+
+    if (options.json) {
+      console.log(JSON.stringify(instructions, null, 2));
+      return;
+    }
+
+    printArchiveInstructionsText(instructions);
+  } catch (error) {
+    spinner?.stop();
+    throw error;
+  }
 }

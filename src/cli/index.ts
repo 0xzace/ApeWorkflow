@@ -25,6 +25,8 @@ import {
   statusCommand,
   instructionsCommand,
   applyInstructionsCommand,
+  verifyInstructionsCommand,
+  archiveInstructionsCommand,
   templatesCommand,
   schemasCommand,
   newChangeCommand,
@@ -36,6 +38,8 @@ import {
   type SchemasOptions,
   type NewChangeOptions,
   type SetChangeOptions,
+  type VerifyInstructionsOptions,
+  type ArchiveInstructionsOptions,
 } from '../commands/workflow/index.js';
 import { maybeShowTelemetryNotice, trackCommand, shutdown } from '../telemetry/index.js';
 
@@ -489,6 +493,36 @@ program
       await schemasCommand(options);
     } catch (error) {
       await handleCliFailure(error, { commandPath: 'schemas' });
+    }
+  });
+
+// Verify instructions command
+program
+  .command('instructions verify')
+  .description('Get verification instructions for a change')
+  .option('--change <id>', 'Change name')
+  .option('--schema <name>', 'Schema override')
+  .option('--json', 'Output as JSON')
+  .action(async (options: VerifyInstructionsOptions) => {
+    try {
+      await verifyInstructionsCommand(options);
+    } catch (error) {
+      await handleCliFailure(error, { commandPath: 'instructions:verify' });
+    }
+  });
+
+// Archive instructions command
+program
+  .command('instructions archive')
+  .description('Get archive instructions for a change')
+  .option('--change <id>', 'Change name')
+  .option('--schema <name>', 'Schema override')
+  .option('--json', 'Output as JSON')
+  .action(async (options: ArchiveInstructionsOptions) => {
+    try {
+      await archiveInstructionsCommand(options);
+    } catch (error) {
+      await handleCliFailure(error, { commandPath: 'instructions:archive' });
     }
   });
 

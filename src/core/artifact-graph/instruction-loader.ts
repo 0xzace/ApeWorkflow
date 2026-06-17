@@ -18,7 +18,7 @@ import {
 import { readProjectConfig, validateConfigRules } from '../project-config.js';
 import type { PlanningHome } from '../planning-home.js';
 import type { ChangeMetadata, InitiativeLink } from '../change-metadata/index.js';
-import type { Artifact, CompletedSet } from './types.js';
+import type { Artifact, CompletedSet, PhaseConfig } from './types.js';
 
 // Session-level cache for validation warnings (avoid repeating same warnings)
 const shownWarnings = new Set<string>();
@@ -58,6 +58,8 @@ export interface ChangeContext {
   metadata?: ChangeMetadata;
   /** Stored initiative link, when this change is linked to shared context */
   initiative?: InitiativeLink;
+  /** Phase configurations from schema (apply, verify, archive, etc.) */
+  phases?: Record<string, PhaseConfig>;
 }
 
 export interface LoadChangeContextOptions {
@@ -253,6 +255,8 @@ export function loadChangeContext(
     ...(options.planningHome ? { planningHome: options.planningHome } : {}),
     ...(metadata ? { metadata } : {}),
     ...(metadata?.initiative ? { initiative: metadata.initiative } : {}),
+    // Expose phases from schema for downstream commands (apply, verify, archive)
+    phases: schema.phases,
   };
 }
 

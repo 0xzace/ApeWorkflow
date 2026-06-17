@@ -86,3 +86,67 @@ apply:
     Read the workspace planning context from status and instructions output before applying.
     Select an affected area and confirm an allowed edit root before making implementation edits.
     Until an explicit implementation context is available, treat linked repos and folders as read-only exploration context.
+  taskTypeRouting:
+    default:
+      - executing-plans
+      - test-driven-development
+      - subagent-driven-development
+    taskTypes:
+      feature:
+        - executing-plans
+        - test-driven-development
+        - subagent-driven-development
+      bugfix:
+        - systematic-debugging
+        - test-driven-development
+        - executing-plans
+      refactor:
+        - executing-plans
+        - test-driven-development
+        - subagent-driven-development
+      docs:
+        - writing-skills
+
+verify:
+  instruction: |
+    Verify implementation matches change artifacts before archiving.
+    Use three dimensions: completeness, correctness, coherence.
+  taskTypeRouting:
+    default:
+      - verification-before-completion
+    taskTypes:
+      feature:
+        - verification-before-completion
+        - requesting-code-review
+        - receiving-code-review
+      bugfix:
+        - verification-before-completion
+        - requesting-code-review
+        - receiving-code-review
+      refactor:
+        - verification-before-completion
+        - requesting-code-review
+        - receiving-code-review
+      docs:
+        - verification-before-completion
+
+archive:
+  instruction: |
+    Archive a completed change. Sync delta specs, then move to archive directory.
+  taskTypeRouting:
+    default:
+      - finishing-a-development-branch
+      - verification-before-completion
+    taskTypes:
+      feature:
+        - finishing-a-development-branch
+        - verification-before-completion
+      bugfix:
+        - finishing-a-development-branch
+        - verification-before-completion
+      refactor:
+        - finishing-a-development-branch
+        - verification-before-completion
+      docs:
+        - finishing-a-development-branch
+        - verification-before-completion

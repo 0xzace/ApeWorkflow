@@ -203,5 +203,106 @@ artifacts:
       const schema = parseSchema(yaml);
       expect(schema.artifacts[0].requires).toEqual([]);
     });
+
+    it('should parse schema with phases block and taskTypeRouting', () => {
+      const yaml = `
+name: test-schema
+version: 1
+description: A test schema with phases
+artifacts:
+  - id: proposal
+    generates: proposal.md
+    description: Initial proposal
+    template: templates/proposal.md
+    requires: []
+  - id: plans
+    generates: plans/*.md
+    description: Plans
+    template: templates/plans.md
+    requires:
+      - proposal
+phases:
+  apply:
+    requires: [plans]
+    tracks: plans/*.md
+    instruction: Apply the plan.
+    taskTypeRouting:
+      default:
+        - executing-plans
+      taskTypes:
+        feature:
+          - executing-plans
+          - test-driven-development
+  verify:
+    instruction: Verify implementation.
+    taskTypeRouting:
+      default:
+        - verification-before-completion
+  archive:
+    instruction: Archive the change.
+    taskTypeRouting:
+      default:
+        - finishing-a-development-branch
+`;
+      const schema = parseSchema(yaml);
+
+      expect(schema.phases).toBeDefined();
+      expect(schema.phases!.apply).toBeDefined();
+      expect(schema.phases!.apply!.taskTypeRouting).toBeDefined();
+      expect(schema.phases!.apply!.taskTypeRouting!.default).toEqual(['executing-plans']);
+      expect(schema.phases!.apply!.taskTypeRouting!.taskTypes).toEqual({
+        feature: ['executing-plans', 'test-driven-development'],
+      });
+
+      expect(schema.phases!.verify).toBeDefined();
+      expect(schema.phases!.verify!.instruction).toBe('Verify implementation.');
+
+      expect(schema.phases!.archive).toBeDefined();
+      expect(schema.phases!.archive!.taskTypeRouting!.default).toEqual([
+        'finishing-a-development-branch',
+      ]);
+    });
+
+    it('should allow phases without requires (e.g. verify, archive)', () => {
+      const yaml = `
+name: test-schema
+version: 1
+description: Phase without requires
+artifacts:
+  - id: proposal
+    generates: proposal.md
+    description: Proposal
+    template: templates/proposal.md
+    requires: []
+phases:
+  verify:
+    instruction: Verify.
+    taskTypeRouting:
+      default:
+        - verification-before-completion
+`;
+      const schema = parseSchema(yaml);
+      expect(schema.phases!.verify).toBeDefined();
+      expect(schema.phases!.verify!.requires).toBeUndefined();
+    });
+
+    it('should throw on invalid phase requires reference', () => {
+      const yaml = `
+name: test-schema
+version: 1
+description: Invalid phase reference
+artifacts:
+  - id: proposal
+    generates: proposal.md
+    description: Proposal
+    template: templates/proposal.md
+    requires: []
+phases:
+  apply:
+    requires: [nonexistent]
+`;
+      expect(() => parseSchema(yaml)).toThrow(SchemaValidationError);
+      expect(() => parseSchema(yaml)).toThrow(/nonexistent/);
+    });
   });
 });

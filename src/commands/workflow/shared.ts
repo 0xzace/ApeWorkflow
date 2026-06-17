@@ -22,6 +22,11 @@ export interface TaskItem {
   done: boolean;
 }
 
+export interface TaskTypeRouting {
+  default: string[];
+  taskTypes: Record<string, string[]>;
+}
+
 export interface ApplyInstructions {
   changeName: string;
   changeDir: string;
@@ -37,6 +42,46 @@ export interface ApplyInstructions {
   state: 'blocked' | 'all_done' | 'ready';
   missingArtifacts?: string[];
   instruction: string;
+  taskTypeRouting?: TaskTypeRouting;
+}
+
+export interface VerifyInstructions {
+  changeName: string;
+  changeDir: string;
+  schemaName: string;
+  initiative?: InitiativeLink;
+  contextFiles: Record<string, string[]>;
+  taskTypeRouting?: TaskTypeRouting;
+  state: 'blocked' | 'ready';
+  missingArtifacts?: string[];
+  hasIncompleteTasks: boolean;
+  instruction: string;
+}
+
+export interface ArchiveInstructions {
+  changeName: string;
+  changeDir: string;
+  schemaName: string;
+  initiative?: InitiativeLink;
+  taskTypeRouting?: TaskTypeRouting;
+  instruction: string;
+  hasDeltaSpecs: boolean;
+  hasIncompleteTasks: boolean;
+  hasIncompleteArtifacts: boolean;
+  artifacts: Array<{ id: string; status: string }>;
+}
+
+// CLI options for verify and archive instruction commands
+export interface VerifyInstructionsOptions {
+  change?: string;
+  schema?: string;
+  json?: boolean;
+}
+
+export interface ArchiveInstructionsOptions {
+  change?: string;
+  schema?: string;
+  json?: boolean;
 }
 
 // -----------------------------------------------------------------------------
