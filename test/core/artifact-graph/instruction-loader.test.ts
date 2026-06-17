@@ -495,9 +495,11 @@ rules:
           // Warning should be shown only once (deduplication works)
           // Note: We may have gotten warnings from other tests, so check that
           // the count didn't increase by more than 1 from the first call
-          const callCount = consoleWarnSpy.mock.calls.filter(call =>
-            call[0]?.includes('Unknown artifact ID in rules')
-          ).length;
+          const callCount = consoleWarnSpy.mock.calls.filter((call) => {
+            // 先把 mock 参数收窄为字符串，再调用 includes，避免 {} 类型报错
+            const firstArg = call[0];
+            return typeof firstArg === 'string' && firstArg.includes('Unknown artifact ID in rules');
+          }).length;
 
           expect(callCount).toBeGreaterThanOrEqual(1);
         } finally {

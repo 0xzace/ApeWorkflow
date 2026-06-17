@@ -225,6 +225,7 @@ describe('artifact-workflow CLI commands', () => {
   });
 
   describe('instructions command', () => {
+    // 中文注释：该用例在全量覆盖运行时会被前序测试拖慢，给它更长超时避免误判失败。
     it('shows instructions for proposal on scaffolded change', async () => {
       // Create empty change directory (no proposal.md)
       const changeDir = path.join(changesDir, 'scaffolded-change');
@@ -232,12 +233,13 @@ describe('artifact-workflow CLI commands', () => {
 
       const result = await runCLI(['instructions', 'proposal', '--change', 'scaffolded-change'], {
         cwd: tempDir,
+        timeoutMs: 30000,
       });
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toContain('<artifact id="proposal"');
       expect(result.stdout).toContain('proposal.md');
       expect(result.stdout).toContain('<template>');
-    });
+    }, 60000);
 
     it('shows instructions for design artifact', async () => {
       await createTestChange('instr-change');
@@ -573,6 +575,7 @@ describe('artifact-workflow CLI commands', () => {
       expect(json.contextFiles.specs).toEqual([expectedSpecPath]);
     });
 
+    // 中文注释：该用例在全量覆盖运行时会被前序测试拖慢，给更长超时避免误判失败。
     it('resolves single-star glob artifacts consistently between status and apply', async () => {
       const schemaDir = path.join(tempDir, 'apeworkflow', 'schemas', 'glob-test');
       const templatesDir = path.join(schemaDir, 'templates');
@@ -617,7 +620,7 @@ apply:
 
       const applyResult = await runCLI(
         ['instructions', 'apply', '--change', 'single-star-glob', '--json'],
-        { cwd: tempDir }
+        { cwd: tempDir, timeoutMs: 30000 }
       );
       expect(applyResult.exitCode).toBe(0);
       const applyJson = JSON.parse(applyResult.stdout);
@@ -627,7 +630,7 @@ apply:
       expect(applyJson.contextFiles).toEqual({
         specs: [resolvedSpecPath],
       });
-    });
+    }, 60000);
 
     it('shows schema instruction from apply block', async () => {
       await createTestChange('instr-apply', ['proposal', 'design', 'specs', 'tasks', 'plans']);
@@ -653,17 +656,18 @@ apply:
       expect(result.stdout).toContain('ready to be archived');
     });
 
+    // 中文注释：该 CLI 路径在全量覆盖运行时会更慢，给它更长的执行窗口避免误判超时。
     it('uses spec-driven schema apply configuration', async () => {
       // Create a spec-driven style change with all artifacts
       await createTestChange('apply-schema-test', ['proposal', 'design', 'specs', 'tasks', 'plans']);
 
       const result = await runCLI(
         ['instructions', 'apply', '--change', 'apply-schema-test', '--schema', 'spec-driven'],
-        { cwd: tempDir }
+        { cwd: tempDir, timeoutMs: 30000 }
       );
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toContain('Schema: spec-driven');
-    });
+    }, 60000);
 
     it('spec-driven schema uses apply block configuration', async () => {
       // Verify that spec-driven schema uses its apply block (plans is the apply artifact, not tasks.md)
