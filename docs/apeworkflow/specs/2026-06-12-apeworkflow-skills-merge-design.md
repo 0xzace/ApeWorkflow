@@ -1,16 +1,16 @@
-# Design: Merge superpowers-5.1.0 Skills as TypeScript Templates
+# Design: Merge ApeWorkflow 5.1.0 Skills as TypeScript Templates
 
 > **Status:** Approved
 > **Date:** 2026-06-12
-> **Change:** apeworkflow/changes/superpowers-skills-merge
+> **Change:** apeworkflow/changes/apeworkflow-skills-merge
 
 ## 1. 背景
 
 ApeWorkflow 现有技能管线是**工作流驱动**的：11 个技能（`apeworkflow-*.ts` 模板），随 profile 启用/禁用，有 `/ape:*` 命令行。
 
-superpowers-5.1.0 的 14 个方法论技能（brainstorming, TDD, systematic-debugging 等）是静态 Markdown 文件（3207 行），覆盖 AI 代理开发方法论。`feedback.ts` 已存在但未接入管线。
+ApeWorkflow 5.1.0 的 14 个方法论技能（brainstorming, TDD, systematic-debugging 等）是静态 Markdown 文件（3207 行），覆盖 AI 代理开发方法论。`feedback.ts` 已存在但未接入管线。
 
-两者互补但需要统一分发机制：抹掉 superpowers 命名痕迹，统一 `apeworkflow-` 前缀，通过同一管线分发全部 26 个技能。
+两者互补但需要统一分发机制：抹掉 ApeWorkflow 命名痕迹，统一 `apeworkflow-` 前缀，通过同一管线分发全部 26 个技能。
 
 ## 2. 目标
 
@@ -23,9 +23,9 @@ superpowers-5.1.0 的 14 个方法论技能（brainstorming, TDD, systematic-deb
 
 ## 3. 非目标
 
-- 不优化技能之间的调用流程（如 superpowers → ApeWorkflow 的衔接）
+- 不优化技能之间的调用流程（如 apeworkflow → ApeWorkflow 的衔接）
 - 不新增 profile 配置或过滤机制
-- 不修改 superpowers 上游内容（本次转换一次性操作）
+- 不修改 apeworkflow 上游内容（本次转换一次性操作）
 - 不做 Registry 重构（现有 11 个技能的硬编码数组保持不变）
 
 ## 4. 架构：双通道技能管线
@@ -273,57 +273,57 @@ function getTestDrivenDevelopmentInstructions(): string {
 }
 ```
 
-## 8. superpowers → apeworkflow 映射表
+## 8. apeworkflow → apeworkflow 映射表
 
-所有 superpowers 原始引用必须转换，抹掉 superpowers 痕迹：
+所有 apeworkflow 原始引用必须转换，抹掉 apeworkflow 痕迹：
 
-### 维度 A: superpowers:<skill-name> 引用（17 处）
+### 维度 A: apeworkflow-<skill-name> 引用（17 处）
 
 ```
-superpowers:test-driven-development          →  apeworkflow-test-driven-development
-superpowers:using-git-worktrees              →  apeworkflow-using-git-worktrees
-superpowers:writing-plans                    →  apeworkflow-writing-plans
-superpowers:finishing-a-development-branch   →  apeworkflow-finishing-a-development-branch
-superpowers:requesting-code-review           →  apeworkflow-requesting-code-review
-superpowers:executing-plans                  →  apeworkflow-executing-plans
-superpowers:subagent-driven-development      →  apeworkflow-subagent-driven-development
-superpowers:systematic-debugging             →  apeworkflow-systematic-debugging
-superpowers:verification-before-completion   →  apeworkflow-verification-before-completion
+apeworkflow-test-driven-development          →  apeworkflow-test-driven-development
+apeworkflow-using-git-worktrees              →  apeworkflow-using-git-worktrees
+apeworkflow-writing-plans                    →  apeworkflow-writing-plans
+apeworkflow-finishing-a-development-branch   →  apeworkflow-finishing-a-development-branch
+apeworkflow-requesting-code-review           →  apeworkflow-requesting-code-review
+apeworkflow-executing-plans                  →  apeworkflow-executing-plans
+apeworkflow-subagent-driven-development      →  apeworkflow-subagent-driven-development
+apeworkflow-systematic-debugging             →  apeworkflow-systematic-debugging
+apeworkflow-verification-before-completion   →  apeworkflow-verification-before-completion
 ```
 
 影响技能：executing-plans(4), subagent-driven-dev(6), systematic-debugging(3), writing-plans(3), receiving-code-review(1), writing-skills(2)
 
-### 维度 B: 路径中的 superpowers（7 处）
+### 维度 B: 路径中的 apeworkflow（7 处）
 
 ```
-docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md  →  apeworkflow/specs/YYYY-MM-DD-<topic>-design.md
-docs/superpowers/plans/<filename>.md  →  apeworkflow/changes/<name>/plans/[序号]<filename>.md
+docs/apeworkflow/specs/YYYY-MM-DD-<topic>-design.md  →  apeworkflow/specs/YYYY-MM-DD-<topic>-design.md
+docs/apeworkflow/plans/<filename>.md  →  apeworkflow/changes/<name>/plans/[序号]<filename>.md
 ```
 
 影响技能：brainstorming(2), writing-plans(3), subagent-driven-dev(1), requesting-code-review(1)
 
-### 维度 C: ~/.config/superpowers/ 路径引用（4 处）
+### 维度 C: ~/.config/apeworkflow/ 路径引用（4 处）
 
 ```
-~/.config/superpowers/worktrees/ → 删除或替换为通用描述
+~/.config/apeworkflow/worktrees/ → 删除或替换为通用描述
 ```
 
 影响技能：finishing-a-development-branch(2), using-git-worktrees(2)
 
-### 维度 D: 文本中的 "Superpowers"（5 处）
+### 维度 D: 文本中的 "ApeWorkflow"（5 处）
 
 ```
-"Superpowers works much better with subagent support"  →  "This works much better with subagent support"
-"Superpowers created this worktree — we own cleanup"   →  "This worktree was created by the skill — clean it up"
+"ApeWorkflow works much better with subagent support"  →  "This works much better with subagent support"
+"ApeWorkflow created this worktree — we own cleanup"   →  "This worktree was created by the skill — clean it up"
 ```
 
 影响技能：executing-plans(1), finishing-a-development-branch(2)
 
-### 维度 E: using-superpowers 技能改名
+### 维度 E: apeworkflow-using-skills 技能改名
 
 ```
-name: using-superpowers        →  name: apeworkflow-using-skills
-技能文件路径：using-superpowers/  →  using-skills/
+name: apeworkflow-using-skills        →  name: apeworkflow-using-skills
+技能文件路径：apeworkflow-using-skills/  →  using-skills/
 ```
 
 ### 维度 F: 附属文件路径引用（简化）
@@ -386,9 +386,9 @@ brainstorming/visual-companion.md
 
 现有 11 个工作流条目已有 `workflowId`，新增 15 个不加 `workflowId`。用 `workflowId !== undefined` 判断比新增 `scope` 字段更自然，不需要修改现有代码。
 
-### 决策 2：抹掉所有 superpowers 痕迹
+### 决策 2：抹掉所有 apeworkflow 痕迹
 
-直接修改 14 个技能文件中的 superpowers 引用为 `apeworkflow-` 或通用描述。不做渐进式兼容。
+直接修改 14 个技能文件中的 apeworkflow 引用为 `apeworkflow-` 或通用描述。不做渐进式兼容。
 
 ### 决策 3：附属文件与模板放同目录
 
@@ -408,14 +408,14 @@ brainstorming/visual-companion.md
 1. 读取原始 SKILL.md（14 个文件）
 2. 解析 YAML frontmatter（`---` 分隔符之间）
 3. 提取 body（frontmatter 之后的内容）
-4. 执行 superpowers→apeworkflow 替换（37+ 处，按维度 A-F 映射表）
+4. 执行 apeworkflow→apeworkflow 替换（37+ 处，按维度 A-F 映射表）
 5. name 加 `apeworkflow-` 前缀
 6. body 中 `` ` ``→`` \` ``, `${`→`$\{`
 7. 生成 TS 代码框架（小文件内联 / 大文件函数式）
 
 **手动处理步骤：**
 1. 审查反引号转义完整性
-2. 确认 superpowers 引用全部替换
+2. 确认 apeworkflow 引用全部替换
 3. 确认大文件使用独立函数模式
 4. 运行 `pnpm run build` 编译
 5. 运行 `pnpm test` 验证
@@ -440,7 +440,7 @@ brainstorming/visual-companion.md
 ### AC4: 技能生成
 - [ ] 全部 26 个技能的 SKILL.md 生成成功
 - [ ] 所有新技能 name 带 `apeworkflow-` 前缀
-- [ ] 内容中无残留 superpowers 引用
+- [ ] 内容中无残留 apeworkflow 引用
 
 ### AC5: 技能清理
 - [ ] profile 切换不会清理全局技能

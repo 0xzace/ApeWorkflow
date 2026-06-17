@@ -1,8 +1,8 @@
-# Superpowers Skills Merge Implementation Plan
+# ApeWorkflow Skills Merge Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use apeworkflow-subagent-driven-development (recommended) or apeworkflow-executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Merge 14 superpowers-5.1.0 Markdown skills into ApeWorkflow's TypeScript template system as 15 global skills (14 + feedback), creating a dual-channel pipeline returning 26 total skills.
+**Goal:** Merge 14 ApeWorkflow 5.1.0 Markdown skills into ApeWorkflow's TypeScript template system as 15 global skills (14 + feedback), creating a dual-channel pipeline returning 26 total skills.
 
 **Architecture:** A dual-channel skill pipeline where 11 workflow skills are profile-filtered and 15 global skills are always present. Skills are TypeScript template files in `src/core/templates/workflows/`. The pipeline is modified to merge both channels at `getSkillTemplates()`.
 
@@ -502,11 +502,11 @@ git commit -m "fix: Phase 1 test compatibility adjustments"
 
 ## Phase 2: Create 14 Skill Templates
 
-**Strategy:** Each skill is an independent task. The content comes from the original SKILL.md files in `/Users/acez/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/`.
+**Strategy:** Each skill is an independent task. The content comes from the original SKILL.md files in `/Users/acez/.claude/plugins/cache/claude-plugins-official/apeworkflow/5.1.0/skills/`.
 
 For each skill:
 1. Parse the original SKILL.md — extract frontmatter (name, description) and body
-2. Apply replacements (superpowers→apeworkflow, paths, text)
+2. Apply replacements (apeworkflow→apeworkflow, paths, text)
 3. Escape template literal characters (`` ` `` → `` \` ``, `${` → `$\{` )
 4. Write the TS file (inline if ≤200 lines, function-based if >200 lines)
 5. Add export to `skill-templates.ts`
@@ -525,7 +525,7 @@ For each skill:
 
 - [ ] **Step 1: Create the TS file**
 
-Read the original file at `/Users/acez/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/brainstorming/SKILL.md`.
+Read the original file at `/Users/acez/.claude/plugins/cache/claude-plugins-official/apeworkflow/5.1.0/skills/brainstorming/SKILL.md`.
 
 Frontmatter:
 ```yaml
@@ -536,7 +536,7 @@ description: "You MUST use this before any creative work - creating features, bu
 Body: Markdown content starting from `# Brainstorming Ideas Into Designs`.
 
 Apply replacements:
-- `docs/superpowers/specs/` → `apeworkflow/specs/` (2 occurrences)
+- `docs/apeworkflow/specs/` → `apeworkflow/specs/` (2 occurrences)
 - `elements-of-style:writing-clearly` → delete (add comment `<!-- elements-of-style skill not available in apeworkflow -->`)
 - `skills/brainstorming/visual-companion.md` → `brainstorming/visual-companion.md`
 
@@ -548,7 +548,7 @@ Generate TS file:
 /**
  * Skill Template: apeworkflow-brainstorming
  *
- * Converted from superpowers brainstorming skill.
+ * Converted from apeworkflow brainstorming skill.
  * Brainstorming guides collaborative design through structured dialogue.
  */
 import type { SkillTemplate } from '../types.js';
@@ -583,13 +583,13 @@ Do NOT invoke any implementation skill, write any code, scaffold any project, or
 mkdir -p /Users/acez/Documents/TIENS/ApeWorkflow/ApeWorkflow/src/core/templates/workflows/apeworkflow-brainstorming/brainstorming
 mkdir -p /Users/acez/Documents/TIENS/ApeWorkflow/ApeWorkflow/src/core/templates/workflows/apeworkflow-brainstorming/scripts
 
-cp /Users/acez/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/brainstorming/scripts/visual-companion.md \
+cp /Users/acez/.claude/plugins/cache/claude-plugins-official/apeworkflow/5.1.0/skills/brainstorming/scripts/visual-companion.md \
   /Users/acez/Documents/TIENS/ApeWorkflow/ApeWorkflow/src/core/templates/workflows/apeworkflow-brainstorming/brainstorming/visual-companion.md
 
-cp /Users/acez/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/brainstorming/scripts/plan-document-reviewer-prompt.md \
+cp /Users/acez/.claude/plugins/cache/claude-plugins-official/apeworkflow/5.1.0/skills/brainstorming/scripts/plan-document-reviewer-prompt.md \
   /Users/acez/Documents/TIENS/ApeWorkflow/ApeWorkflow/src/core/templates/workflows/apeworkflow-brainstorming/scripts/plan-document-reviewer-prompt.md
 
-cp /Users/acez/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/brainstorming/spec-document-reviewer-prompt.md \
+cp /Users/acez/.claude/plugins/cache/claude-plugins-official/apeworkflow/5.1.0/skills/brainstorming/spec-document-reviewer-prompt.md \
   /Users/acez/Documents/TIENS/ApeWorkflow/ApeWorkflow/src/core/templates/workflows/apeworkflow-brainstorming/spec-document-reviewer-prompt.md
 ```
 
@@ -652,7 +652,7 @@ git commit -m "feat(skills): add apeworkflow-brainstorming as global skill"
 
 - [ ] **Step 1: Create the TS file**
 
-Read from `/Users/acez/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/dispatching-parallel-agents/SKILL.md`.
+Read from `/Users/acez/.claude/plugins/cache/claude-plugins-official/apeworkflow/5.1.0/skills/dispatching-parallel-agents/SKILL.md`.
 
 Frontmatter:
 ```yaml
@@ -660,7 +660,7 @@ name: dispatching-parallel-agents
 description: Use when facing 2+ independent tasks that can be worked on without shared state or sequential dependencies
 ```
 
-Replacements: none needed (no superpowers references).
+Replacements: none needed (no apeworkflow references).
 
 Pattern: Inline (182 lines, ≤200).
 
@@ -704,7 +704,7 @@ git commit -m "feat(skills): add apeworkflow-dispatching-parallel-agents as glob
 
 - [ ] **Step 1: Create the TS file**
 
-Read from `/Users/acez/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/executing-plans/SKILL.md`.
+Read from `/Users/acez/.claude/plugins/cache/claude-plugins-official/apeworkflow/5.1.0/skills/executing-plans/SKILL.md`.
 
 Frontmatter:
 ```yaml
@@ -713,13 +713,13 @@ description: Use when you have a written implementation plan to execute in a sep
 ```
 
 Replacements (Dimension A, C, D):
-- `"Superpowers works much better with subagent support"` → `"This works much better with subagent support"`
-- `superpowers:subagent-driven-development` → `apeworkflow-subagent-driven-development`
-- `superpowers:finishing-a-development-branch` → `apeworkflow-finishing-a-development-branch`
-- `superpowers:using-git-worktrees` → `apeworkflow-using-git-worktrees`
-- `superpowers:writing-plans` → `apeworkflow-writing-plans`
-- `superpowers:test-driven-development` → `apeworkflow-test-driven-development`
-- `superpowers:verification-before-completion` → `apeworkflow-verification-before-completion`
+- `"ApeWorkflow works much better with subagent support"` → `"This works much better with subagent support"`
+- `apeworkflow-subagent-driven-development` → `apeworkflow-subagent-driven-development`
+- `apeworkflow-finishing-a-development-branch` → `apeworkflow-finishing-a-development-branch`
+- `apeworkflow-using-git-worktrees` → `apeworkflow-using-git-worktrees`
+- `apeworkflow-writing-plans` → `apeworkflow-writing-plans`
+- `apeworkflow-test-driven-development` → `apeworkflow-test-driven-development`
+- `apeworkflow-verification-before-completion` → `apeworkflow-verification-before-completion`
 
 Pattern: Inline (70 lines).
 
@@ -742,7 +742,7 @@ git commit -m "feat(skills): add apeworkflow-executing-plans as global skill"
 
 - [ ] **Step 1: Create the TS file**
 
-Read from `/Users/acez/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/finishing-a-development-branch/SKILL.md`.
+Read from `/Users/acez/.claude/plugins/cache/claude-plugins-official/apeworkflow/5.1.0/skills/finishing-a-development-branch/SKILL.md`.
 
 Frontmatter:
 ```yaml
@@ -751,8 +751,8 @@ description: Use when implementation is complete, all tests pass, and you need t
 ```
 
 Replacements:
-- `"Superpowers created this worktree — we own cleanup"` → `"This worktree was created by the skill — clean it up"`
-- `~/.config/superpowers/worktrees/` → Delete the lines mentioning this path (lines about checking worktree path under this directory). Replace with generic description: `a worktree managed by the skill (under .worktrees/ or worktrees/ directory)`.
+- `"ApeWorkflow created this worktree — we own cleanup"` → `"This worktree was created by the skill — clean it up"`
+- `~/.config/apeworkflow/worktrees/` → Delete the lines mentioning this path (lines about checking worktree path under this directory). Replace with generic description: `a worktree managed by the skill (under .worktrees/ or worktrees/ directory)`.
 
 Pattern: Function-based (251 lines, >200).
 
@@ -792,7 +792,7 @@ git commit -m "feat(skills): add apeworkflow-finishing-a-development-branch as g
 - Modify: `src/core/templates/skill-templates.ts`
 - Modify: `src/core/shared/skill-generation.ts`
 
-Read from `/Users/acez/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/receiving-code-review/SKILL.md`.
+Read from `/Users/acez/.claude/plugins/cache/claude-plugins-official/apeworkflow/5.1.0/skills/receiving-code-review/SKILL.md`.
 
 Frontmatter:
 ```yaml
@@ -800,7 +800,7 @@ name: receiving-code-review
 description: Use when receiving code review feedback, before implementing suggestions, especially if feedback seems unclear or technically questionable - requires technical rigor and verification, not performative agreement or blind implementation
 ```
 
-Replacements: none (no superpowers references).
+Replacements: none (no apeworkflow references).
 
 Pattern: Function-based (213 lines).
 
@@ -822,7 +822,7 @@ git commit -m "feat(skills): add apeworkflow-receiving-code-review as global ski
 - Modify: `src/core/templates/skill-templates.ts`
 - Modify: `src/core/shared/skill-generation.ts`
 
-Read from `/Users/acez/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/requesting-code-review/SKILL.md`.
+Read from `/Users/acez/.claude/plugins/cache/claude-plugins-official/apeworkflow/5.1.0/skills/requesting-code-review/SKILL.md`.
 
 Frontmatter:
 ```yaml
@@ -831,14 +831,14 @@ description: Use when completing tasks, implementing major features, or before m
 ```
 
 Replacements:
-- `docs/superpowers/plans/<filename>.md` → `apeworkflow/changes/<name>/plans/[序号]<filename>.md`
+- `docs/apeworkflow/plans/<filename>.md` → `apeworkflow/changes/<name>/plans/[序号]<filename>.md`
 - `requesting-code-review/code-reviewer.md` → `apeworkflow-requesting-code-review/code-reviewer.md`
 
 Pattern: Inline (103 lines).
 
 Attached file: Copy `code-reviewer.md`:
 ```bash
-cp /Users/acez/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/requesting-code-review/code-reviewer.md \
+cp /Users/acez/.claude/plugins/cache/claude-plugins-official/apeworkflow/5.1.0/skills/requesting-code-review/code-reviewer.md \
   /Users/acez/Documents/TIENS/ApeWorkflow/ApeWorkflow/src/core/templates/workflows/apeworkflow-requesting-code-review/code-reviewer.md
 ```
 
@@ -862,17 +862,17 @@ git commit -m "feat(skills): add apeworkflow-requesting-code-review as global sk
 - Modify: `src/core/templates/skill-templates.ts`
 - Modify: `src/core/shared/skill-generation.ts`
 
-Read from `/Users/acez/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/subagent-driven-development/SKILL.md`.
+Read from `/Users/acez/.claude/plugins/cache/claude-plugins-official/apeworkflow/5.1.0/skills/subagent-driven-development/SKILL.md`.
 
 Replacements:
-- `superpowers:finishing-a-development-branch` → `apeworkflow-finishing-a-development-branch` (2 places including dot graph)
-- `docs/superpowers/plans/` → `apeworkflow/changes/<name>/plans/[序号]/`
-- `~/.config/superpowers/hooks/` → Delete (add comment or remove the line)
-- `superpowers:using-git-worktrees` → `apeworkflow-using-git-worktrees`
-- `superpowers:writing-plans` → `apeworkflow-writing-plans`
-- `superpowers:requesting-code-review` → `apeworkflow-requesting-code-review`
-- `superpowers:test-driven-development` → `apeworkflow-test-driven-development`
-- `superpowers:executing-plans` → `apeworkflow-executing-plans`
+- `apeworkflow-finishing-a-development-branch` → `apeworkflow-finishing-a-development-branch` (2 places including dot graph)
+- `docs/apeworkflow/plans/` → `apeworkflow/changes/<name>/plans/[序号]/`
+- `~/.config/apeworkflow/hooks/` → Delete (add comment or remove the line)
+- `apeworkflow-using-git-worktrees` → `apeworkflow-using-git-worktrees`
+- `apeworkflow-writing-plans` → `apeworkflow-writing-plans`
+- `apeworkflow-requesting-code-review` → `apeworkflow-requesting-code-review`
+- `apeworkflow-test-driven-development` → `apeworkflow-test-driven-development`
+- `apeworkflow-executing-plans` → `apeworkflow-executing-plans`
 - `./implementer-prompt.md` → `apeworkflow-subagent-driven-development/implementer-prompt.md`
 
 Pattern: Function-based (279 lines).
@@ -880,7 +880,7 @@ Pattern: Function-based (279 lines).
 Attached files: Copy 3 prompt files:
 ```bash
 for f in implementer-prompt.md spec-reviewer-prompt.md code-quality-reviewer-prompt.md; do
-  cp "/Users/acez/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/subagent-driven-development/$f" \
+  cp "/Users/acez/.claude/plugins/cache/claude-plugins-official/apeworkflow/5.1.0/skills/subagent-driven-development/$f" \
     /Users/acez/Documents/TIENS/ApeWorkflow/ApeWorkflow/src/core/templates/workflows/apeworkflow-subagent-driven-development/$f
 done
 ```
@@ -903,11 +903,11 @@ git commit -m "feat(skills): add apeworkflow-subagent-driven-development as glob
 - Modify: `src/core/templates/skill-templates.ts`
 - Modify: `src/core/shared/skill-generation.ts`
 
-Read from `/Users/acez/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/systematic-debugging/SKILL.md`.
+Read from `/Users/acez/.claude/plugins/cache/claude-plugins-official/apeworkflow/5.1.0/skills/systematic-debugging/SKILL.md`.
 
 Replacements:
-- `superpowers:test-driven-development` → `apeworkflow-test-driven-development` (2 places)
-- `superpowers:verification-before-completion` → `apeworkflow-verification-before-completion` (1 place)
+- `apeworkflow-test-driven-development` → `apeworkflow-test-driven-development` (2 places)
+- `apeworkflow-verification-before-completion` → `apeworkflow-verification-before-completion` (1 place)
 
 Pattern: Function-based (296 lines).
 
@@ -915,7 +915,7 @@ Attached files (10 files):
 ```bash
 mkdir -p /Users/acez/Documents/TIENS/ApeWorkflow/ApeWorkflow/src/core/templates/workflows/apeworkflow-systematic-debugging
 for f in root-cause-tracing.md defense-in-depth.md condition-based-waiting.md test-debug-verify.ts test-invariant-debug.sh root-cause-tracing.ts debug-helpers.ts log-analysis.md error-patterns.md; do
-  cp "/Users/acez/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/systematic-debugging/$f" \
+  cp "/Users/acez/.claude/plugins/cache/claude-plugins-official/apeworkflow/5.1.0/skills/systematic-debugging/$f" \
     /Users/acez/Documents/TIENS/ApeWorkflow/ApeWorkflow/src/core/templates/workflows/apeworkflow-systematic-debugging/$f 2>/dev/null || true
 done
 ```
@@ -940,7 +940,7 @@ git commit -m "feat(skills): add apeworkflow-systematic-debugging as global skil
 - Modify: `src/core/templates/skill-templates.ts`
 - Modify: `src/core/shared/skill-generation.ts`
 
-Read from `/Users/acez/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/test-driven-development/SKILL.md`.
+Read from `/Users/acez/.claude/plugins/cache/claude-plugins-official/apeworkflow/5.1.0/skills/test-driven-development/SKILL.md`.
 
 Replacements: none.
 
@@ -948,7 +948,7 @@ Pattern: Function-based (371 lines).
 
 Attached file:
 ```bash
-cp /Users/acez/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/test-driven-development/testing-anti-patterns.md \
+cp /Users/acez/.claude/plugins/cache/claude-plugins-official/apeworkflow/5.1.0/skills/test-driven-development/testing-anti-patterns.md \
   /Users/acez/Documents/TIENS/ApeWorkflow/ApeWorkflow/src/core/templates/workflows/apeworkflow-test-driven-development/testing-anti-patterns.md
 ```
 
@@ -969,10 +969,10 @@ git commit -m "feat(skills): add apeworkflow-test-driven-development as global s
 - Modify: `src/core/templates/skill-templates.ts`
 - Modify: `src/core/shared/skill-generation.ts`
 
-Read from `/Users/acez/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/using-git-worktrees/SKILL.md`.
+Read from `/Users/acez/.claude/plugins/cache/claude-plugins-official/apeworkflow/5.1.0/skills/using-git-worktrees/SKILL.md`.
 
 Replacements:
-- `~/.config/superpowers/worktrees/` → Replace with generic description: `a worktree managed by the skill (under .worktrees/ or worktrees/ directory)`
+- `~/.config/apeworkflow/worktrees/` → Replace with generic description: `a worktree managed by the skill (under .worktrees/ or worktrees/ directory)`
   - Lines 79, 81, 97, 106 in the original SKILL.md reference this path
 
 Pattern: Function-based (215 lines).
@@ -997,13 +997,13 @@ git commit -m "feat(skills): add apeworkflow-using-git-worktrees as global skill
 - Modify: `src/core/templates/skill-templates.ts`
 - Modify: `src/core/shared/skill-generation.ts`
 
-Read from `/Users/acez/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/using-superpowers/SKILL.md`.
+Read from `/Users/acez/.claude/plugins/cache/claude-plugins-official/apeworkflow/5.1.0/skills/apeworkflow-using-skills/SKILL.md`.
 
 Replacements:
-- `name: using-superpowers` → `name: apeworkflow-using-skills` (in frontmatter → in TS name field)
-- `Superpowers skills override` → `Apeworkflow skills override` (Dimension D)
-- `~/.config/superpowers/` → generic description
-- `using-superpowers:` → `apeworkflow-using-skills:` (skill reference in skill flow diagram)
+- `name: apeworkflow-using-skills` → `name: apeworkflow-using-skills` (in frontmatter → in TS name field)
+- `ApeWorkflow skills override` → `ApeWorkflow skills override` (Dimension D)
+- `~/.config/apeworkflow/` → generic description
+- `apeworkflow-using-skills-` → `apeworkflow-using-skills:` (skill reference in skill flow diagram)
 
 Pattern: Inline (117 lines).
 
@@ -1011,7 +1011,7 @@ Attached files:
 ```bash
 mkdir -p /Users/acez/Documents/TIENS/ApeWorkflow/ApeWorkflow/src/core/templates/workflows/apeworkflow-using-skills/references
 for f in copilot-tools.md codex-tools.md gemini-tools.md; do
-  cp "/Users/acez/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/using-superpowers/references/$f" \
+  cp "/Users/acez/.claude/plugins/cache/claude-plugins-official/apeworkflow/5.1.0/skills/apeworkflow-using-skills/references/$f" \
     /Users/acez/Documents/TIENS/ApeWorkflow/ApeWorkflow/src/core/templates/workflows/apeworkflow-using-skills/references/$f
 done
 ```
@@ -1023,7 +1023,7 @@ Export name: `getUsingSkillsSkillTemplate`.
 - [ ] **Step 8: Commit**
 
 ```bash
-git commit -m "feat(skills): add apeworkflow-using-skills as global skill (formerly using-superpowers)"
+git commit -m "feat(skills): add apeworkflow-using-skills as global skill"
 ```
 
 ### Task 2.12: Create apeworkflow-verification-before-completion.ts
@@ -1033,7 +1033,7 @@ git commit -m "feat(skills): add apeworkflow-using-skills as global skill (forme
 - Modify: `src/core/templates/skill-templates.ts`
 - Modify: `src/core/shared/skill-generation.ts`
 
-Read from `/Users/acez/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/verification-before-completion/SKILL.md`.
+Read from `/Users/acez/.claude/plugins/cache/claude-plugins-official/apeworkflow/5.1.0/skills/verification-before-completion/SKILL.md`.
 
 Replacements: none.
 
@@ -1057,19 +1057,19 @@ git commit -m "feat(skills): add apeworkflow-verification-before-completion as g
 - Modify: `src/core/templates/skill-templates.ts`
 - Modify: `src/core/shared/skill-generation.ts`
 
-Read from `/Users/acez/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/writing-plans/SKILL.md`.
+Read from `/Users/acez/.claude/plugins/cache/claude-plugins-official/apeworkflow/5.1.0/skills/writing-plans/SKILL.md`.
 
 Replacements:
-- `superpowers:using-git-worktrees` → `apeworkflow-using-git-worktrees`
-- `docs/superpowers/plans/` → `apeworkflow/changes/<name>/plans/[序号]/` (3 places)
-- `superpowers:subagent-driven-development` → `apeworkflow-subagent-driven-development` (2 places)
-- `superpowers:executing-plans` → `apeworkflow-executing-plans`
+- `apeworkflow-using-git-worktrees` → `apeworkflow-using-git-worktrees`
+- `docs/apeworkflow/plans/` → `apeworkflow/changes/<name>/plans/[序号]/` (3 places)
+- `apeworkflow-subagent-driven-development` → `apeworkflow-subagent-driven-development` (2 places)
+- `apeworkflow-executing-plans` → `apeworkflow-executing-plans`
 
 Pattern: Inline (152 lines).
 
 Attached file:
 ```bash
-cp /Users/acez/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/writing-plans/plan-document-reviewer-prompt.md \
+cp /Users/acez/.claude/plugins/cache/claude-plugins-official/apeworkflow/5.1.0/skills/writing-plans/plan-document-reviewer-prompt.md \
   /Users/acez/Documents/TIENS/ApeWorkflow/ApeWorkflow/src/core/templates/workflows/apeworkflow-writing-plans/plan-document-reviewer-prompt.md
 ```
 
@@ -1091,11 +1091,11 @@ git commit -m "feat(skills): add apeworkflow-writing-plans as global skill"
 - Modify: `src/core/templates/skill-templates.ts`
 - Modify: `src/core/shared/skill-generation.ts`
 
-Read from `/Users/acez/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/writing-skills/SKILL.md`.
+Read from `/Users/acez/.claude/plugins/cache/claude-plugins-official/apeworkflow/5.1.0/skills/writing-skills/SKILL.md`.
 
 Replacements:
-- `superpowers:test-driven-development` → `apeworkflow-test-driven-development` (2 places)
-- `superpowers:systematic-debugging` → `apeworkflow-systematic-debugging` (1 place)
+- `apeworkflow-test-driven-development` → `apeworkflow-test-driven-development` (2 places)
+- `apeworkflow-systematic-debugging` → `apeworkflow-systematic-debugging` (1 place)
 
 Pattern: Function-based (655 lines).
 
@@ -1103,10 +1103,10 @@ Attached files:
 ```bash
 mkdir -p /Users/acez/Documents/TIENS/ApeWorkflow/ApeWorkflow/src/core/templates/workflows/apeworkflow-writing-skills/examples
 for f in anthropic-best-practices.md graphviz-conventions.dot persuasion-principles.md render-graphs.js testing-skills-with-subagents.md; do
-  cp "/Users/acez/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/writing-skills/$f" \
+  cp "/Users/acez/.claude/plugins/cache/claude-plugins-official/apeworkflow/5.1.0/skills/writing-skills/$f" \
     /Users/acez/Documents/TIENS/ApeWorkflow/ApeWorkflow/src/core/templates/workflows/apeworkflow-writing-skills/$f
 done
-cp -r "/Users/acez/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/writing-skills/examples/"* \
+cp -r "/Users/acez/.claude/plugins/cache/claude-plugins-official/apeworkflow/5.1.0/skills/writing-skills/examples/"* \
   /Users/acez/Documents/TIENS/ApeWorkflow/ApeWorkflow/src/core/templates/workflows/apeworkflow-writing-skills/examples/
 ```
 
@@ -1380,11 +1380,11 @@ pnpm test 2>&1
 ```
 Expected: All tests pass.
 
-- [ ] **Step 3: Verify no superpowers references in new files**
+- [ ] **Step 3: Verify no apeworkflow references in new files**
 
 ```bash
 cd /Users/acez/Documents/TIENS/ApeWorkflow/ApeWorkflow
-grep -r "superpowers" src/core/templates/workflows/apeworkflow-*.ts | wc -l
+grep -r "apeworkflow" src/core/templates/workflows/apeworkflow-*.ts | wc -l
 ```
 Expected: `0`
 
@@ -1423,7 +1423,7 @@ Expected: `11`
 
 ```bash
 git add -A
-git commit -m "chore: final verification — build, tests, no superpowers references"
+git commit -m "chore: final verification — build, tests, no apeworkflow references"
 ```
 
 ---
@@ -1442,7 +1442,7 @@ git commit -m "chore: final verification — build, tests, no superpowers refere
 | AC3: With filter returns match+15 | Task 1.2 (dual-channel logic) |
 | AC4: All 26 SKILL.md generated | Phase 2 (14 new + 1 existing + 1 feedback) |
 | AC4: apeworkflow- prefix | Phase 2 (all names prefixed) |
-| AC4: No superpowers references | Task 5.1 step 3 |
+| AC4: No apeworkflow references | Task 5.1 step 3 |
 | AC5: Global skills not cleaned up | Task 1.5 (isWorkflowEntry filter) |
 | AC6: Profile UI not expanded | No change needed (WORKFLOW_TO_SKILL_DIR unchanged) |
 | AC7: Attached files copied | Task 3.1 |
@@ -1456,5 +1456,5 @@ git commit -m "chore: final verification — build, tests, no superpowers refere
 | Backtick escaping errors in TS template literals | Careful manual review after each skill generation; build catches syntax errors immediately |
 | Missing attached file copies | Each skill task includes explicit copy commands; verify in Phase 5 |
 | Test count mismatches | Tests updated alongside implementation (Phase 4 runs after all skills registered) |
-| superpowers reference leaks | Each skill task has specific replacement checklist; Phase 5 verifies 0 leaks |
+| apeworkflow reference leaks | Each skill task has specific replacement checklist; Phase 5 verifies 0 leaks |
 | Type errors from WorkflowId changes | WorkflowId is derived from ALL_WORKFLOWS by TypeScript; adding 'propose' is the only change, type auto-updates |

@@ -53,7 +53,7 @@
 #### 发生了什么
 
 - 同样从 `/ape:explore 实现ToDo` 开始。
-- 先加载了 `using-superpowers` 的启动上下文。
+- 先加载了 `apeworkflow-using-skills` 的启动上下文。
 - 之后在 explore 过程中还未进入明确规划或实现，就遇到了连续 `502 Bad Gateway`。
 - 随后会话被用户中断。
 

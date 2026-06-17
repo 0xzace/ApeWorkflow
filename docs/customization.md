@@ -345,7 +345,7 @@ Community schemas are not vendored into ApeWorkflow core — they live in their 
 
 | Schema | Maintainer | Repository | Description |
 |--------|-----------|-----------|-------------|
-| `superpowers-bridge` | @JiangWay | [JiangWay/apeworkflow-schemas](https://github.com/JiangWay/apeworkflow-schemas/tree/main/superpowers-bridge) | Integrates ApeWorkflow's artifact governance with [obra/superpowers](https://github.com/obra/superpowers) execution skills (brainstorming, writing-plans, TDD via subagents, code review, finishing). Adds an evidence-first `retrospective` artifact filling a gap Superpowers does not natively cover. |
+| `apeworkflow-bridge` | @JiangWay | [JiangWay/apeworkflow-schemas](https://github.com/JiangWay/apeworkflow-schemas/tree/main/apeworkflow-bridge) | Integrates ApeWorkflow's artifact governance with ApeWorkflow execution skills (brainstorming, writing-plans, TDD via subagents, code review, finishing). Adds an evidence-first `retrospective` artifact filling a gap ApeWorkflow does not natively cover. |
 
 > Want to contribute a community schema? Open an issue with a link to your repository, or submit a PR adding a row to this table.
 
