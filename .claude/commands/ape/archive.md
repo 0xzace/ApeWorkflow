@@ -97,9 +97,7 @@ Archive a completed change in the experimental workflow.
    - Whether specs were synced (if applicable)
    - Note about any warnings (incomplete artifacts / plan tasks)
 
-**Task type routing**: This command delegates to the CLI's `taskTypeRouting`. Run `apeworkflow instructions verify --json` to get the routing table (keys: feature, bugfix, refactor, docs). Default verify/archive chains:
-- `verify`：`verification-before-completion -> requesting-code-review -> receiving-code-review`
-- `archive`：`finishing-a-development-branch -> verification-before-completion`
+任务类型路由：调用 `apeworkflow instructions archive --change <name> --json` 获取。不要在此内联静态路由表。
 
 **Output On Success**
 
