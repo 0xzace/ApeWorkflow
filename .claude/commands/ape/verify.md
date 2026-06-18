@@ -157,8 +157,7 @@ Verify that an implementation matches the change artifacts (specs, tasks, design
 - **False Positives**: When uncertain, prefer SUGGESTION over WARNING, WARNING over CRITICAL
 - **Actionability**: Every issue must have a specific recommendation with file/line references where applicable
 
-**Task type routing**: This command delegates to the CLI's `taskTypeRouting`. Run `apeworkflow instructions apply --json` to get the routing table (keys: feature, bugfix, refactor, docs). Default verify chains:
-- `verify`：`verification-before-completion -> requesting-code-review -> receiving-code-review`
+任务类型路由：调用 `apeworkflow instructions verify --change <name> --json` 获取。不要在此内联静态路由表。
 
    **Graceful Degradation**
 
