@@ -6,7 +6,7 @@ compatibility: Requires apeworkflow CLI.
 metadata:
   author: apeworkflow
   version: "1.0"
-  generatedBy: "25.6.17"
+  generatedBy: "25.6.17.2"
 ---
 
 Keep the ApeWorkflow apply shell and route task execution through methodology skills.
@@ -66,16 +66,7 @@ Keep the ApeWorkflow apply shell and route task execution through methodology sk
    For each pending task, use the task type to choose the methodology Skill chain, then let that Skill chain do the concrete implementation work.
 
    **Task type routing**
-
-## 任务类型路由
-
-从 CLI 输出动态读取。运行 `apeworkflow instructions apply --change "<name>" --json`，
-使用 `taskTypeRouting.taskTypes` 中对应任务类型的 skill 链。
-
-### 统一规则
-- `apply` 阶段只负责根据任务类型分发到对应方法论 Skill
-- `verify` 阶段先提供验证证据，再进入 review
-- `archive` 阶段先收尾，再确认归档
+   Route selection is controlled by the active schema's taskTypeRouting. Do not inline a static task route table here.
 
    **Shell rule**: this command only owns selection, loading, routing, progress tracking, and pause/completion output. It does not describe or perform the detailed development steps itself.
 
