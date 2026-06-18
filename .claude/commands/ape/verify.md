@@ -11,15 +11,18 @@ Verify that an implementation matches the change artifacts (specs, tasks, design
 
 **Steps**
 
-1. **If no change name provided, prompt for selection**
+1. **If no change name provided, select the change**
 
-   Run `apeworkflow list --json` to get available changes. Use the **AskUserQuestion tool** to let the user select.
+   If a name is provided, use it. Otherwise:
+   - Infer from conversation context if the user mentioned a change
+   - Auto-select if only one active change exists
+   - If ambiguous, run `apeworkflow list --json` to get available changes and use the **AskUserQuestion tool** to let the user select
 
    Show changes that have implementation tasks (plan files under `plans/` exist).
    Include the schema used for each change if available.
    Mark changes with incomplete tasks as "(In Progress)".
 
-   **IMPORTANT**: Do NOT guess or auto-select a change. Always let the user choose.
+   Always announce: "Using change: <name>" and how to override (e.g., `/ape:verify <other>`).
 
 2. **Check status to understand the schema**
    ```bash
@@ -30,7 +33,11 @@ Verify that an implementation matches the change artifacts (specs, tasks, design
    - `planningHome`, `changeRoot`, `artifactPaths`, and `actionContext`: path and scope context
    - Which artifacts exist for this change
 
-   If status reports `actionContext.mode: "workspace-planning"`, explain that full workspace implementation verification is not supported in this slice and STOP. Do not infer repo-local implementation ownership or edit linked repos.
+   If status reports `actionContext.mode: "workspace-planning"`, explain that full workspace implementation verification is not supported in this slice. Instead:
+   1. Verify only the planning artifacts (proposal, design, tasks, plans) against each other
+   2. Note that code-level verification requires workspace scope
+   3. Do NOT infer repo-local implementation ownership or edit linked repos
+   4. STOP
 
 3. **Get planning context and load artifacts**
 
@@ -150,15 +157,8 @@ Verify that an implementation matches the change artifacts (specs, tasks, design
 - **False Positives**: When uncertain, prefer SUGGESTION over WARNING, WARNING over CRITICAL
 - **Actionability**: Every issue must have a specific recommendation with file/line references where applicable
 
-## 任务类型路由
-
-从 CLI 输出动态读取。运行 `apeworkflow instructions apply --change "<name>" --json`，
-使用 `taskTypeRouting.taskTypes` 中对应任务类型的 skill 链。
-
-### 统一规则
-- `apply` 阶段按任务类型选择执行顺序
-- `verify` 阶段先提供验证证据，再进入 review
-- `archive` 阶段先收尾，再确认归档
+**Task type routing**: This command delegates to the CLI's `taskTypeRouting`. Run `apeworkflow instructions apply --json` to get the routing table (keys: feature, bugfix, refactor, docs). Default verify chains:
+- `verify`：`verification-before-completion -> requesting-code-review -> receiving-code-review`
 
    **Graceful Degradation**
 

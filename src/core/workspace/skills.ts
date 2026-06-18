@@ -289,33 +289,50 @@ function isApeWorkflowManagedSkillDir(skillDir: string): boolean {
 /**
  * Copy attached (non-.ts) files from the source workflows directory to the target skill directory.
  * Attached files live alongside the TS template in src/core/templates/workflows/<dirName>/
+ *
+ * Returns a list of failed file names (empty if all succeeded or if the source dir simply doesn't exist).
+ * Non-existent source dirs are not an error — only actual copy failures are reported.
  */
 async function copyAttachedFiles(
   sourceWorkflowsDir: string,
   targetSkillDir: string,
   dirName: string
-): Promise<void> {
+): Promise<string[]> {
   const srcDir = path.join(sourceWorkflowsDir, dirName);
+  const failures: string[] = [];
 
+  // Check if source directory exists — if not, no attached files to copy (not an error)
+  let entries: nodeFs.Dirent[];
   try {
-    const entries = await fs.readdir(srcDir, { withFileTypes: true });
-    for (const entry of entries) {
-      // Skip only skill template TS files (the skill definition itself), not attached TS files
-      if (/^apeworkflow-.*\.ts$/.test(entry.name)) continue;
+    entries = await fs.readdir(srcDir, { withFileTypes: true });
+  } catch {
+    // No attached files or directory doesn't exist — this is fine
+    return failures;
+  }
 
-      const srcPath = path.join(srcDir, entry.name);
-      const dstPath = path.join(targetSkillDir, entry.name);
+  for (const entry of entries) {
+    // Skip only skill template TS files (the skill definition itself), not attached TS files
+    if (/^apeworkflow-.*\.ts$/.test(entry.name)) continue;
 
+    const srcPath = path.join(srcDir, entry.name);
+    const dstPath = path.join(targetSkillDir, entry.name);
+
+    try {
       if (entry.isDirectory()) {
         await fs.mkdir(dstPath, { recursive: true });
         await copyDirRecursive(srcPath, dstPath);
       } else {
+        // Ensure parent directory of destination file exists
+        await fs.mkdir(path.dirname(dstPath), { recursive: true });
         await fs.copyFile(srcPath, dstPath);
       }
+    } catch {
+      // Individual file copy failure — track but don't abort the whole workflow
+      failures.push(entry.name);
     }
-  } catch {
-    // No attached files or directory doesn't exist — this is fine
   }
+
+  return failures;
 }
 
 async function copyDirRecursive(src: string, dst: string): Promise<void> {
@@ -327,6 +344,8 @@ async function copyDirRecursive(src: string, dst: string): Promise<void> {
     if (entry.isDirectory()) {
       await copyDirRecursive(srcPath, dstPath);
     } else {
+      // Ensure parent directory exists for each file
+      await fs.mkdir(path.dirname(dstPath), { recursive: true });
       await fs.copyFile(srcPath, dstPath);
     }
   }
@@ -416,9 +435,17 @@ export async function generateWorkspaceAgentSkills(
       }
 
       // Copy attached files (non-.ts files from the workflows source directory)
-      const sourceWorkflowsDir = path.join(__dirname, '../../templates/workflows');
+      // __dirname is dist/core/workspace/ → go up one level to dist/core/ then into templates
+      const sourceWorkflowsDir = path.join(__dirname, '../templates/workflows');
       for (const { dirName } of skillTemplates) {
-        await copyAttachedFiles(sourceWorkflowsDir, skillsDir, dirName);
+        const targetSkillDir = path.join(skillsDir, dirName);
+        const failures = await copyAttachedFiles(sourceWorkflowsDir, targetSkillDir, dirName);
+        if (failures.length > 0) {
+          console.warn(
+            `apeworkflow: [${tool.value}] Failed to install attached files for "${dirName}": ${failures.join(', ')}. ` +
+            `Check that the template source files exist in ${sourceWorkflowsDir}/${dirName}/.`
+          );
+        }
       }
 
       const result = makeAgentResult(workspaceRoot, tool, profileContext.workflowIds);
@@ -534,9 +561,16 @@ export async function updateWorkspaceAgentSkills(
       }
 
       // Copy attached files
-      const sourceWorkflowsDir = path.join(__dirname, '../../templates/workflows');
+      // __dirname is dist/core/workspace/ → go up one level to dist/core/ then into templates
+      const sourceWorkflowsDir = path.join(__dirname, '../templates/workflows');
       for (const { dirName } of skillTemplates) {
-        await copyAttachedFiles(sourceWorkflowsDir, skillsDir, dirName);
+        const targetSkillDir = path.join(skillsDir, dirName);
+        const failures = await copyAttachedFiles(sourceWorkflowsDir, targetSkillDir, dirName);
+        if (failures.length > 0) {
+          console.warn(
+            `apeworkflow: [${tool.value}] Failed to update attached files for "${dirName}": ${failures.join(', ')}.`
+          );
+        }
       }
 
       const removed = await removeManagedWorkflowSkillDirs(

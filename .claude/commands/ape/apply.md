@@ -46,7 +46,18 @@ Keep the ApeWorkflow apply shell and route task execution through methodology sk
    - If `state: "all_done"`: congratulate, suggest archive
    - Otherwise: proceed to implementation
 
-   **Workspace guard:** If status JSON reports `actionContext.mode: "workspace-planning"` and `allowedEditRoots` is empty, explain that full workspace apply is not supported in this slice. Treat linked repos and folders as read-only context, ask the user to select an affected area through an explicit implementation workflow, and STOP before editing files.
+   **Workspace guard:** If status JSON reports `actionContext.mode: "workspace-planning"` and `allowedEditRoots` is empty, explain that full workspace apply is not supported in this slice. Instead:
+   1. Treat linked repos and folders as read-only context for now
+   2. Suggest using `/ape:explore` to investigate the workspace scope
+   3. For specific sub-areas, suggest `/ape:propose <name> --areas <area-name>` to create a targeted change
+   4. STOP before editing files
+
+
+   **Cost estimate:** Before starting implementation, display:
+   ```
+   Estimated cost: ~N sub-agent invocations (M tasks × 3 reviewers each)
+   ```
+   If the task count is high (>5), suggest considering subagent-driven-development vs inline execution based on the plan's complexity.
 
 4. **Read context files**
 
@@ -62,35 +73,7 @@ Keep the ApeWorkflow apply shell and route task execution through methodology sk
    For each pending task, use the task type to choose the methodology Skill chain, then let that Skill chain do the concrete implementation work.
 
    **Task type routing**
-
-   Run `apeworkflow instructions apply --change "<name>" --json` to get the routing table.
-   Use `taskTypeRouting` from the JSON output:
-   - `taskTypeRouting.default`: fallback skill chain when task type is unrecognized
-   - `taskTypeRouting.taskTypes.<type>`: skill chain for the specific task type
-
-   ## 任务类型路由
-
-   从 CLI 输出动态读取。运行 `apeworkflow instructions apply --change "<name>" --json`，
-   使用返回 JSON 中的 `taskTypeRouting` 字段。示例：
-
-   ```json
-   {
-     "taskTypeRouting": {
-       "default": ["executing-plans", "test-driven-development", "subagent-driven-development"],
-       "taskTypes": {
-         "feature": ["executing-plans", "test-driven-development", "subagent-driven-development"],
-         "bugfix": ["systematic-debugging", "test-driven-development", "executing-plans"],
-         "refactor": ["executing-plans", "test-driven-development", "subagent-driven-development"],
-         "docs": ["writing-skills"]
-       }
-     }
-   }
-   ```
-
-   ### 统一规则
-   - `apply` 阶段只负责根据任务类型分发到对应方法论 Skill
-   - `verify` 阶段先提供验证证据，再进入 review
-   - `archive` 阶段先收尾，再确认归档
+   Route selection is controlled by the active schema's taskTypeRouting. Do not inline a static task route table here.
 
    **Shell rule**: this command only owns selection, loading, routing, progress tracking, and pause/completion output. It does not describe or perform the detailed development steps itself.
 

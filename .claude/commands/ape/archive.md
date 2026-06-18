@@ -7,18 +7,21 @@ tags: [workflow, archive, experimental]
 
 Archive a completed change in the experimental workflow.
 
-**Input**: Optionally specify a change name after `/ape:archive` (e.g., `/ape:archive add-auth`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
+**Input**: Optionally specify a change name. If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
 **Steps**
 
-1. **If no change name provided, prompt for selection**
+1. **If no change name provided, select the change**
 
-   Run `apeworkflow list --json` to get available changes. Use the **AskUserQuestion tool** to let the user select.
+   If a name is provided, use it. Otherwise:
+   - Infer from conversation context if the user mentioned a change
+   - Auto-select if only one active change exists
+   - If ambiguous, run `apeworkflow list --json` to get available changes and use the **AskUserQuestion tool** to let the user select
 
    Show only active changes (not already archived).
    Include the schema used for each change if available.
 
-   **IMPORTANT**: Do NOT guess or auto-select a change. Always let the user choose.
+   Always announce: "Using change: <name>" and how to override (e.g., `/ape:archive <other>`).
 
 2. **Check artifact completion status**
 
@@ -29,11 +32,15 @@ Archive a completed change in the experimental workflow.
    - `planningHome`, `changeRoot`, `artifactPaths`, and `actionContext`: path and scope context
    - `artifacts`: List of artifacts with their status (`done` or other)
 
-   If status reports `actionContext.mode: "workspace-planning"`, explain that workspace archive is not supported in this slice and STOP. Do not move workspace changes into repo-local archives or edit linked repos.
+   If status reports `actionContext.mode: "workspace-planning"`, explain that workspace archive is not supported in this slice. Instead:
+   1. Note the change is in workspace planning mode
+   2. Suggest archiving the planning artifacts manually at the workspace's archive location
+   3. Do NOT move workspace changes into repo-local archives or edit linked repos
+   4. STOP
 
    **If any artifacts are not `done`:**
    - Display warning listing incomplete artifacts
-   - Prompt user for confirmation to continue
+   - Use **AskUserQuestion tool** to confirm user wants to proceed
    - Proceed if user confirms
 
 3. **Check task completion status**
@@ -44,7 +51,7 @@ Archive a completed change in the experimental workflow.
 
    **If incomplete tasks found:**
    - Display warning showing count of incomplete tasks
-   - Prompt user for confirmation to continue
+   - Use **AskUserQuestion tool** to confirm user wants to proceed
    - Proceed if user confirms
 
    **If no plan files exist:** Proceed without task-related warning.
@@ -87,18 +94,12 @@ Archive a completed change in the experimental workflow.
    - Change name
    - Schema that was used
    - Archive location
-   - Spec sync status (synced / sync skipped / no delta specs)
-   - Note about any warnings (incomplete artifacts/tasks)
+   - Whether specs were synced (if applicable)
+   - Note about any warnings (incomplete artifacts / plan tasks)
 
-## 任务类型路由
-
-从 CLI 输出动态读取。运行 `apeworkflow instructions apply --change "<name>" --json`，
-使用 `taskTypeRouting.taskTypes` 中对应任务类型的 skill 链。
-
-### 统一规则
-- `apply` 阶段按任务类型选择执行顺序
-- `verify` 阶段先提供验证证据，再进入 review
-- `archive` 阶段先收尾，再确认归档
+**Task type routing**: This command delegates to the CLI's `taskTypeRouting`. Run `apeworkflow instructions verify --json` to get the routing table (keys: feature, bugfix, refactor, docs). Default verify/archive chains:
+- `verify`：`verification-before-completion -> requesting-code-review -> receiving-code-review`
+- `archive`：`finishing-a-development-branch -> verification-before-completion`
 
 **Output On Success**
 
@@ -108,56 +109,9 @@ Archive a completed change in the experimental workflow.
 **Change:** <change-name>
 **Schema:** <schema-name>
 **Archived to:** the archive path derived from `planningHome.changesDir`/YYYY-MM-DD-<name>/
-**Specs:** ✓ Synced to main specs
+**Specs:** ✓ Synced to main specs (or "No delta specs" or "Sync skipped")
 
 All artifacts complete. All tasks complete.
-```
-
-**Output On Success (No Delta Specs)**
-
-```
-## Archive Complete
-
-**Change:** <change-name>
-**Schema:** <schema-name>
-**Archived to:** the archive path derived from `planningHome.changesDir`/YYYY-MM-DD-<name>/
-**Specs:** No delta specs
-
-All artifacts complete. All tasks complete.
-```
-
-**Output On Success With Warnings**
-
-```
-## Archive Complete (with warnings)
-
-**Change:** <change-name>
-**Schema:** <schema-name>
-**Archived to:** the archive path derived from `planningHome.changesDir`/YYYY-MM-DD-<name>/
-**Specs:** Sync skipped (user chose to skip)
-
-**Warnings:**
-- Archived with 2 incomplete artifacts
-- Archived with 3 incomplete tasks
-- Delta spec sync was skipped (user chose to skip)
-
-Review the archive if this was not intentional.
-```
-
-**Output On Error (Archive Exists)**
-
-```
-## Archive Failed
-
-**Change:** <change-name>
-**Target:** the archive path derived from `planningHome.changesDir`/YYYY-MM-DD-<name>/
-
-Target archive directory already exists.
-
-**Options:**
-1. Rename the existing archive
-2. Delete the existing archive if it's a duplicate
-3. Wait until a different date to archive
 ```
 
 **Guardrails**
@@ -166,5 +120,5 @@ Target archive directory already exists.
 - Don't block archive on warnings - just inform and confirm
 - Preserve .apeworkflow.yaml when moving to archive (it moves with the directory)
 - Show clear summary of what happened
-- If sync is requested, use the Skill tool to invoke `apeworkflow-sync-specs` (agent-driven)
+- If sync is requested, use apeworkflow-sync-specs approach (agent-driven)
 - If delta specs exist, always run the sync assessment and show the combined summary before prompting

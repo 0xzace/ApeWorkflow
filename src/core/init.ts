@@ -157,6 +157,9 @@ export class InitCommand {
     // Create config.yaml if needed
     const configStatus = await this.createConfig(apeworkflowPath, extendMode);
 
+    // Create CLAUDE.md if it doesn't exist
+    await this.createCLAUDEMarkdown(projectPath);
+
     // Display success message
     this.displaySuccessMessage(projectPath, validatedTools, results, configStatus);
   }
@@ -629,6 +632,74 @@ export class InitCommand {
       return 'created';
     } catch {
       return 'skipped';
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // CLAUDE.MD
+  // ═══════════════════════════════════════════════════════════
+
+  private async createCLAUDEMarkdown(projectPath: string): Promise<void> {
+    const claudeMdPath = path.join(projectPath, 'CLAUDE.md');
+    if (fs.existsSync(claudeMdPath)) {
+      return; // Already exists
+    }
+
+    const content = `# ApeWorkflow
+
+This project uses **ApeWorkflow** for spec-driven development. All code changes go through the ApeWorkflow pipeline:
+
+\`\`\`
+idea → proposal → specs → design → tasks → plans → apply → archive
+\`\`\`
+
+## Quick Start
+
+\`\`\`bash
+# Explore ideas without committing
+/ape:explore "my idea"
+
+# Create a change with full artifacts
+/ape:propose "my-feature"
+
+# Implement tasks from a change
+/ape:apply
+
+# Archive completed changes
+/ape:archive
+\`\`\`
+
+## Command Reference
+
+| Command | Description |
+|---|---|
+| /ape:onboard | Learn the workflow with a guided cycle |
+| /ape:explore | Think through problems before implementation |
+| /ape:propose | Create a change with all artifacts |
+| /ape:apply | Implement tasks from a change |
+| /ape:verify | Verify implementation matches artifacts |
+| /ape:archive | Archive a completed change |
+| /ape:bulk-archive | Archive multiple changes at once |
+| /ape:feedback | Submit feedback about ApeWorkflow |
+
+## Key Concepts
+
+- **Change**: A container for all artifacts around a piece of work. Lives at \`apeworkflow/changes/<name>/\`
+- **Specs**: Define WHAT is being built (requirement + scenario format)
+- **Design**: Documents HOW we'll build it (decisions, tradeoffs)
+- **Plans**: Detailed implementation steps under \`plans/\`
+- **Archive**: Completed changes go to \`apeworkflow/changes/archive/YYYY-MM-DD-<name>/\`
+
+## File Locations
+
+- Planning artifacts: \`apeworkflow/changes/<name>/\`
+- Main specs: \`apeworkflow/specs/<capability>/spec.md\`
+- Config: \`apeworkflow/config.yaml\`
+`;
+    try {
+      await FileSystemUtils.writeFile(claudeMdPath, content);
+    } catch {
+      // Silently skip if file creation fails
     }
   }
 

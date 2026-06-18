@@ -10,6 +10,7 @@ import chalk from 'chalk';
 import ora from 'ora';
 import * as fs from 'fs';
 import { createRequire } from 'module';
+import { fileURLToPath } from 'url';
 import { FileSystemUtils } from '../utils/file-system.js';
 import { transformToHyphenCommands } from '../utils/command-references.js';
 import { AI_TOOLS, APEWORKFLOW_DIR_NAME } from './config.js';
@@ -52,11 +53,71 @@ import {
 
 const require = createRequire(import.meta.url);
 const { version: APEWORKFLOW_VERSION } = require('../../package.json');
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const OLD_CORE_WORKFLOWS = ['propose', 'explore', 'apply', 'archive'] as const;
 const INSTALL_COMMAND_IDS = Array.from(new Set<string>([
   ...COMMAND_IDS,
   ...VISIBLE_COMMAND_IDS,
 ]));
+
+/**
+ * Copy attached (non-.ts) files from the source workflows directory to the target skill directory.
+ * Returns a list of failed file names (empty if all succeeded or source dir doesn't exist).
+ */
+async function copyAttachedFiles(
+  sourceWorkflowsDir: string,
+  targetSkillDir: string,
+  dirName: string
+): Promise<string[]> {
+  const srcDir = path.join(sourceWorkflowsDir, dirName);
+  const failures: string[] = [];
+
+  let entries: fs.Dirent[];
+  try {
+    entries = await fs.promises.readdir(srcDir, { withFileTypes: true });
+  } catch {
+    return failures;
+  }
+
+  for (const entry of entries) {
+    // Skip only skill template TS files
+    if (/^apeworkflow-.*\.ts$/.test(entry.name)) continue;
+
+    const srcPath = path.join(srcDir, entry.name);
+    const dstPath = path.join(targetSkillDir, entry.name);
+
+    try {
+      if (entry.isDirectory()) {
+        await fs.promises.mkdir(dstPath, { recursive: true });
+        await copyDirRecursive(srcPath, dstPath);
+      } else {
+        // Ensure parent directory of destination file exists
+        await fs.promises.mkdir(path.dirname(dstPath), { recursive: true });
+        await fs.promises.copyFile(srcPath, dstPath);
+      }
+    } catch {
+      failures.push(entry.name);
+    }
+  }
+
+  return failures;
+}
+
+async function copyDirRecursive(src: string, dst: string): Promise<void> {
+  await fs.promises.mkdir(dst, { recursive: true });
+  const entries = await fs.promises.readdir(src, { withFileTypes: true });
+  for (const entry of entries) {
+    const srcPath = path.join(src, entry.name);
+    const dstPath = path.join(dst, entry.name);
+    if (entry.isDirectory()) {
+      await copyDirRecursive(srcPath, dstPath);
+    } else {
+      // Ensure parent directory exists for each file
+      await fs.promises.mkdir(path.dirname(dstPath), { recursive: true });
+      await fs.promises.copyFile(srcPath, dstPath);
+    }
+  }
+}
 
 /**
  * Options for the update command.
@@ -206,6 +267,20 @@ export class UpdateCommand {
             const transformer = (tool.value === 'opencode' || tool.value === 'pi') ? transformToHyphenCommands : undefined;
             const skillContent = generateSkillContent(template, APEWORKFLOW_VERSION, transformer);
             await FileSystemUtils.writeFile(skillFile, skillContent);
+          }
+
+          // Copy attached files (non-.ts files from the workflows source directory)
+          // __dirname is dist/core/ → ./templates/workflows resolves to dist/core/templates/workflows
+          const sourceWorkflowsDir = path.join(__dirname, './templates/workflows');
+          for (const { dirName } of skillTemplates) {
+            const targetSkillDir = path.join(skillsDir, dirName);
+            const failures = await copyAttachedFiles(sourceWorkflowsDir, targetSkillDir, dirName);
+            if (failures.length > 0) {
+              console.warn(
+                chalk.yellow(`[update] Failed to install attached files for "${dirName}": ${failures.join(', ')}. `) +
+                chalk.dim(`Check that template source files exist in ${sourceWorkflowsDir}/${dirName}/.`)
+              );
+            }
           }
 
           removedDeselectedSkillCount += await this.removeUnselectedSkillDirs(skillsDir, desiredWorkflows);
@@ -699,6 +774,19 @@ export class UpdateCommand {
             const transformer = (tool.value === 'opencode' || tool.value === 'pi') ? transformToHyphenCommands : undefined;
             const skillContent = generateSkillContent(template, APEWORKFLOW_VERSION, transformer);
             await FileSystemUtils.writeFile(skillFile, skillContent);
+          }
+
+          // Copy attached files (non-.ts files from the workflows source directory)
+          // __dirname is dist/core/ → ./templates/workflows resolves to dist/core/templates/workflows
+          const sourceWorkflowsDir = path.join(__dirname, './templates/workflows');
+          for (const { dirName } of skillTemplates) {
+            const targetSkillDir = path.join(skillsDir, dirName);
+            const failures = await copyAttachedFiles(sourceWorkflowsDir, targetSkillDir, dirName);
+            if (failures.length > 0) {
+              console.warn(
+                chalk.yellow(`[update] Failed to install attached files for "${dirName}": ${failures.join(', ')}.`)
+              );
+            }
           }
         }
 
