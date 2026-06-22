@@ -295,9 +295,17 @@ But this summary is optional. Sometimes the thinking IS the value.
 export function getApeExploreCommandTemplate(): CommandTemplate {
   return {
     name: 'APE: Explore',
-    description: 'Enter explore mode - think through ideas, investigate problems, clarify requirements',
+    description: 'Enter explore mode - see apeworkflow-explore skill',
     category: 'Workflow',
-    tags: ['workflow', 'explore', 'experimental', 'thinking'],
-    content: getExploreSkillTemplate().instructions,
+    tags: ['workflow', 'explore'],
+    content: `---
+name: "APE: Explore"
+description: "Enter explore mode - see apeworkflow-explore skill"
+category: Workflow
+tags: [workflow, explore]
+---
+
+Invoke skill: apeworkflow-explore
+`,
   };
 }

@@ -116,26 +116,18 @@ Only proceed with submission after user confirms.`,
 
 export function getApeFeedbackCommandTemplate(): CommandTemplate {
   return {
-    name: 'ApeWorkflow Feedback',
-    description: 'Collect and submit feedback about ApeWorkflow',
-    category: 'Workflow',
-    tags: ['workflow', 'feedback', 'help'],
-    content: `Collect and submit feedback about ApeWorkflow.
+    name: "APE: Feedback",
+    description: "Submit feedback about ApeWorkflow",
+    category: "Workflow",
+    tags: ["workflow", "feedback"],
+    content: `---
+name: "APE: Feedback"
+description: "Submit feedback about ApeWorkflow"
+category: Workflow
+tags: [workflow, feedback]
+---
 
-**Input**: Ask the user for a clear title and body, then confirm before submitting.
-
-**Steps**
-
-1. Gather the user’s feedback and the context around it.
-2. Remove any sensitive paths, secrets, or private names.
-3. Show the draft back to the user for approval.
-4. After confirmation, submit it with \`apeworkflow feedback\`.
-
-**Guardrails**
-
-- MUST ask for explicit approval before submission
-- MUST anonymize sensitive details
-- MUST keep technical context that helps explain the issue
+Invoke skill: apeworkflow-feedback
 `,
   };
 }

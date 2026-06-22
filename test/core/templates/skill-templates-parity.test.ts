@@ -43,7 +43,7 @@ const EXPECTED_FUNCTION_HASHES: Record<string, string> = {
   getFfChangeSkillTemplate: 'ed635dbd529279df70c2971939919878d4998d2066940dc1cfdbb053b4f7a50f',
   getSyncSpecsSkillTemplate: '494052dee37f5c9434aeb27d0035b5aee646ff6c38ca5fa5350da74f4ea342fc',
   getOnboardSkillTemplate: '41263103a8369be56e6e182c73f94d5d1dc484b16cfedf0d94496341767abe43',
-  getApeExploreCommandTemplate: '71da8d35fed708fc25711d7564ed2c52740b27ee2e80edc18e78ae70ad4e0607',
+  getApeExploreCommandTemplate: '380c1d8e586639fdd0e2480e293e089681ebb33a85bc681fa1abc9afa4e534fd',
   getApeNewCommandTemplate: '8192785fba8d80afd76112732fd15da7fa47ef37d453c5defb2ef87c8f3e4b11',
   getApeContinueCommandTemplate: '8506ea084cf4140d95e4e5f3551862bdbc3492d7cc7397d350934549013805c4',
   getApeApplyCommandTemplate: '9f075f9d8bb25f78bc630aef6f8c033f7801677389a40e0256b72835f0fbc513',
@@ -58,10 +58,10 @@ const EXPECTED_FUNCTION_HASHES: Record<string, string> = {
   getApeVerifyCommandTemplate: '12b1ecd44d9d0c676901b1a9af83614fb360c9dd9083dbe1d109e198826fea58',
   getApeBrainstormingCommandTemplate: '8e2b8c4cc2a33e7326844ed152d05dd9b0ae354bcbc41442d7346cd1fb24edff',
   getApeProposeSkillTemplate: 'c384340885af9a28f7bd76ddbd2324f2e67c08405a9e9bac043613233df37ec0',
-  getApeProposeCommandTemplate: '558cf11e8e59da7c93d634b0ca90a7947b8da0f22eca5123084940c352666356',
+  getApeProposeCommandTemplate: '67518454a6e2690e56dd6be478c47e84f5422ac4062d7bb996c6bf9f812e7a66',
   getWritingPlansSkillTemplate: '77e91046fa6f275f91e85c05f1cd063d74d496660ceeef154decfc150967cf17',
   getApeWritingPlansCommandTemplate: '10a3b5d25027f8e7b33b87e8f2f03430f2ceb802ba7191a79a0b12fe804f22b3',
-  getApeFeedbackCommandTemplate: '64a41ece5a3dcb7f5806af0e178c74e396d2b03c6437ad87c847220f693b207b',
+  getApeFeedbackCommandTemplate: 'e6f9d657f7c8c5a9005041bb076ed165c8ec5482eec32301ce4cba3a2a6758a1',
   getFeedbackSkillTemplate: '1062057eab299213fdc18db1922cc0b94030c2db04ce80e0641bf3b920cfb92f',
 };
 

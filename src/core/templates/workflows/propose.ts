@@ -124,9 +124,18 @@ After completing all artifacts, summarize:
 export function getApeProposeCommandTemplate(): CommandTemplate {
   return {
     name: 'APE: Propose',
-    description: 'Propose a new change - create it, refine the core artifacts, and then write the implementation plan',
+    description: 'Create a change with artifacts',
     category: 'Workflow',
-    tags: ['workflow', 'artifacts', 'experimental'],
-    content: getApeProposeSkillTemplate().instructions,
+    tags: ['workflow', 'propose'],
+    content: `---
+name: "APE: Propose"
+description: "Create a change with artifacts"
+category: Workflow
+tags: [workflow, propose]
+---
+
+Invoke skill: apeworkflow-propose
+Prompt: change name or description
+`,
   };
 }
