@@ -25,6 +25,11 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
 
    Always announce: "Using change: <name>" and how to override (e.g., \`/ape:apply <other>\`).
 
+   **Config-aware selection:** Read \`apeworkflow/config.yaml\` for \`strictness.selectionPolicy\`:
+   - \`auto-if-single\`: auto-select if only one active change exists (default)
+   - \`always-prompt\`: always prompt the user
+   - If not set, use \`auto-if-single\` as default behavior
+
 2. **Check status to understand the shell context**
    \`\`\`bash
    apeworkflow status --change "<name>" --json
@@ -61,6 +66,12 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
    - Other schemas: follow the contextFiles from CLI output
 
    The detailed plan file(s) under \`plans/\` are the implementation source of truth.
+
+   **Config-aware plan loading:** Read \`plan.granularity\` from config:
+   - \`fine\`: load all artifacts entirely
+   - \`medium\`: load proposal + relevant specs (default)
+   - \`coarse\`: load task outline + proposal summary only
+   - If not set, use \`medium\` as default
 
 5. **Dispatch by task type**
 
