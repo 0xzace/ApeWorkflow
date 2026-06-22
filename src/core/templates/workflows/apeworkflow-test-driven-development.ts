@@ -23,6 +23,11 @@ Write the test first. Watch it fail. Write minimal code to pass.
 
 **Core principle:** If you didn't watch the test fail, you don't know if it tests the right thing.
 
+**Config-aware strictness:** Read \`strictness.tdd\` from \`apeworkflow/config.yaml\`:
+- \`true\` (default): Iron-clad TDD — NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST
+- \`false\`: Recommended TDD — prefer test-first but can discuss exceptions
+- \`skip\`: TDD disabled — write code freely
+
 **Violating the letter of the rules is violating the spirit of the rules.**
 
 ## When to Use
