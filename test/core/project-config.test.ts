@@ -794,6 +794,127 @@ rules:
         expect(result.success).toBe(true);
       });
     });
+
+    describe('partial configs', () => {
+      it('accepts partial config with only schema and strictness', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          strictness: { tdd: true },
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('accepts partial config with only schema and plan', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          plan: { granularity: 'fine' },
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('accepts partial config with only schema and skills', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          skills: { maxDepth: 1 },
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('accepts partial config with only schema and onboarding', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          onboarding: { maxPauses: 1 },
+        });
+        expect(result.success).toBe(true);
+      });
+    });
+
+    describe('invalid nested values', () => {
+      it('rejects invalid tdd value (string that is not skip)', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          strictness: { tdd: 'invalid' as unknown as boolean | 'skip' },
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it('rejects number for tdd (must be boolean or skip)', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          strictness: { tdd: 1 as unknown as boolean | 'skip' },
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it('rejects invalid selectionPolicy', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          strictness: { selectionPolicy: 'invalid-policy' as string },
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it('rejects invalid granularity', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          plan: { granularity: 'super-fine' as string },
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it('rejects invalid loadPolicy', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          skills: { loadPolicy: 'lazy' as string },
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it('rejects float for maxDepth (must be integer)', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          skills: { maxDepth: 2.5 },
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it('rejects float for maxPauses (must be integer)', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          onboarding: { maxPauses: 3.5 },
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it('rejects string for maxDepth', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          skills: { maxDepth: 'deep' as unknown as number },
+        });
+        expect(result.success).toBe(false);
+      });
+    });
+
+    describe('empty config and schema-only', () => {
+      it('rejects empty object (schema is required)', () => {
+        const result = ProjectConfigSchema.safeParse({});
+        expect(result.success).toBe(false);
+      });
+
+      it('accepts config with only schema', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('rejects empty string schema', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: '',
+        });
+        expect(result.success).toBe(false);
+      });
+    });
   });
 
   describe('DEFAULT_PROJECT_CONFIG', () => {
@@ -873,6 +994,203 @@ plan:
       expect(result.plan.granularity).toBe('fine');
       expect(result.skills.loadPolicy).toBe('smart'); // default
       expect(result.onboarding.maxPauses).toBe(3); // default
+    });
+
+    it('preserves user schema while using defaults for other keys', async () => {
+      const { readProjectConfigWithDefaults } = await import(
+        '../../src/core/project-config.js'
+      );
+
+      // Use nested subdirectory to avoid conflicts with other tests
+      const baseDir = path.join(tempDir, 'edge-default-preserve');
+      const cfgDir = path.join(baseDir, 'apeworkflow');
+      fs.mkdirSync(cfgDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(cfgDir, 'config.yaml'),
+        `schema: custom-schema
+strictness:
+  tdd: false
+`
+      );
+
+      const config = readProjectConfigWithDefaults(baseDir);
+
+      expect(config.schema).toBe('custom-schema');
+      expect(config.strictness.tdd).toBe(false); // user override
+      expect(config.strictness.noGratitude).toBe(true); // default preserved
+      expect(config.plan.granularity).toBe('medium'); // default preserved
+    });
+
+    it('defaults when config has only schema', async () => {
+      const { readProjectConfigWithDefaults } = await import(
+        '../../src/core/project-config.js'
+      );
+
+      // Use nested subdirectory to avoid conflicts with other tests
+      const baseDir = path.join(tempDir, 'edge-only-schema');
+      const cfgDir = path.join(baseDir, 'apeworkflow');
+      fs.mkdirSync(cfgDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(cfgDir, 'config.yaml'),
+        `schema: test-schema
+`
+      );
+
+      const config = readProjectConfigWithDefaults(baseDir);
+
+      expect(config.schema).toBe('test-schema');
+      expect(config.strictness.tdd).toBe(true);
+      expect(config.strictness.noGratitude).toBe(true);
+      expect(config.strictness.selectionPolicy).toBe('auto-if-single');
+      expect(config.plan.granularity).toBe('medium');
+      expect(config.skills.loadPolicy).toBe('smart');
+      expect(config.skills.maxDepth).toBe(2);
+      expect(config.onboarding.maxPauses).toBe(3);
+    });
+
+    it('empty config object returns full defaults', async () => {
+      const { readProjectConfigWithDefaults } = await import(
+        '../../src/core/project-config.js'
+      );
+
+      // Use nested subdirectory to avoid conflicts with other tests
+      const baseDir = path.join(tempDir, 'edge-empty-config');
+      const cfgDir = path.join(baseDir, 'apeworkflow');
+      fs.mkdirSync(cfgDir, { recursive: true });
+      // Write empty YAML
+      fs.writeFileSync(path.join(cfgDir, 'config.yaml'), '');
+
+      const config = readProjectConfigWithDefaults(baseDir);
+
+      // readProjectConfig returns null for empty YAML, so all defaults apply
+      expect(config.schema).toBe('spec-driven');
+      expect(config.strictness.tdd).toBe(true);
+      expect(config.plan.granularity).toBe('medium');
+      expect(config.skills.maxDepth).toBe(2);
+      expect(config.onboarding.maxPauses).toBe(3);
+    });
+
+    it('partial config with only strictness key', async () => {
+      const { readProjectConfigWithDefaults } = await import(
+        '../../src/core/project-config.js'
+      );
+
+      // Use nested subdirectory to avoid conflicts with other tests
+      const baseDir = path.join(tempDir, 'edge-partial-strictness');
+      const cfgDir = path.join(baseDir, 'apeworkflow');
+      fs.mkdirSync(cfgDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(cfgDir, 'config.yaml'),
+        `schema: spec-driven
+strictness:
+  noGratitude: false
+`
+      );
+
+      const config = readProjectConfigWithDefaults(baseDir);
+
+      expect(config.schema).toBe('spec-driven');
+      expect(config.strictness.tdd).toBe(true); // default
+      expect(config.strictness.noGratitude).toBe(false); // user override
+      expect(config.strictness.selectionPolicy).toBe('auto-if-single'); // default
+      expect(config.plan.granularity).toBe('medium'); // default
+      expect(config.skills.loadPolicy).toBe('smart'); // default
+      expect(config.onboarding.maxPauses).toBe(3); // default
+    });
+
+    it('partial config with only plan key', async () => {
+      const { readProjectConfigWithDefaults } = await import(
+        '../../src/core/project-config.js'
+      );
+
+      // Use nested subdirectory to avoid conflicts with other tests
+      const baseDir = path.join(tempDir, 'edge-partial-plan');
+      const cfgDir = path.join(baseDir, 'apeworkflow');
+      fs.mkdirSync(cfgDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(cfgDir, 'config.yaml'),
+        `schema: spec-driven
+plan:
+  granularity: coarse
+`
+      );
+
+      const config = readProjectConfigWithDefaults(baseDir);
+
+      expect(config.schema).toBe('spec-driven');
+      expect(config.plan.granularity).toBe('coarse'); // user override
+      expect(config.skills.maxDepth).toBe(2); // default
+      expect(config.onboarding.maxPauses).toBe(3); // default
+    });
+
+    it('partial config with only skills key', async () => {
+      const { readProjectConfigWithDefaults } = await import(
+        '../../src/core/project-config.js'
+      );
+
+      // Use nested subdirectory to avoid conflicts with other tests
+      const baseDir = path.join(tempDir, 'edge-partial-skills');
+      const cfgDir = path.join(baseDir, 'apeworkflow');
+      fs.mkdirSync(cfgDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(cfgDir, 'config.yaml'),
+        `schema: spec-driven
+skills:
+  maxDepth: 3
+`
+      );
+
+      const config = readProjectConfigWithDefaults(baseDir);
+
+      expect(config.schema).toBe('spec-driven');
+      expect(config.skills.maxDepth).toBe(3); // user override
+      expect(config.skills.loadPolicy).toBe('smart'); // default
+      expect(config.onboarding.maxPauses).toBe(3); // default
+    });
+
+    it('partial config with only onboarding key', async () => {
+      const { readProjectConfigWithDefaults } = await import(
+        '../../src/core/project-config.js'
+      );
+
+      // Use nested subdirectory to avoid conflicts with other tests
+      const baseDir = path.join(tempDir, 'edge-partial-onboarding');
+      const cfgDir = path.join(baseDir, 'apeworkflow');
+      fs.mkdirSync(cfgDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(cfgDir, 'config.yaml'),
+        `schema: spec-driven
+onboarding:
+  maxPauses: 5
+`
+      );
+
+      const config = readProjectConfigWithDefaults(baseDir);
+
+      expect(config.schema).toBe('spec-driven');
+      expect(config.onboarding.maxPauses).toBe(5); // user override
+      expect(config.skills.loadPolicy).toBe('smart'); // default
+      expect(config.plan.granularity).toBe('medium'); // default
+    });
+
+    it('returns full defaults when no config file exists', async () => {
+      const { readProjectConfigWithDefaults } = await import(
+        '../../src/core/project-config.js'
+      );
+
+      // Use a fresh nested subdirectory that has no config
+      const baseDir = path.join(tempDir, 'edge-no-config');
+
+      const config = readProjectConfigWithDefaults(baseDir);
+
+      expect(config.schema).toBe('spec-driven');
+      expect(config.strictness.tdd).toBe(true);
+      expect(config.strictness.noGratitude).toBe(true);
+      expect(config.strictness.selectionPolicy).toBe('auto-if-single');
+      expect(config.plan.granularity).toBe('medium');
+      expect(config.skills.loadPolicy).toBe('smart');
+      expect(config.skills.maxDepth).toBe(2);
+      expect(config.onboarding.maxPauses).toBe(3);
     });
   });
 });
