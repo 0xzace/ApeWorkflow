@@ -934,3 +934,74 @@ describe('preCheckArchiveConflict', () => {
     expect(result).toBeNull();
   });
 });
+
+describe('generateArchiveName edge cases', () => {
+  it('handles names with hyphens', async () => {
+    const { generateArchiveName } = await import('../../src/core/archive.js');
+    const name = generateArchiveName('my-cool-change', '2026-06-18');
+    expect(name).toBe('2026-06-18-my-cool-change');
+  });
+
+  it('handles names with underscores', async () => {
+    const { generateArchiveName } = await import('../../src/core/archive.js');
+    const name = generateArchiveName('my_cool_change', '2026-06-18', true);
+    expect(name).toBe('2026-06-18-my_cool_change-1');
+  });
+
+  it('defaults to 2-suffix when both base and -1 exist', async () => {
+    const { generateArchiveName } = await import('../../src/core/archive.js');
+    const name = generateArchiveName('test', '2026-01-01', true, true);
+    expect(name).toBe('2026-01-01-test-2');
+  });
+
+  it('returns empty-sounding name correctly', async () => {
+    const { generateArchiveName } = await import('../../src/core/archive.js');
+    const name = generateArchiveName('', '2026-06-18');
+    expect(name).toBe('2026-06-18-');
+  });
+});
+
+describe('preCheckArchiveConflict advanced', () => {
+  it('handles single other change', async () => {
+    const { preCheckArchiveConflict } = await import('../../src/core/archive.js');
+    const result = preCheckArchiveConflict('my-change', [
+      {
+        name: 'other-change',
+        deltaSpecs: [{ capability: 'auth', requirements: ['Login'] }],
+      },
+    ]);
+    expect(result).toBeNull(); // stub doesn't compare capabilities yet
+  });
+
+  it('handles multiple other changes', async () => {
+    const { preCheckArchiveConflict } = await import('../../src/core/archive.js');
+    const result = preCheckArchiveConflict('my-change', [
+      {
+        name: 'change-a',
+        deltaSpecs: [{ capability: 'auth', requirements: ['Login'] }],
+      },
+      {
+        name: 'change-b',
+        deltaSpecs: [{ capability: 'billing', requirements: ['Invoice'] }],
+      },
+    ]);
+    expect(result).toBeNull(); // stub doesn't compare capabilities yet
+  });
+
+  it('skips self-reference', async () => {
+    const { preCheckArchiveConflict } = await import('../../src/core/archive.js');
+    const result = preCheckArchiveConflict('my-change', [
+      {
+        name: 'my-change',
+        deltaSpecs: [{ capability: 'auth', requirements: ['Login'] }],
+      },
+    ]);
+    expect(result).toBeNull();
+  });
+
+  it('handles empty list', async () => {
+    const { preCheckArchiveConflict } = await import('../../src/core/archive.js');
+    const result = preCheckArchiveConflict('my-change', []);
+    expect(result).toBeNull();
+  });
+});
