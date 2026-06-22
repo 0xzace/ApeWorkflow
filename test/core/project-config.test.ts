@@ -795,4 +795,84 @@ rules:
       });
     });
   });
+
+  describe('DEFAULT_PROJECT_CONFIG', () => {
+    it('should have correct default values', async () => {
+      const { DEFAULT_PROJECT_CONFIG } = await import('../../src/core/project-config.js');
+
+      expect(DEFAULT_PROJECT_CONFIG.schema).toBe('spec-driven');
+      expect(DEFAULT_PROJECT_CONFIG.context).toBeUndefined();
+      expect(DEFAULT_PROJECT_CONFIG.rules).toBeUndefined();
+      expect(DEFAULT_PROJECT_CONFIG.strictness.tdd).toBe(true);
+      expect(DEFAULT_PROJECT_CONFIG.strictness.noGratitude).toBe(true);
+      expect(DEFAULT_PROJECT_CONFIG.strictness.selectionPolicy).toBe('auto-if-single');
+      expect(DEFAULT_PROJECT_CONFIG.plan.granularity).toBe('medium');
+      expect(DEFAULT_PROJECT_CONFIG.skills.loadPolicy).toBe('smart');
+      expect(DEFAULT_PROJECT_CONFIG.skills.maxDepth).toBe(2);
+      expect(DEFAULT_PROJECT_CONFIG.onboarding.maxPauses).toBe(3);
+    });
+  });
+
+  describe('readProjectConfigWithDefaults', () => {
+    it('returns defaults when no config file exists', async () => {
+      const { readProjectConfigWithDefaults, DEFAULT_PROJECT_CONFIG } = await import(
+        '../../src/core/project-config.js'
+      );
+
+      // tempDir has no config.yaml
+      const result = readProjectConfigWithDefaults(tempDir);
+
+      expect(result).toEqual(DEFAULT_PROJECT_CONFIG);
+    });
+
+    it('deep-merges user config with defaults', async () => {
+      const { readProjectConfigWithDefaults, DEFAULT_PROJECT_CONFIG } = await import(
+        '../../src/core/project-config.js'
+      );
+
+      // Write a partial config that only sets schema and strictness
+      const configDir = path.join(tempDir, 'apeworkflow');
+      fs.mkdirSync(configDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(configDir, 'config.yaml'),
+        `schema: my-custom-schema
+strictness:
+  tdd: false
+`
+      );
+
+      const result = readProjectConfigWithDefaults(tempDir);
+
+      expect(result.schema).toBe('my-custom-schema');
+      expect(result.strictness.tdd).toBe(false);
+      expect(result.strictness.noGratitude).toBe(true); // default
+      expect(result.strictness.selectionPolicy).toBe('auto-if-single'); // default
+      expect(result.plan.granularity).toBe('medium'); // default
+      expect(result.skills.loadPolicy).toBe('smart'); // default
+      expect(result.onboarding.maxPauses).toBe(3); // default
+    });
+
+    it('returns defaults (with undefined context/rules) when user sets only plan', async () => {
+      const { readProjectConfigWithDefaults } = await import(
+        '../../src/core/project-config.js'
+      );
+
+      const configDir = path.join(tempDir, 'apeworkflow');
+      fs.mkdirSync(configDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(configDir, 'config.yaml'),
+        `schema: spec-driven
+plan:
+  granularity: fine
+`
+      );
+
+      const result = readProjectConfigWithDefaults(tempDir);
+
+      expect(result.schema).toBe('spec-driven');
+      expect(result.plan.granularity).toBe('fine');
+      expect(result.skills.loadPolicy).toBe('smart'); // default
+      expect(result.onboarding.maxPauses).toBe(3); // default
+    });
+  });
 });

@@ -90,6 +90,27 @@ export const ProjectConfigSchema = z.object({
 
 export type ProjectConfig = z.infer<typeof ProjectConfigSchema>;
 
+export const DEFAULT_PROJECT_CONFIG: Required<ProjectConfig> = {
+  schema: 'spec-driven',
+  context: undefined,
+  rules: undefined,
+  strictness: {
+    tdd: true,
+    noGratitude: true,
+    selectionPolicy: 'auto-if-single',
+  },
+  plan: {
+    granularity: 'medium',
+  },
+  skills: {
+    loadPolicy: 'smart',
+    maxDepth: 2,
+  },
+  onboarding: {
+    maxPauses: 3,
+  },
+};
+
 const MAX_CONTEXT_SIZE = 50 * 1024; // 50KB hard limit
 
 /**
@@ -200,12 +221,93 @@ export function readProjectConfig(projectRoot: string): ProjectConfig | null {
       }
     }
 
+    // Parse strictness field using Zod
+    if (raw.strictness !== undefined) {
+      const strictnessResult = ProjectConfigSchema.shape.strictness.safeParse(
+        raw.strictness
+      );
+      if (strictnessResult.success) {
+        config.strictness = strictnessResult.data;
+      } else {
+        console.warn(`Invalid 'strictness' field in config`);
+      }
+    }
+
+    // Parse plan field using Zod
+    if (raw.plan !== undefined) {
+      const planResult = ProjectConfigSchema.shape.plan.safeParse(raw.plan);
+      if (planResult.success) {
+        config.plan = planResult.data;
+      } else {
+        console.warn(`Invalid 'plan' field in config`);
+      }
+    }
+
+    // Parse skills field using Zod
+    if (raw.skills !== undefined) {
+      const skillsResult = ProjectConfigSchema.shape.skills.safeParse(raw.skills);
+      if (skillsResult.success) {
+        config.skills = skillsResult.data;
+      } else {
+        console.warn(`Invalid 'skills' field in config`);
+      }
+    }
+
+    // Parse onboarding field using Zod
+    if (raw.onboarding !== undefined) {
+      const onboardingResult =
+        ProjectConfigSchema.shape.onboarding.safeParse(raw.onboarding);
+      if (onboardingResult.success) {
+        config.onboarding = onboardingResult.data;
+      } else {
+        console.warn(`Invalid 'onboarding' field in config`);
+      }
+    }
+
     // Return partial config even if some fields failed
     return Object.keys(config).length > 0 ? (config as ProjectConfig) : null;
   } catch (error) {
     console.warn(`Failed to parse apeworkflow/config.yaml:`, error);
     return null;
   }
+}
+
+/**
+ * Read config and merge with sensible defaults.
+ * Returns a fully-populated config where every field has a value.
+ *
+ * @param projectRoot - The root directory of the project (where `apeworkflow/` lives)
+ * @returns Config with all fields populated (defaults applied where not set)
+ */
+export function readProjectConfigWithDefaults(
+  projectRoot: string
+): Required<ProjectConfig> {
+  const parsed = readProjectConfig(projectRoot);
+  if (parsed === null) {
+    return { ...DEFAULT_PROJECT_CONFIG };
+  }
+
+  return {
+    schema: parsed.schema,
+    context: parsed.context ?? undefined,
+    rules: parsed.rules ?? undefined,
+    strictness: {
+      ...DEFAULT_PROJECT_CONFIG.strictness,
+      ...(parsed.strictness ?? {}),
+    },
+    plan: {
+      ...DEFAULT_PROJECT_CONFIG.plan,
+      ...(parsed.plan ?? {}),
+    },
+    skills: {
+      ...DEFAULT_PROJECT_CONFIG.skills,
+      ...(parsed.skills ?? {}),
+    },
+    onboarding: {
+      ...DEFAULT_PROJECT_CONFIG.onboarding,
+      ...(parsed.onboarding ?? {}),
+    },
+  };
 }
 
 /**
