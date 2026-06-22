@@ -93,6 +93,37 @@ type InitCommandOptions = {
 };
 
 // -----------------------------------------------------------------------------
+// Graceful Degradation — scan for onboarding tasks
+// -----------------------------------------------------------------------------
+
+export type ScanStatus = 'empty' | 'small' | 'rich';
+
+export interface ScanResult {
+  status: ScanStatus;
+  suggestion: string;
+  suggestions?: string[];
+}
+
+/**
+ * Scan the codebase for small task opportunities for onboarding.
+ * Returns a ScanResult that determines the onboarding path.
+ */
+export function scanForTasks(todoComments: string[]): ScanResult {
+  if (todoComments.length === 0) {
+    return { status: 'empty', suggestion: 'hello-world-exercise' };
+  }
+
+  if (todoComments.length <= 2) {
+    return { status: 'small', suggestion: 'skip-brainstorming' };
+  }
+
+  return {
+    status: 'rich',
+    suggestions: todoComments.slice(0, 5),
+  };
+}
+
+// -----------------------------------------------------------------------------
 // Init Command Class
 // -----------------------------------------------------------------------------
 

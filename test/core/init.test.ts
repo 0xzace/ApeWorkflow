@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { promises as fs } from 'fs';
 import path from 'path';
 import os from 'os';
-import { InitCommand } from '../../src/core/init.js';
+import { InitCommand, scanForTasks } from '../../src/core/init.js';
 import { saveGlobalConfig, getGlobalConfig } from '../../src/core/global-config.js';
 
 const { confirmMock, showWelcomeScreenMock, searchableMultiSelectMock } = vi.hoisted(() => ({
@@ -766,6 +766,43 @@ describe('InitCommand - profile and detection features', () => {
 
     const skillFile = path.join(testDir, '.claude', 'skills', 'apeworkflow-explore', 'SKILL.md');
     expect(await fileExists(skillFile)).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// scanForTasks — graceful degradation for onboarding
+// ---------------------------------------------------------------------------
+
+describe('scanForTasks', () => {
+  it('returns empty result when no TODO/FIXME found', () => {
+    const result = scanForTasks([]);
+    expect(result.status).toBe('empty');
+    expect(result.suggestion).toBe('hello-world-exercise');
+  });
+
+  it('returns small result when few tasks found', () => {
+    const result = scanForTasks(['TODO: fix typo']);
+    expect(result.status).toBe('small');
+    expect(result.suggestion).toBe('skip-brainstorming');
+  });
+
+  it('returns rich result when many tasks found', () => {
+    const result = scanForTasks([
+      'TODO: fix bug',
+      'FIXME: error handling',
+      'HACK: quick fix',
+      'XXX: security issue',
+    ]);
+    expect(result.status).toBe('rich');
+    expect(result.suggestions).toBeDefined();
+    expect(result.suggestions).toHaveLength(4);
+  });
+
+  it('returns rich result with max 5 suggestions', () => {
+    const tasks = Array.from({ length: 10 }, (_, i) => `TODO: task ${i}`);
+    const result = scanForTasks(tasks);
+    expect(result.status).toBe('rich');
+    expect(result.suggestions).toHaveLength(5);
   });
 });
 
