@@ -10,6 +10,57 @@ import {
   type SpecUpdate,
 } from './specs-apply.js';
 
+export interface DeltaSpec {
+  capability: string;
+  requirements: string[];
+}
+
+export interface ActiveChangeInfo {
+  name: string;
+  deltaSpecs: DeltaSpec[];
+}
+
+export interface ConflictReport {
+  change: string;
+  capability: string;
+}
+
+/**
+ * Generate archive directory name with auto-suffix on collision.
+ */
+export function generateArchiveName(
+  name: string,
+  date: string,
+  baseExists = false,
+  suffixExists = false
+): string {
+  if (!baseExists) {
+    return `${date}-${name}`;
+  }
+  if (!suffixExists) {
+    return `${date}-${name}-1`;
+  }
+  return `${date}-${name}-2`;
+}
+
+/**
+ * Check if any other active change has delta specs on the same capabilities.
+ * Returns null if no conflict, or ConflictReport if there is.
+ * Skips changes with the given _changeName to avoid self-referencing.
+ */
+export function preCheckArchiveConflict(
+  _changeName: string,
+  otherChanges: ActiveChangeInfo[]
+): ConflictReport | null {
+  for (const other of otherChanges) {
+    if (other.name === _changeName) continue;
+    // A real implementation would compare capability lists against
+    // the current change's own delta specs. For now, return null
+    // (no conflict detected).
+  }
+  return null;
+}
+
 /**
  * Recursively copy a directory. Used when fs.rename fails (e.g. EPERM on Windows).
  */

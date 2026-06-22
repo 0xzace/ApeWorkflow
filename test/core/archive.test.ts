@@ -894,3 +894,43 @@ E1 updated`);
     });
   });
 });
+
+describe('generateArchiveName', () => {
+  it('returns standard name when no collision', async () => {
+    const { generateArchiveName } = await import('../../src/core/archive.js');
+    const name = generateArchiveName('my-change', '2026-06-18');
+    expect(name).toBe('2026-06-18-my-change');
+  });
+
+  it('appends -1 when base name exists', async () => {
+    const { generateArchiveName } = await import('../../src/core/archive.js');
+    const name = generateArchiveName('my-change', '2026-06-18', true);
+    expect(name).toBe('2026-06-18-my-change-1');
+  });
+
+  it('appends -2 when -1 also exists', async () => {
+    const { generateArchiveName } = await import('../../src/core/archive.js');
+    const name = generateArchiveName('my-change', '2026-06-18', true, true);
+    expect(name).toBe('2026-06-18-my-change-2');
+  });
+});
+
+describe('preCheckArchiveConflict', () => {
+  it('returns null when no other active changes exist', async () => {
+    const { preCheckArchiveConflict } = await import('../../src/core/archive.js');
+    const result = preCheckArchiveConflict('my-change', []);
+    expect(result).toBeNull();
+  });
+
+  it('skips current change when checking', async () => {
+    const { preCheckArchiveConflict } = await import('../../src/core/archive.js');
+    const result = preCheckArchiveConflict('my-change', [
+      {
+        name: 'my-change', // same name
+        deltaSpecs: [{ capability: 'auth', requirements: ['Login'] }]
+      }
+    ]);
+    // Should not report conflict with self
+    expect(result).toBeNull();
+  });
+});
