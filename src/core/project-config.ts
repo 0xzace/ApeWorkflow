@@ -38,6 +38,54 @@ export const ProjectConfigSchema = z.object({
     )
     .optional()
     .describe('Per-artifact rules, keyed by artifact ID'),
+
+  // Optional: methodology strictness
+  strictness: z.object({
+    tdd: z
+      .union([z.boolean(), z.literal('skip')])
+      .optional()
+      .describe('true=iron-clad TDD, false=recommended, skip=disabled'),
+    noGratitude: z
+      .boolean()
+      .optional()
+      .describe('true=disable performative thanks, false=normal interaction'),
+    selectionPolicy: z
+      .enum(['auto-if-single', 'always-prompt'])
+      .optional()
+      .describe('Change selection strategy unified across apply/archive/verify'),
+  }).optional().describe('Methodology strictness settings'),
+
+  // Optional: implementation plan granularity
+  plan: z.object({
+    granularity: z
+      .enum(['fine', 'medium', 'coarse'])
+      .optional()
+      .describe('Plan granularity: fine=2-5min steps, medium=3-5 steps per task, coarse=1 paragraph'),
+  }).optional().describe('Implementation plan settings'),
+
+  // Optional: skill loading and execution strategy
+  skills: z.object({
+    loadPolicy: z
+      .enum(['smart', 'strict'])
+      .optional()
+      .describe('smart=keyword-based matching, strict=load-on-1%-chance'),
+    maxDepth: z
+      .number()
+      .int()
+      .min(1)
+      .optional()
+      .describe('Maximum skill nesting depth'),
+  }).optional().describe('Skill loading strategy'),
+
+  // Optional: onboarding experience tuning
+  onboarding: z.object({
+    maxPauses: z
+      .number()
+      .int()
+      .min(1)
+      .optional()
+      .describe('Maximum PAUSE points during onboarding'),
+  }).optional().describe('Onboarding experience settings'),
 });
 
 export type ProjectConfig = z.infer<typeof ProjectConfigSchema>;

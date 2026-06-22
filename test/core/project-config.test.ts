@@ -6,6 +6,7 @@ import {
   readProjectConfig,
   validateConfigRules,
   suggestSchemas,
+  ProjectConfigSchema,
 } from '../../src/core/project-config.js';
 
 describe('project-config', () => {
@@ -605,6 +606,193 @@ rules:
       // 'abcdefghijk' has large Levenshtein distance from all schemas
       expect(message).not.toContain('Did you mean');
       expect(message).toContain('Available schemas:');
+    });
+  });
+
+  describe('ProjectConfigSchema', () => {
+    describe('strictness.tdd', () => {
+      it('accepts true', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          strictness: { tdd: true },
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('accepts false', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          strictness: { tdd: false },
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('accepts skip', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          strictness: { tdd: 'skip' },
+        });
+        expect(result.success).toBe(true);
+      });
+    });
+
+    describe('strictness.selectionPolicy', () => {
+      it('accepts auto-if-single', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          strictness: { selectionPolicy: 'auto-if-single' },
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('rejects invalid selectionPolicy', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          strictness: { selectionPolicy: 'invalid' as string },
+        });
+        expect(result.success).toBe(false);
+      });
+    });
+
+    describe('plan.granularity', () => {
+      it('accepts fine', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          plan: { granularity: 'fine' },
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('accepts medium', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          plan: { granularity: 'medium' },
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('accepts coarse', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          plan: { granularity: 'coarse' },
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('rejects invalid granularity', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          plan: { granularity: 'invalid' as string },
+        });
+        expect(result.success).toBe(false);
+      });
+    });
+
+    describe('skills.loadPolicy', () => {
+      it('accepts smart', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          skills: { loadPolicy: 'smart' },
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('accepts strict', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          skills: { loadPolicy: 'strict' },
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('rejects invalid loadPolicy', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          skills: { loadPolicy: 'invalid' as string },
+        });
+        expect(result.success).toBe(false);
+      });
+    });
+
+    describe('skills.maxDepth', () => {
+      it('accepts positive number 1', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          skills: { maxDepth: 1 },
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('accepts positive number 5', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          skills: { maxDepth: 5 },
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('rejects 0', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          skills: { maxDepth: 0 },
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it('rejects negative number', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          skills: { maxDepth: -1 },
+        });
+        expect(result.success).toBe(false);
+      });
+    });
+
+    describe('onboarding.maxPauses', () => {
+      it('accepts positive number 1', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          onboarding: { maxPauses: 1 },
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('accepts positive number 10', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          onboarding: { maxPauses: 10 },
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('rejects 0', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          onboarding: { maxPauses: 0 },
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it('rejects negative number', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          onboarding: { maxPauses: -1 },
+        });
+        expect(result.success).toBe(false);
+      });
+    });
+
+    describe('full config with all 4 new keys', () => {
+      it('accepts complete config with all fields', () => {
+        const result = ProjectConfigSchema.safeParse({
+          schema: 'spec-driven',
+          strictness: { tdd: true, noGratitude: true, selectionPolicy: 'auto-if-single' },
+          plan: { granularity: 'fine' },
+          skills: { loadPolicy: 'smart', maxDepth: 3 },
+          onboarding: { maxPauses: 5 },
+        });
+        expect(result.success).toBe(true);
+      });
     });
   });
 });
