@@ -133,3 +133,40 @@ export function buildNextSteps(input: ChangeNextStepsInput): string[] {
 
   return steps;
 }
+
+export type EditMode = 'full' | 'partial' | 'none';
+
+export interface EditScope {
+  mode: EditMode;
+  roots: string[];
+  askUser?: boolean;
+  reason?: string;
+}
+
+/**
+ * Resolve edit scope for workspace-planning mode.
+ * Instead of STOPPING when allowedEditRoots is empty,
+ * offer partial execution with available roots.
+ */
+export function resolveEditScope(
+  actionContext: {
+    mode: string;
+    allowedEditRoots?: string[];
+    availableEditRoots?: string[];
+  }
+): EditScope {
+  if (actionContext.mode !== 'workspace-planning') {
+    return { mode: 'full', roots: actionContext.allowedEditRoots ?? ['repo-local'] };
+  }
+
+  if (actionContext.allowedEditRoots && actionContext.allowedEditRoots.length > 0) {
+    return { mode: 'full', roots: actionContext.allowedEditRoots };
+  }
+
+  const available = actionContext.availableEditRoots ?? [];
+  if (available.length > 0) {
+    return { mode: 'partial', roots: available, askUser: true };
+  }
+
+  return { mode: 'none', roots: [], reason: 'no editable roots' };
+}
