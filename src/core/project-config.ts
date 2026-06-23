@@ -90,7 +90,32 @@ export const ProjectConfigSchema = z.object({
 
 export type ProjectConfig = z.infer<typeof ProjectConfigSchema>;
 
-export const DEFAULT_PROJECT_CONFIG: Required<ProjectConfig> = {
+/**
+ * ProjectConfig with all fields required (for defaults/merged config).
+ * Optional fields get sensible empty values.
+ */
+export type RequiredProjectConfig = {
+  schema: string;
+  context: string | undefined;
+  rules: Record<string, string[]> | undefined;
+  strictness: {
+    tdd: boolean | 'skip';
+    noGratitude: boolean;
+    selectionPolicy: 'auto-if-single' | 'always-prompt';
+  };
+  plan: {
+    granularity: 'fine' | 'medium' | 'coarse';
+  };
+  skills: {
+    loadPolicy: 'smart' | 'strict';
+    maxDepth: number;
+  };
+  onboarding: {
+    maxPauses: number;
+  };
+};
+
+export const DEFAULT_PROJECT_CONFIG: RequiredProjectConfig = {
   schema: 'spec-driven',
   context: undefined,
   rules: undefined,
@@ -281,7 +306,7 @@ export function readProjectConfig(projectRoot: string): ProjectConfig | null {
  */
 export function readProjectConfigWithDefaults(
   projectRoot: string
-): Required<ProjectConfig> {
+): RequiredProjectConfig {
   const parsed = readProjectConfig(projectRoot);
   if (parsed === null) {
     return { ...DEFAULT_PROJECT_CONFIG };

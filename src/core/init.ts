@@ -119,6 +119,7 @@ export function scanForTasks(todoComments: string[]): ScanResult {
 
   return {
     status: 'rich',
+    suggestion: 'multiple-tasks-found',
     suggestions: todoComments.slice(0, 5),
   };
 }

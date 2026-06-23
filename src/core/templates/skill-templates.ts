@@ -15,6 +15,7 @@ export { getSyncSpecsSkillTemplate, getApeSyncCommandTemplate } from './workflow
 export { getArchiveChangeSkillTemplate, getApeArchiveCommandTemplate } from './workflows/archive-change.js';
 export { getBulkArchiveChangeSkillTemplate, getApeBulkArchiveCommandTemplate } from './workflows/bulk-archive-change.js';
 export { getVerifyChangeSkillTemplate, getApeVerifyCommandTemplate } from './workflows/verify-change.js';
+export { getVerificationSkillTemplate } from './workflows/verify.js';
 export { getOnboardSkillTemplate, getApeOnboardCommandTemplate } from './workflows/onboard.js';
 export { getApeProposeSkillTemplate, getApeProposeCommandTemplate } from './workflows/propose.js';
 export { getFeedbackSkillTemplate, getApeFeedbackCommandTemplate } from './workflows/feedback.js';
