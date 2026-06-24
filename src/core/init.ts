@@ -266,9 +266,11 @@ export class InitCommand {
     });
 
     if (!shouldCleanup) {
-      console.log(chalk.dim('Initialization cancelled.'));
+      console.log(chalk.yellow('Legacy file cleanup skipped.'));
       console.log(chalk.dim('Run with --force to skip this prompt, or manually remove legacy files.'));
-      process.exit(0);
+      console.log(chalk.dim('Note: Legacy files may cause conflicts with the current version.'));
+      process.exitCode = 1;
+      return;
     }
 
     await this.performLegacyCleanup(projectPath, detection);
@@ -322,7 +324,10 @@ export class InitCommand {
         return [...detectedToolIds];
       }
       throw new Error(
-        `No tools detected and no --tools flag provided. Valid tools:\n  ${validTools.join('\n  ')}\n\nUse --tools all, --tools none, or --tools claude,cursor,...`
+        `No tools detected and no --tools flag provided.\n\n` +
+        `ApeWorkflow installs skills and slash commands for AI coding tools.\n` +
+        `Valid tools: ${validTools.join(', ')}\n\n` +
+        `Use --tools all, --tools none, or --tools claude,cursor,...`
       );
     }
 
@@ -379,6 +384,7 @@ export class InitCommand {
       console.log(`Detected tool directories: ${detectedOnlyNames.join(', ')} (${detectionLabel})`);
     }
 
+    const { confirm } = await import('@inquirer/prompts');
     const selectedTools = await searchableMultiSelect({
       message: `Select tools to set up (${validTools.length} available)`,
       pageSize: 15,
@@ -387,7 +393,15 @@ export class InitCommand {
     });
 
     if (selectedTools.length === 0) {
-      throw new Error('At least one tool must be selected');
+      const cancel = await confirm({ message: 'No tools selected. Cancel setup?' });
+      if (cancel) {
+        console.log(chalk.dim('Setup cancelled.'));
+        process.exitCode = 1;
+        return [];
+      }
+      // User chose not to cancel — re-prompt
+      console.log(chalk.yellow('You must select at least one tool.'));
+      return this.getSelectedTools(toolStates, extendMode, detectedTools, projectPath);
     }
 
     return selectedTools;
@@ -730,8 +744,10 @@ idea → proposal → specs → design → tasks → plans → apply → archive
 `;
     try {
       await FileSystemUtils.writeFile(claudeMdPath, content);
-    } catch {
-      // Silently skip if file creation fails
+    } catch (error) {
+      console.log(chalk.yellow(`Warning: Failed to create CLAUDE.md — ${error instanceof Error ? error.message : 'unknown error'}`));
+      console.log(chalk.dim('  This file provides project context to your AI tool. Without it, your AI may not be aware of ApeWorkflow conventions.'));
+      console.log(chalk.dim('  You can create it manually or check file permissions in the project directory.'));
     }
   }
 
@@ -790,7 +806,8 @@ idea → proposal → specs → design → tasks → plans → apply → archive
 
     // Show skipped commands
     if (results.commandsSkipped.length > 0) {
-      console.log(chalk.dim(`Commands skipped for: ${results.commandsSkipped.join(', ')} (no adapter)`));
+      console.log(chalk.dim(`Slash commands skipped for: ${results.commandsSkipped.join(', ')}`));
+      console.log(chalk.dim('  (No slash command support detected for this tool — skills are still installed.)'));
     }
     if (results.removedCommandCount > 0) {
       console.log(chalk.dim(`Removed: ${results.removedCommandCount} command files (delivery: skills)`));

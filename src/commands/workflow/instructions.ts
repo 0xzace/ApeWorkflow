@@ -84,7 +84,13 @@ export async function instructionsCommand(
       spinner?.stop();
       const validIds = context.graph.getAllArtifacts().map((a) => a.id);
       throw new Error(
-        `Missing required argument <artifact>. Valid artifacts:\n  ${validIds.join('\n  ')}`
+        `Missing artifact argument. An artifact is a planning document for this change (e.g., proposal, specs, design, tasks).\n\n` +
+        `Available artifacts:\n  ${validIds.join('\n  ')}\n\n` +
+        `Usage: apeworkflow instructions <artifact> --change <change-name>\n` +
+        `Or use sub-commands for implementation flows:\n` +
+        `  apeworkflow instructions apply --change <change-name>   (apply pending tasks)\n` +
+        `  apeworkflow instructions verify --change <change-name>  (verify implementation)\n` +
+        `  apeworkflow instructions archive --change <change-name> (archive completed change)`
       );
     }
 
@@ -94,7 +100,8 @@ export async function instructionsCommand(
       spinner?.stop();
       const validIds = context.graph.getAllArtifacts().map((a) => a.id);
       throw new Error(
-        `Artifact '${artifactId}' not found in schema '${context.schemaName}'. Valid artifacts:\n  ${validIds.join('\n  ')}`
+        `Artifact '${artifactId}' not found in schema '${context.schemaName}'.\n\n` +
+        `Available artifacts:\n  ${validIds.join('\n  ')}`
       );
     }
 

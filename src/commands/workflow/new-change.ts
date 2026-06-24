@@ -68,7 +68,13 @@ export function validateWorkspaceAffectedAreas(planningHome: PlanningHome, affec
   }
 
   if (planningHome.kind !== 'workspace') {
-    throw new Error('--areas can only be used when creating a workspace-scoped change');
+    throw new Error(
+      '--areas can only be used with workspace-scoped changes.\n' +
+      'To create a workspace change, first initialize a workspace with:\n' +
+      '  apeworkflow workspace create <workspace-name>\n\n' +
+      'For repo-local changes (default), use:\n' +
+      '  apeworkflow new change <change-name>'
+    );
   }
 
   const validAreas = new Set(planningHome.workspace?.links ?? []);

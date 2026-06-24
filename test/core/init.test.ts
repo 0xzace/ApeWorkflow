@@ -189,7 +189,12 @@ describe('InitCommand', () => {
       const logCalls = (console.log as unknown as { mock: { calls: unknown[][] } }).mock.calls.flat().map(String);
       expect(
         logCalls.some(
-          (entry) => entry.includes('Commands skipped for: kimi') && entry.includes('(no adapter)'),
+          (entry) => entry.includes('Slash commands skipped for:') && entry.includes('kimi'),
+        ),
+      ).toBe(true);
+      expect(
+        logCalls.some(
+          (entry) => entry.includes('skills are still installed'),
         ),
       ).toBe(true);
     });

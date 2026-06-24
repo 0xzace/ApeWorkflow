@@ -68,8 +68,9 @@ describe('validateWorkspaceAffectedAreas', () => {
   });
 
   it('repo 下使用 areas 抛出', () => {
+    expect(() => validateWorkspaceAffectedAreas(repoPlanningHome, ['core'])).toThrow();
     expect(() => validateWorkspaceAffectedAreas(repoPlanningHome, ['core']))
-      .toThrow('--areas can only be used when creating a workspace-scoped change');
+      .toThrow(expect.objectContaining({ message: expect.stringContaining('workspace-scoped changes') }));
   });
 
   it('无 links 的 workspace 下所有区域都无效', () => {

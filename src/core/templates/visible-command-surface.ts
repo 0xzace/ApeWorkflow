@@ -21,13 +21,13 @@ interface VisibleCommandEntry {
 
 // 单一来源：所有用户可见命令都从这里分组派生，避免不同表格各自维护列表。
 const VISIBLE_COMMANDS: readonly VisibleCommandEntry[] = [
-  { id: 'explore', group: 'core', description: 'Think through problems before or during work' },
-  { id: 'propose', group: 'core', description: 'Create a change and generate all artifacts' },
-  { id: 'apply', group: 'core', description: 'Implement tasks from a change' },
+  { id: 'explore', group: 'core', description: 'Think through problems before implementation' },
+  { id: 'propose', group: 'core', description: 'Create a change and generate all planning artifacts' },
+  { id: 'apply', group: 'core', description: 'Implement tasks from an existing change' },
   { id: 'archive', group: 'core', description: 'Archive a completed change' },
-  { id: 'verify', group: 'additional', description: 'Verify implementation matches artifacts' },
-  { id: 'onboard', group: 'additional', description: 'Learn the ApeWorkflow workflow' },
-  { id: 'bulk-archive', group: 'additional', description: 'Archive multiple completed changes' },
+  { id: 'verify', group: 'additional', description: 'Verify implementation matches planning artifacts' },
+  { id: 'onboard', group: 'additional', description: 'Walk through the complete workflow with a real example' },
+  { id: 'bulk-archive', group: 'additional', description: 'Archive multiple completed changes at once' },
   { id: 'feedback', group: 'additional', description: 'Submit feedback about ApeWorkflow' },
 ] as const;
 

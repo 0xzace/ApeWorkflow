@@ -37,7 +37,14 @@ Skills use Claude Code tool names. Non-CC platforms: see \`references/copilot-to
 
 ## The Rule
 
-**Invoke relevant or requested skills BEFORE any response or action.** Even a 1% chance a skill might apply means that you should invoke the skill to check. If an invoked skill turns out to be wrong for the situation, you don't need to use it.
+**Invoke relevant or requested skills BEFORE responding to meaningful tasks.** The skill-checking strategy should respect the project's \`skills.loadPolicy\` config:
+
+- **\`smart\` (default):** Check for skills when the user request involves development, debugging, testing, or any structured methodology. A simple factual question ("what's the version of X") does NOT need a skill check. A question about code structure, file organization, or implementation approach SHOULD be checked.
+- **\`strict\`:** Check for skills before every response or action. Use this when you want maximum discipline.
+
+If no \`skills.loadPolicy\` is configured, default to **smart** — check for skills on any development-related request, but skip the check for simple factual questions, greetings, or casual conversation.
+
+When in doubt, a quick check is better than missing a relevant skill. If an invoked skill turns out to be wrong for the situation, you don't need to use it.
 
 \`\`\`dot
 digraph skill_flow {
@@ -51,8 +58,8 @@ digraph skill_flow {
     "Respond (including clarifications)" [shape=doublecircle];
 
     "User message received" -> "Might any skill apply?";
-    "Might any skill apply?" -> "Invoke Skill tool" [label="yes, even 1%"];
-    "Might any skill apply?" -> "Respond (including clarifications)" [label="definitely not"];
+    "Might any skill apply?" -> "Invoke Skill tool" [label="yes, development-related"];
+    "Might any skill apply?" -> "Respond (including clarifications)" [label="no, factual/chit-chat"];
     "Invoke Skill tool" -> "Announce: 'Using [skill] to [purpose]'";
     "Announce: 'Using [skill] to [purpose]'" -> "Has checklist?";
     "Has checklist?" -> "Create TodoWrite todo per item" [label="yes"];
@@ -67,16 +74,16 @@ These thoughts mean STOP--you're rationalizing:
 
 | Thought | Reality |
 |---------|---------|
-| "This is just a simple question" | Questions are tasks. Check for skills. |
-| "I need more context first" | Skill check comes BEFORE clarifying questions. |
-| "Let me explore the codebase first" | Skills tell you HOW to explore. Check first. |
-| "I can check git/files quickly" | Files lack conversation context. Check for skills. |
-| "Let me gather information first" | Skills tell you HOW to gather information. |
-| "This doesn't need a formal skill" | If a skill exists, use it. |
+| "This is just a simple question" | Factual questions (e.g., "what's the version?") are fine. But any development-related request should check for skills. |
+| "I need more context first" | If context requires methodology (debugging, TDD, etc.), check skills first. |
+| "Let me explore the codebase first" | Skills tell you HOW to explore. Check first if exploration is development-related. |
+| "I can check git/files quickly" | Files lack conversation context. If the work involves methodology, check skills. |
+| "Let me gather information first" | Skills tell you HOW to gather information for development tasks. |
+| "This doesn't need a formal skill" | If a skill exists for this methodology, use it. |
 | "I remember this skill" | Skills evolve. Read current version. |
-| "This doesn't count as a task" | Action = task. Check for skills. |
-| "The skill is overkill" | Simple things become complex. Use it. |
-| "I'll just do this one thing first" | Check BEFORE doing anything. |
+| "This doesn't count as a task" | Any implementation action = task. Check for skills. |
+| "The skill is overkill" | Simple things become complex. Use the skill. |
+| "I'll just do this one thing first" | A single small action can have unexpected complexity. Check. |
 | "This feels productive" | Undisciplined action wastes time. Skills prevent this. |
 | "I know what that means" | Knowing the concept != using the skill. Invoke it. |
 

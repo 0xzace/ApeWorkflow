@@ -229,7 +229,8 @@ export class UpdateCommand {
 
     // 8. Display update plan
     if (this.force) {
-      console.log(`Force updating ${configuredTools.length} tool(s): ${configuredTools.join(', ')}`);
+      console.log(`Refreshing all instruction files for ${configuredTools.length} tool(s): ${configuredTools.join(', ')}`);
+      console.log(chalk.dim('  (The --force flag regenerates files even when they are already up to date.)'));
     } else {
       this.displayUpdatePlan([...toolsToUpdateSet], statusByTool, toolsUpToDate);
     }
@@ -383,8 +384,10 @@ export class UpdateCommand {
     const toolNames = toolStatuses.map((s) => s.toolId);
     console.log(chalk.green(`✓ All ${toolStatuses.length} tool(s) up to date (v${APEWORKFLOW_VERSION})`));
     console.log(chalk.dim(`  Tools: ${toolNames.join(', ')}`));
+    console.log(chalk.dim(`  Version: ${APEWORKFLOW_VERSION}`));
     console.log();
-    console.log(chalk.dim('Use --force to refresh files anyway.'));
+    console.log(chalk.dim('Run `apeworkflow update --force` to regenerate all files.'));
+    console.log(chalk.dim('Run `apeworkflow config profile` to change your workflow profile.'));
   }
 
   /**
@@ -448,7 +451,34 @@ export class UpdateCommand {
     const extraWorkflows = installedWorkflows.filter((w) => !profileSet.has(w));
 
     if (extraWorkflows.length > 0) {
-      console.log(chalk.dim(`Note: ${extraWorkflows.length} extra workflows not in profile (use \`apeworkflow config profile\` to manage)`));
+      const workflowLabels: Record<string, string> = {
+        brainstorming: 'brainstorming',
+        'dispatching-parallel-agents': 'parallel agents',
+        'executing-plans': 'plan execution',
+        'finishing-a-development-branch': 'branch finish',
+        'receiving-code-review': 'code review (receive)',
+        'requesting-code-review': 'code review (request)',
+        'subagent-driven-development': 'subagent-driven dev',
+        'systematic-debugging': 'systematic debugging',
+        'test-driven-development': 'TDD',
+        'using-git-worktrees': 'git worktrees',
+        'verification-before-completion': 'verification',
+        'writing-plans': 'plan writing',
+        'writing-skills': 'skill writing',
+        explore: 'explore',
+        apply: 'apply',
+        archive: 'archive',
+        bulkArchive: 'bulk archive',
+        continue: 'continue',
+        ff: 'ff change',
+        new: 'new change',
+        onboard: 'onboard',
+        propose: 'propose',
+        sync: 'spec sync',
+        verify: 'verify',
+      };
+      const labeled = extraWorkflows.map(w => workflowLabels[w] ?? w);
+      console.log(chalk.dim(`Note: ${extraWorkflows.length} additional workflow(s) installed (${labeled.join(', ')}). They are not in your current profile — use \`apeworkflow config profile\` to manage them.`));
     }
   }
 
@@ -470,7 +500,8 @@ export class UpdateCommand {
       return;
     }
 
-    console.log(chalk.dim('Note: The core profile now includes sync. Your custom profile is preserving the old core workflow set.'));
+    console.log(chalk.dim('Note: The core profile now includes a "sync" workflow (automatic spec updates after archiving).'));
+    console.log(chalk.dim('Your custom profile is preserving the old core workflow set (without sync).'));
     console.log(chalk.dim('Run `apeworkflow config profile core` and then `apeworkflow update` to add sync.'));
   }
 
@@ -627,7 +658,8 @@ export class UpdateCommand {
     if (!canPrompt) {
       // Non-interactive mode without --force: warn and continue
       // (Unlike init, update doesn't abort - user may just want to update skills)
-      console.log(chalk.yellow('⚠ Run with --force to auto-cleanup legacy files, or run interactively.'));
+      console.log(chalk.yellow('⚠ Legacy ApeWorkflow files detected. They may conflict with the current version.'));
+      console.log(chalk.yellow('  Run with --force to auto-cleanup legacy files, or run interactively.'));
       console.log();
       return [];
     }

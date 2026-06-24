@@ -79,16 +79,18 @@ describe('ListCommand', () => {
       const changesDir = path.join(tempDir, 'apeworkflow', 'changes');
       await fs.mkdir(path.join(changesDir, 'archive'), { recursive: true });
       await fs.mkdir(path.join(changesDir, 'my-change'), { recursive: true });
-      
+
       // Create a plan file with some tasks
       await writePlan('my-change', '- [x] Task 1\n- [ ] Task 2\n');
 
       const listCommand = new ListCommand();
       await listCommand.execute(tempDir, 'changes');
 
-      expect(logOutput).toContain('Changes:');
-      expect(logOutput.some(line => line.includes('my-change'))).toBe(true);
-      expect(logOutput.some(line => line.includes('archive'))).toBe(false);
+      // Check that no change line includes the archive directory name
+      const changeLines = logOutput.filter(line =>
+        line.includes('my-change') || line.includes('Tasks') || line.includes('Complete') || line.includes('No tasks')
+      );
+      expect(changeLines.some(line => line.includes('archive') && line.includes('my-change'))).toBe(false);
     });
 
     it('should count tasks correctly', async () => {

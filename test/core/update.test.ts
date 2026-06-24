@@ -717,9 +717,9 @@ Content
       const forceUpdateCommand = new UpdateCommand({ force: true });
       await forceUpdateCommand.execute(testDir);
 
-      // Should show "Force updating" message
+      // Should show "Refreshing" message when force is used
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Force updating')
+        expect.stringContaining('Refreshing all instruction files for')
       );
 
       // Should show updated message
@@ -751,8 +751,8 @@ Content
         call.map(arg => String(arg)).join(' ')
       );
 
-      // Should not show "Use --force" since force was used
-      const hasForceHint = allCalls.some(call => call.includes('Use --force'));
+      // Should not show "Run `apeworkflow update --force`" since force was used
+      const hasForceHint = allCalls.some(call => call.includes('update --force'));
       expect(hasForceHint).toBe(false);
 
       consoleSpy.mockRestore();
@@ -791,7 +791,7 @@ metadata:
 
       // Should show both tools being force updated
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Force updating 2 tool(s)')
+        expect.stringContaining('Refreshing all instruction files for 2 tool(s)')
       );
 
       consoleSpy.mockRestore();
@@ -1446,7 +1446,7 @@ More user content after markers.
         call.map(arg => String(arg)).join(' ')
       );
       expect(calls.some(call =>
-        call.includes('The core profile now includes sync')
+        call.includes('The core profile now includes') && call.includes('sync')
       )).toBe(true);
       expect(calls.some(call =>
         call.includes('apeworkflow config profile core') && call.includes('apeworkflow update')

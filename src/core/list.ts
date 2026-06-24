@@ -148,6 +148,13 @@ export class ListCommand {
         const timeAgo = formatRelativeTime(change.lastModified);
         console.log(`${padding}${paddedName}     ${status.padEnd(12)}  ${timeAgo}`);
       }
+
+      console.log();
+      console.log('Commands:');
+      console.log(`  apeworkflow status --change <name>    View change details and artifact status`);
+      console.log(`  apeworkflow new change <name>         Create a new change`);
+      console.log(`  apeworkflow verify <name>             Verify implementation`);
+      console.log(`  apeworkflow archive <name>            Archive a completed change`);
       return;
     }
 

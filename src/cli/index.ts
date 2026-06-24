@@ -70,10 +70,15 @@ export function getCommandPath(command: Command): string {
 program
   .name('apeworkflow')
   .description('AI-native system for spec-driven development')
-  .version(version);
+  .version(version)
+  .option('--no-color', 'Disable color output')
+  .addHelpText('afterAll', `
 
-// Global options
-program.option('--no-color', 'Disable color output');
+ENVIRONMENT VARIABLES
+  APEWORKFLOW_TELEMETRY=0   Disable telemetry analytics
+  DO_NOT_TRACK=1            Standard opt-out for analytics
+  CI=true                   Auto-disables telemetry in CI environments
+`);
 
 // Apply global flags and telemetry before any command runs
 // Note: preAction receives (thisCommand, actionCommand) where:
@@ -122,7 +127,7 @@ async function hasRepoLocalApeWorkflowProject(projectPath: string): Promise<bool
 
 program
   .command('init [path]')
-  .description('Initialize ApeWorkflow in your project')
+  .description('Initialize ApeWorkflow in your project (sets up skills, slash commands, and config)')
   .option('--tools <tools>', toolsOptionDescription)
   .option('--force', 'Auto-cleanup legacy files without prompting')
   .option('--profile <profile>', 'Override global config profile (core or custom)')
@@ -445,15 +450,20 @@ program
     try {
       await statusCommand(options);
     } catch (error) {
-      await handleCliFailure(error, { commandPath: 'templates' });
+      await handleCliFailure(error, { commandPath: 'status' });
     }
   });
 
 // Instructions command
+// Note: special sub-commands `apply`, `verify`, `archive` route to different flows.
+//   instructions <artifact>    → generate artifact creation instructions
+//   instructions apply         → generate task application instructions for a change
+//   instructions verify        → generate verification instructions for a change
+//   instructions archive       → generate archive instructions for a change
 program
   .command('instructions [artifact]')
-  .description('Output enriched instructions for creating an artifact or applying tasks')
-  .option('--change <id>', 'Change name')
+  .description('Output enriched instructions for creating artifacts or applying tasks')
+  .option('--change <id>', 'Change name (required for "apply", "verify", "archive")')
   .option('--schema <name>', 'Schema override (auto-detected from config.yaml)')
   .option('--json', 'Output as JSON')
   .action(async (artifactId: string | undefined, options: InstructionsOptions) => {

@@ -44,6 +44,33 @@ Stop here if not installed.
 
 ---
 
+## Phase 0: Experience Detection
+
+Before starting, detect the user's experience level with ApeWorkflow. This determines how verbose and interactive the onboarding should be.
+
+**Ask once** (at the very beginning, before Phase 1):
+
+> "How familiar are you with ApeWorkflow?"
+> 1. **New** — First time, explain everything
+> 2. **Some experience** — I've used it a bit, explain key concepts but skip basics
+> 3. **Experienced** — I know the workflow, just show me the quick tour
+
+**Behavior by level:**
+
+| Level | PAUSE points | EXPLAIN sections | Time |
+|---|---|---|---|
+| New | Full (all 4 marked PAUSE) | Full (all EXPLAIN blocks) | ~15-20 min |
+| Some experience | Reduced (only after tasks and archive) | Skip basic concepts, keep architecture explanations | ~8-12 min |
+| Experienced | Minimal (only after tasks) | Skip entirely, just demonstrate | ~5 min |
+
+For **experienced** users: combine phases 3-8 into a single rapid demo. Skip the EXPLAIN blocks. Just do the work and say "I just created the proposal, specs, design, and tasks in sequence."
+
+For **some experience** users: keep EXPLAIN for proposal and design (the most important concepts), skip the others. Reduce pauses to 2 points.
+
+The goal is to respect the user's time. An experienced user doesn't need to be taught what a "change" is.
+
+---
+
 ## Phase 1: Welcome
 
 Display:
@@ -524,10 +551,11 @@ Exit gracefully.
 
 ## Guardrails
 
-- **Follow the EXPLAIN → DO → SHOW → PAUSE pattern** at key transitions (after explore, after proposal draft, after tasks, after archive)
+- **Adapt to experience level** — Use Phase 0 to determine the right depth. Don't over-explain to experienced users or under-explain to beginners
+- **Follow the EXPLAIN → DO → SHOW → PAUSE pattern** at key transitions, but skip or compress based on experience level
 - **Keep narration light** during implementation—teach without lecturing
-- **Don't skip phases** even if the change is small—the goal is teaching the workflow
-- **Pause for acknowledgment** at marked points, but don't over-pause
+- **Don't skip phases entirely** (even for small changes, the goal is teaching the workflow), but compress them for experienced users
+- **Pause only where marked** — and only the number appropriate for the user's level
 - **Handle exits gracefully**—never pressure the user to continue
 - **Use real codebase tasks**—don't simulate or use fake examples
 - **Adjust scope gently**—guide toward smaller tasks but respect user choice`;

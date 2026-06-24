@@ -30,6 +30,22 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
    - \`always-prompt\`: always prompt the user
    - If not set, use \`auto-if-single\` as default behavior
 
+   **Rich change display:** When prompting the user to select a change, include more context than just the schema name:
+   - Run \`apeworkflow status --change "<name>" --json\` for each candidate change
+   - Show: change name, schema, artifact completion count (e.g., "3/5"), whether \`plans\` artifact is done (needed for apply), and a brief description if available in the proposal.md
+   - Prioritize or mark changes where \`plans\` is complete (they're ready to apply)
+   - Flag changes where \`plans\` is incomplete (the user will need to generate plans first)
+   - Example prompt:
+     \`\`\`
+     Which change to implement?
+
+     1. add-login (spec-driven) — 5/5 artifacts, plans ✓ — "Add OAuth login"
+     2. fix-header (spec-driven) — 2/5 artifacts, plans ✗ — "Fix header alignment"
+     3. refactor-db (spec-driven) — 4/5 artifacts, plans ✓ — "Migrate to PostgreSQL"
+
+     Tip: Only changes with plans ✓ are ready to implement. Others need plans first.
+     \`\`\`
+
 2. **Check status to understand the shell context**
    \`\`\`bash
    apeworkflow status --change "<name>" --json

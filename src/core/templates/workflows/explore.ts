@@ -300,7 +300,7 @@ export function getApeExploreCommandTemplate(): CommandTemplate {
     tags: ['workflow', 'explore'],
     content: `---
 name: "APE: Explore"
-description: "Enter explore mode - see apeworkflow-explore skill"
+description: "Enter explore mode — think through problems before or during work"
 category: Workflow
 tags: [workflow, explore]
 ---

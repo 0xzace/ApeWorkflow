@@ -51,21 +51,26 @@ export class CompletionCommand {
 
       // Shell was detected but not supported
       if (detectionResult.detected && !detectionResult.shell) {
-        console.error(`Error: Shell '${detectionResult.detected}' is not supported yet. Currently supported: ${CompletionFactory.getSupportedShells().join(', ')}`);
+        console.error(`Error: Shell '${detectionResult.detected}' is not supported yet.`);
+        console.error(`Currently supported: ${CompletionFactory.getSupportedShells().join(', ')}`);
+        console.error(`You can try specifying a supported shell explicitly, e.g.: apeworkflow completion ${operationName} zsh`);
         process.exitCode = 1;
         return null;
       }
 
       // No shell specified and cannot auto-detect
-      console.error('Error: Could not auto-detect shell. Please specify shell explicitly.');
-      console.error(`Usage: apeworkflow completion ${operationName} [shell]`);
-      console.error(`Currently supported: ${CompletionFactory.getSupportedShells().join(', ')}`);
+      console.error(`Error: Could not auto-detect your shell. Please specify it explicitly.`);
+      console.error(`Usage: apeworkflow completion ${operationName} <shell>`);
+      console.error(`Supported shells: ${CompletionFactory.getSupportedShells().join(', ')}`);
+      console.error(`Run 'echo $SHELL' to see your current shell.`);
       process.exitCode = 1;
       return null;
     }
 
     if (!CompletionFactory.isSupported(normalizedShell)) {
-      console.error(`Error: Shell '${normalizedShell}' is not supported yet. Currently supported: ${CompletionFactory.getSupportedShells().join(', ')}`);
+      console.error(`Error: Shell '${normalizedShell}' is not supported yet.`);
+      console.error(`Currently supported: ${CompletionFactory.getSupportedShells().join(', ')}`);
+      console.error(`You can try specifying a supported shell explicitly, e.g.: apeworkflow completion ${operationName} zsh`);
       process.exitCode = 1;
       return null;
     }

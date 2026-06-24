@@ -1,20 +1,44 @@
+# ApeWorkflow Configuration
+# Available options:
+#
+# schema:        Workflow schema to use. Values: "spec-driven" (default).
+#
+# plan:          Plan granularity for the apply workflow. Values:
+#                  - "fine":    One task per file (most detailed)
+#                  - "medium":  One task per file group (default)
+#                  - "coarse":  One task per logical feature
+#                Example:
+#                  plan:
+#                    granularity: fine
+#
+# strictness:    Enforcement levels.
+#   selectionPolicy:  How to select changes when multiple exist.
+#                     - "auto-if-single": Automatically pick single change (default)
+#                     - "always-prompt":    Always ask user to choose
+#   tdd:              Whether TDD is enforced during implementation.
+#                     - true:  Every production change must have a failing test first
+#                     - false: No TDD enforcement (default)
+#                     - skip:  Skip TDD checks entirely
+#                Example:
+#                  strictness:
+#                    selectionPolicy: auto-if-single
+#                    tdd: false
+#
+# context:         Project context shown to AI when creating artifacts.
+#                  Add your tech stack, conventions, style guides, domain knowledge, etc.
+#                Example:
+#                  context: |
+#                    Tech stack: TypeScript, React, Node.js
+#                    We use conventional commits
+#                    Domain: e-commerce platform
+#
+# rules:           Per-artifact rules for content generation.
+#                Example:
+#                  rules:
+#                    proposal:
+#                      - Keep proposals under 500 words
+#                      - Always include a "Non-goals" section
+#                    tasks:
+#                      - Break tasks into chunks of max 2 hours
+
 schema: spec-driven
-
-# Project context (optional)
-# This is shown to AI when creating artifacts.
-# Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
-
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always include a "Non-goals" section
-#     tasks:
-#       - Break tasks into chunks of max 2 hours

@@ -20,6 +20,10 @@ Do NOT invoke any implementation skill, write any code, scaffold any project, or
 
 ## Checklist
 
+Use the **full 7-step** checklist for meaningful changes (features, refactors, multi-file work). Use the **lightweight** mode for trivial changes (typos, single-line fixes, simple renames, minor formatting).
+
+### Full Checklist (default)
+
 You MUST create a task for each of these items and complete them in order:
 
 1. **Explore project context** - check files, docs, recent commits, and the current change artifacts
@@ -29,6 +33,24 @@ You MUST create a task for each of these items and complete them in order:
 5. **Update the change artifacts** - patch \`proposal.md\`, \`design.md\`, and \`tasks.md\` with the clarified requirements, dependencies, and scope changes; keep \`tasks.md\` as a plain task outline
 6. **Reconcile the artifacts** - make sure the three files agree with each other and with the current understanding
 7. **Transition to implementation planning** - invoke \`writing-plans\` to create the detailed implementation plan
+
+### Lightweight Checklist (for trivial changes)
+
+For changes that are clearly small (single file, single function, obvious fix), use this reduced checklist:
+
+1. **Quick context check** - glance at the existing artifacts (just verify they're coherent, no deep dive)
+2. **Confirm scope** - one question to confirm the change is appropriate (e.g., "Should I rename this variable in the whole function or just one place?")
+3. **Update artifacts minimally** - patch only what needs changing (skip reconciliation unless scope is unclear)
+4. **Hand off** - invoke \`writing-plans\`
+
+Use lightweight mode when ALL of these are true:
+- The change affects at most 1-2 files
+- The fix is obvious (typo, formatting, simple rename, add missing validation)
+- There's no architectural decision to make
+- There are no cross-cutting concerns
+- The user has described exactly what they want
+
+If ANY condition is ambiguous, fall back to the full checklist.
 
 ## Process Flow
 

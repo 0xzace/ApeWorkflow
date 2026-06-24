@@ -287,8 +287,8 @@ describe('artifact-workflow CLI commands', () => {
       const result = await runCLI(['instructions', '--change', 'test-change'], { cwd: tempDir });
       expect(result.exitCode).toBe(1);
       const output = getOutput(result);
-      expect(output).toContain('Missing required argument <artifact>');
-      expect(output).toContain('Valid artifacts');
+      expect(output).toContain('Missing artifact argument');
+      expect(output).toContain('proposal');
     });
 
     it('errors for unknown artifact', async () => {
@@ -300,7 +300,7 @@ describe('artifact-workflow CLI commands', () => {
       expect(result.exitCode).toBe(1);
       const output = getOutput(result);
       expect(output).toContain("Artifact 'unknown-artifact' not found");
-      expect(output).toContain('Valid artifacts');
+      expect(output).toContain('proposal');
     });
   });
 

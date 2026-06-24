@@ -84,8 +84,9 @@ describe('CompletionCommand', () => {
       await command.generate({});
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Error: Could not auto-detect shell. Please specify shell explicitly.'
+        expect.stringContaining('Error: Could not auto-detect your shell.')
       );
+      expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Usage: apeworkflow completion generate'));
       expect(process.exitCode).toBe(1);
     });
 
@@ -93,8 +94,9 @@ describe('CompletionCommand', () => {
       await command.generate({ shell: 'tcsh' });
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        "Error: Shell 'tcsh' is not supported yet. Currently supported: zsh, bash, fish, powershell"
+        expect.stringContaining("Error: Shell 'tcsh' is not supported yet.")
       );
+      expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Currently supported:'));
       expect(process.exitCode).toBe(1);
     });
 
@@ -141,7 +143,7 @@ describe('CompletionCommand', () => {
       await command.install({});
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Error: Could not auto-detect shell. Please specify shell explicitly.'
+        expect.stringContaining('Error: Could not auto-detect your shell.')
       );
       expect(process.exitCode).toBe(1);
     });
@@ -150,7 +152,7 @@ describe('CompletionCommand', () => {
       await command.install({ shell: 'tcsh' });
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        "Error: Shell 'tcsh' is not supported yet. Currently supported: zsh, bash, fish, powershell"
+        expect.stringContaining("Error: Shell 'tcsh' is not supported yet.")
       );
       expect(process.exitCode).toBe(1);
     });
@@ -190,7 +192,7 @@ describe('CompletionCommand', () => {
       await command.uninstall({ yes: true });
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Error: Could not auto-detect shell. Please specify shell explicitly.'
+        expect.stringContaining('Error: Could not auto-detect your shell.')
       );
       expect(process.exitCode).toBe(1);
     });
@@ -199,7 +201,7 @@ describe('CompletionCommand', () => {
       await command.uninstall({ shell: 'tcsh', yes: true });
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        "Error: Shell 'tcsh' is not supported yet. Currently supported: zsh, bash, fish, powershell"
+        expect.stringContaining("Error: Shell 'tcsh' is not supported yet.")
       );
       expect(process.exitCode).toBe(1);
     });
@@ -319,7 +321,7 @@ describe('CompletionCommand', () => {
       await command.generate({});
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        "Error: Shell 'tcsh' is not supported yet. Currently supported: zsh, bash, fish, powershell"
+        expect.stringContaining("Error: Shell 'tcsh' is not supported yet.")
       );
       expect(process.exitCode).toBe(1);
     });

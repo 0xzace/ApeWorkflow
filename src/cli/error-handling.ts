@@ -1,4 +1,3 @@
-import ora from 'ora';
 import {
   createErrorReporter,
   type ErrorReportContext,
@@ -49,7 +48,9 @@ export async function handleCliFailure(
 
   console.log();
   // 中文注释：这里要兼容 string / object 异常，不能只读取 Error.message。
-  ora().fail(`Error: ${getErrorMessage(error)}`);
+  // 使用 console.error 而不是 ora().fail()，因为此时没有 spinner 在运行，
+  // ora().fail() 会输出 spinner ANSI 字符，污染错误输出。
+  console.error(`Error: ${getErrorMessage(error)}`);
   process.exit(1);
 }
 

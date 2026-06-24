@@ -5,20 +5,12 @@ const cliErrorHandlingMocks = vi.hoisted(() => {
   const createErrorReporterMock = vi.fn(() => ({
     report: reportSpy,
   }));
-  const oraFailSpy = vi.fn();
 
   return {
     reportSpy,
     createErrorReporterMock,
-    oraFailSpy,
   };
 });
-
-vi.mock('ora', () => ({
-  default: () => ({
-    fail: cliErrorHandlingMocks.oraFailSpy,
-  }),
-}));
 
 vi.mock('../../src/core/error-reporting/index.js', () => ({
   createErrorReporter: cliErrorHandlingMocks.createErrorReporterMock,
@@ -27,11 +19,15 @@ vi.mock('../../src/core/error-reporting/index.js', () => ({
 import { handleCliFailure, installErrorReportingHooks } from '../../src/cli/error-handling.js';
 
 describe('cli/error-handling', () => {
+  let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
+    consoleErrorSpy.mockRestore();
     vi.restoreAllMocks();
     process.exitCode = undefined;
   });
@@ -54,7 +50,7 @@ describe('cli/error-handling', () => {
         source: 'command',
       })
     );
-    expect(cliErrorHandlingMocks.oraFailSpy).toHaveBeenCalledWith('Error: boom');
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Error: boom');
 
     exitSpy.mockRestore();
   });
@@ -70,7 +66,7 @@ describe('cli/error-handling', () => {
       })
     ).rejects.toThrow('process.exit(1)');
 
-    expect(cliErrorHandlingMocks.oraFailSpy).toHaveBeenCalledWith('Error: boom');
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Error: boom');
     exitSpy.mockRestore();
   });
 
