@@ -65,6 +65,16 @@ export const COMMAND_REGISTRY: CommandDefinition[] = [
     flags: [],
   },
   {
+    name: 'verify',
+    description: 'Verify artifact consistency for a change and output a scorecard',
+    acceptsPositional: true,
+    positionalType: 'change-id',
+    positionals: [{ name: 'change-name', type: 'change-id', optional: true }],
+    flags: [
+      COMMON_FLAGS.json,
+    ],
+  },
+  {
     name: 'validate',
     description: 'Validate changes and specs',
     acceptsPositional: true,
