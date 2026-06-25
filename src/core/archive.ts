@@ -315,19 +315,12 @@ export class ArchiveCommand {
       }
     }
 
-    // Create archive directory with date prefix
-    const archiveName = `${this.getArchiveDate()}-${changeName}`;
+    // Create archive directory with date prefix (auto-suffix on collision)
+    const archiveDate = this.getArchiveDate();
+    const baseExists = await this.archivePathExists(archiveDir, changeName, archiveDate);
+    const suffixExists = await this.archivePathSuffixExists(archiveDir, changeName, archiveDate);
+    const archiveName = generateArchiveName(changeName, archiveDate, baseExists, suffixExists);
     const archivePath = path.join(archiveDir, archiveName);
-
-    // Check if archive already exists
-    try {
-      await fs.access(archivePath);
-      throw new Error(`Archive '${archiveName}' already exists.`);
-    } catch (error: any) {
-      if (error.code !== 'ENOENT') {
-        throw error;
-      }
-    }
 
     // Create archive directory if needed
     await fs.mkdir(archiveDir, { recursive: true });
@@ -336,6 +329,32 @@ export class ArchiveCommand {
     await moveDirectory(changeDir, archivePath);
 
     console.log(`Change '${changeName}' archived as '${archiveName}'.`);
+  }
+
+  private async archivePathExists(
+    archiveDir: string,
+    name: string,
+    date: string
+  ): Promise<boolean> {
+    try {
+      await fs.access(path.join(archiveDir, `${date}-${name}`));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  private async archivePathSuffixExists(
+    archiveDir: string,
+    name: string,
+    date: string
+  ): Promise<boolean> {
+    try {
+      await fs.access(path.join(archiveDir, `${date}-${name}-1`));
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   private async selectChange(changesDir: string): Promise<string | null> {

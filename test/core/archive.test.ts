@@ -289,20 +289,46 @@ New feature description.
       ).rejects.toThrow("Change 'non-existent-change' not found.");
     });
 
-    it('should throw error if archive already exists', async () => {
+    it('should auto-suffix archive name on collision instead of throwing', async () => {
       const changeName = 'duplicate-feature';
       const changeDir = path.join(tempDir, 'apeworkflow', 'changes', changeName);
       await fs.mkdir(changeDir, { recursive: true });
-      
+
       // Create existing archive with same date
       const date = new Date().toISOString().split('T')[0];
-      const archivePath = path.join(tempDir, 'apeworkflow', 'changes', 'archive', `${date}-${changeName}`);
-      await fs.mkdir(archivePath, { recursive: true });
-      
-      // Try to archive
-      await expect(
-        archiveCommand.execute(changeName, { yes: true })
-      ).rejects.toThrow(`Archive '${date}-${changeName}' already exists.`);
+      const existingArchivePath = path.join(tempDir, 'apeworkflow', 'changes', 'archive', `${date}-${changeName}`);
+      await fs.mkdir(existingArchivePath, { recursive: true });
+
+      // Archive the change — should succeed with -1 suffix
+      await archiveCommand.execute(changeName, { yes: true });
+
+      const archiveDir = path.join(tempDir, 'apeworkflow', 'changes', 'archive');
+      const archives = await fs.readdir(archiveDir);
+
+      // Should have 2 entries: the pre-existing one and the new suffixed one
+      expect(archives).toContain(`${date}-${changeName}`);
+      expect(archives).toContain(`${date}-${changeName}-1`);
+    });
+
+    it('should use -2 suffix when both base and -1 already exist', async () => {
+      const changeName = 'triple-feature';
+      const changeDir = path.join(tempDir, 'apeworkflow', 'changes', changeName);
+      await fs.mkdir(changeDir, { recursive: true });
+
+      const date = new Date().toISOString().split('T')[0];
+      const baseArchive = path.join(tempDir, 'apeworkflow', 'changes', 'archive', `${date}-${changeName}`);
+      const oneArchive = path.join(tempDir, 'apeworkflow', 'changes', 'archive', `${date}-${changeName}-1`);
+      await fs.mkdir(baseArchive, { recursive: true });
+      await fs.mkdir(oneArchive, { recursive: true });
+
+      await archiveCommand.execute(changeName, { yes: true });
+
+      const archiveDir = path.join(tempDir, 'apeworkflow', 'changes', 'archive');
+      const archives = await fs.readdir(archiveDir);
+
+      expect(archives).toContain(`${date}-${changeName}`);
+      expect(archives).toContain(`${date}-${changeName}-1`);
+      expect(archives).toContain(`${date}-${changeName}-2`);
     });
 
     it('should handle changes without plan files', async () => {
