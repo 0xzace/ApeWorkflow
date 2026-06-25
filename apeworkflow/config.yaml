@@ -16,13 +16,13 @@
 #                     - "auto-if-single": Automatically pick single change (default)
 #                     - "always-prompt":    Always ask user to choose
 #   tdd:              Whether TDD is enforced during implementation.
-#                     - true:  Every production change must have a failing test first
-#                     - false: No TDD enforcement (default)
+#                     - true:  Every production change must have a failing test first (default)
+#                     - false: No TDD enforcement
 #                     - skip:  Skip TDD checks entirely
 #                Example:
 #                  strictness:
 #                    selectionPolicy: auto-if-single
-#                    tdd: false
+#                    tdd: true
 #
 # context:         Project context shown to AI when creating artifacts.
 #                  Add your tech stack, conventions, style guides, domain knowledge, etc.
