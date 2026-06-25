@@ -93,8 +93,15 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
 
    For each pending task, use the task type to choose the methodology Skill chain, then let that Skill chain do the concrete implementation work.
 
-   **Task type routing**
-   Route selection is controlled by the active schema's taskTypeRouting. Do not inline a static task route table here.
+   **Task type routing algorithm:**
+   a. Read the `taskTypeRouting` object from the `apeworkflow instructions apply --change "<name>" --json` output. It has shape: `{ default: string[], taskTypes: { [typeName]: string[] } }`
+   b. For each task, extract its `type` field (set during writing-plans). If the task has no `type` field (value is `undefined`), use the `default` skill chain.
+   c. If the task has a `type` field, look it up in `taskTypeRouting.taskTypes[typeName]`. If found, use that chain. If the type key doesn't exist in the routing table, fall back to `default`.
+   d. Execute each skill in the matched chain sequentially.
+
+   **Example:**
+   - Task has `type: "bugfix"` — Look up `taskTypeRouting.taskTypes["bugfix"]` → `[systematic-debugging, test-driven-development, executing-plans]` → Execute in that order
+   - Task has `type: undefined` → Use `taskTypeRouting.default` → `[executing-plans, test-driven-development, subagent-driven-development]`
 
    **Shell rule**: this command only owns selection, loading, routing, progress tracking, and pause/completion output. It does not describe or perform the detailed development steps itself.
 
