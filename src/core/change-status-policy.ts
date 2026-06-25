@@ -22,6 +22,7 @@ export interface ActionContext {
   linkedContext: Array<{ name: string }>;
   allowedEditRoots: string[];
   requiresAffectedAreaSelection: boolean;
+  availableEditRoots?: string[];
   constraints: string[];
 }
 
@@ -110,6 +111,7 @@ export function buildActionContext(input: ActionContextInput): ActionContext {
     linkedContext: [],
     allowedEditRoots: [input.projectRoot],
     requiresAffectedAreaSelection: false,
+    availableEditRoots: [],
     constraints: ['Repo-local change artifacts and implementation edits are scoped to this project.'],
   };
 }

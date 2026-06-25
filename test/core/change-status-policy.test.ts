@@ -114,6 +114,7 @@ describe('change status policy helpers', () => {
       linkedContext: [],
       allowedEditRoots: ['/repo'],
       requiresAffectedAreaSelection: false,
+      availableEditRoots: [],
       constraints: ['Repo-local change artifacts and implementation edits are scoped to this project.'],
     });
 
