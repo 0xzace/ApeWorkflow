@@ -6,6 +6,7 @@ import { FileSystemUtils } from '../utils/file-system.js';
 export interface ChecklistItem {
   description: string;
   done: boolean;
+  type?: string;
 }
 
 /**
@@ -46,9 +47,20 @@ export function parseChecklistItems(content: string): ChecklistItem[] {
       continue;
     }
 
+    const description = checkboxMatch[2].trim();
+    // Extract optional type prefix: "Type: feature — actual description"
+    let type: string | undefined;
+    let cleanDescription = description;
+    const typePrefixMatch = description.match(/^Type:\s*(\w+)\s*[—-]\s*(.+)$/);
+    if (typePrefixMatch) {
+      type = typePrefixMatch[1].toLowerCase();
+      cleanDescription = typePrefixMatch[2].trim();
+    }
+
     items.push({
       done: checkboxMatch[1].toLowerCase() === 'x',
-      description: checkboxMatch[2].trim(),
+      description: cleanDescription,
+      type,
     });
   }
 
