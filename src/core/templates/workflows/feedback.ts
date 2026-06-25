@@ -41,8 +41,9 @@ export function getFeedbackSkillTemplate(): SkillTemplate {
 4. **Present draft for approval**
    - Show the complete draft to the user
    - Display both title and body clearly
-   - Ask for explicit approval before submitting
-   - Allow the user to request modifications
+   - Use **AskUserQuestion tool** with options: [A] Submit as-is  [B] I want to modify it  [C] Regenerate draft
+   - If user selects modify, ask what to change (again with options + free input)
+   - If user selects regenerate, re-draft with different emphasis
 
 5. **Submit on confirmation**
    - Use the \`apeworkflow feedback\` command to submit
@@ -86,7 +87,7 @@ Working at <company>
 **Guardrails**
 
 - MUST show complete draft before submitting
-- MUST ask for explicit approval
+- MUST ask for explicit approval using **AskUserQuestion tool** with options (not open-ended text)
 - MUST anonymize sensitive information
 - ALLOW user to modify draft before submitting
 - DO NOT submit without user confirmation
@@ -95,7 +96,7 @@ Working at <company>
 
 **User Confirmation Required**
 
-Always ask:
+Always use **AskUserQuestion tool** (not free-text prompt) when asking for approval:
 \`\`\`
 Here's the feedback I've drafted:
 
@@ -104,7 +105,11 @@ Title: [title]
 Body:
 [body]
 
-Does this look good? I can modify it if you'd like, or submit it as-is.
+Options:
+[A] Submit as-is
+[B] I want to modify it — tell me what you'd change
+[C] Regenerate draft
+[D] 其他方案: <free input>
 \`\`\`
 
 Only proceed with submission after user confirms.`,

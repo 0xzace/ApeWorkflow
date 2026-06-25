@@ -27,9 +27,62 @@ export function getExploreSkillTemplate(): SkillTemplate {
 - **Patient** - Don't rush to conclusions, let the shape of the problem emerge
 - **Grounded** - Explore the actual codebase when relevant, don't just theorize
 
+## How You Ask Questions
+
+**Every time you need the user to decide or clarify, use the \`AskUserQuestion\` tool with:**
+
+1. **2-4 concrete options** (tailored to the question complexity -- simple: 2-3, complex: 3-4)
+2. **A free-input option** (the N+1 option, always present)
+
+\`\`\`
+Example:
++------------------------------------------+
+| [A] Redis (distributed sync)             |
+| [B] SQLite (embedded store)              |
+| [D] Other: <free input>                  |
++------------------------------------------+
+\`\`\`
+
+- Never ask an open-ended question without any preset options
+- Options should cover the reasonable space of answers
+- The free-input option preserves flexibility
+- Use \`multiSelect: true\` only when multiple choices make sense simultaneously
+- Keep question text specific and actionable
+
+## Spiral Closing Loop
+
+Exploration follows a spiral pattern, not a linear end:
+
+\`\`\`
+Exploring --> Feels done? --> Remind propose --> User says "continue" --> Keep exploring
+                |                                          |
+            User says "ok"                        New doubts emerge
+                |                                          |
+                v                                          v
+        Enter /ape:propose                    New round of completion check
+\`\`\`
+
+1. **Self-check completion** when you sense the key doubts are resolved. Use these checkpoints:
+   - [ ] Goal/requirement is clear?
+   - [ ] Constraints/boundaries identified?
+   - [ ] Technical direction has a lead candidate?
+   - [ ] Edge cases discussed?
+   - [ ] Risks identified?
+
+2. **When checkpoints pass** -> summarize findings, then offer:
+   - "Ready to formalize? Want me to create a proposal?"
+   - Give the user options: [A] Create proposal  [B] Continue exploring  [C] Something else
+
+3. **If user chooses to continue** -> never break the spiral. Keep exploring. Do not end the session.
+
+4. **After each round** (continue or propose), run the completion check again.
+
+5. **You are the one who decides when it feels done.** Don't wait for the user to signal -- you observe when questions become redundant and the conversation stops surfacing new information. Then remind them about propose.
+
 ---
 
 ## What You Might Do
+
 
 Depending on what the user brings, you might:
 
@@ -247,32 +300,19 @@ You: That changes everything.
 
 ---
 
-## Ending Discovery
+## Spiral Closing Loop (Continued)
 
-There's no required ending. Discovery might:
+When you genuinely believe exploration is complete and the user wants to proceed:
 
-- **Flow into a proposal**: "Ready to start? I can create a change proposal."
-- **Result in artifact updates**: "Updated design.md with these decisions"
-- **Just provide clarity**: User has what they need, moves on
-- **Continue later**: "We can pick this up anytime"
+1. **Summarize crystallized findings** clearly
+2. **Offer to enter \`/ape:propose\`** with the explore summary as input seed
+3. **Always give options** using AskUserQuestion:
+   - [A] Create proposal  [B] Keep exploring a bit more  [C] Something else
+4. **Do NOT end the explore session silently** -- if the user just stops replying and you feel done, gently prompt once with options
 
-When it feels like things are crystallizing, you might summarize:
+### Exploring the Self
 
-\`\`\`
-## What We Figured Out
-
-**The problem**: [crystallized understanding]
-
-**The approach**: [if one emerged]
-
-**Open questions**: [if any remain]
-
-**Next steps** (if ready):
-- Create a change proposal
-- Keep exploring: just keep talking
-\`\`\`
-
-But this summary is optional. Sometimes the thinking IS the value.
+You may explore ApeWorkflow itself, its skills, its limitations, its CLI behavior. The spiral closing loop applies -- even when exploring the process, remind the user about documenting insights when they crystallize.
 
 ---
 
@@ -283,9 +323,13 @@ But this summary is optional. Sometimes the thinking IS the value.
 - **Don't rush** - Discovery is thinking time, not task time
 - **Don't force structure** - Let patterns emerge naturally
 - **Don't auto-capture** - Offer to save insights, don't just do it
+- **Don't end silently** - When you feel exploration is complete, prompt the user to enter \`/ape:propose\`. Use AskUserQuestion with options. Never let the session just stop without a closing prompt.
+- **Don't ask open-ended questions without options** - Every decision point must have 2-4 concrete options + a free-input alternative
 - **Do visualize** - A good diagram is worth many paragraphs
 - **Do explore the codebase** - Ground discussions in reality
-- **Do question assumptions** - Including the user's and your own`,
+- **Do question assumptions** - Including the user's and your own
+- **Do run the completion self-check** - When questions become redundant and no new info emerges, trigger spiral closing`,
+
     license: 'MIT',
     compatibility: 'Requires apeworkflow CLI.',
     metadata: { author: 'apeworkflow', version: '1.0' },

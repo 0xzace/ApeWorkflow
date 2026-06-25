@@ -1,0 +1,43 @@
+schema: spec-driven
+
+# Project context (optional)
+# This is shown to AI when creating artifacts.
+# Add your tech stack, conventions, style guides, domain knowledge, etc.
+# Example:
+#   context: |
+#     Tech stack: TypeScript, React, Node.js
+#     We use conventional commits
+#     Domain: e-commerce platform
+
+# Per-artifact rules (optional)
+# Add custom rules for specific artifacts.
+# Example:
+#   rules:
+#     proposal:
+#       - Keep proposals under 500 words
+#       - Always include a "Non-goals" section
+#     tasks:
+#       - Break tasks into chunks of max 2 hours
+
+# Methodology strictness (optional)
+# Controls how strictly methodology skills are enforced.
+# strictness:
+#   selectionPolicy: auto-if-single  # or "always-prompt" — change selection strategy
+#   tdd: true                        # true=iron-clad TDD (default), false=recommended, skip=disabled
+#   noGratitude: false               # true=disable performative thanks from AI
+
+# Implementation plan settings (optional)
+# Controls how granular plan files are generated.
+# plan:
+#   granularity: medium  # fine=2-5min steps, medium=3-5 steps per task, coarse=1 paragraph
+
+# Skill loading strategy (optional)
+# Controls how skills are discovered and loaded during use.
+# skills:
+#   loadPolicy: smart    # smart=keyword-based matching, strict=load on any chance
+#   maxDepth: 5          # Maximum skill nesting depth (prevents infinite loops)
+
+# Onboarding experience (optional)
+# Tunes the /ape:onboard guided tour.
+# onboarding:
+#   maxPauses: 5  # Maximum PAUSE points during onboarding (prevents excessive interactivity)
