@@ -22,6 +22,7 @@ export function getArchiveChangeSkillTemplate(): SkillTemplate {
 
    Show only active changes (not already archived).
    Include the schema used for each change if available.
+   Present options as A, B, C, ... with a "其他方案" free-input option.
 
    **IMPORTANT**: Do NOT guess or auto-select a change. Always let the user choose.
 
@@ -34,11 +35,11 @@ export function getArchiveChangeSkillTemplate(): SkillTemplate {
    - \`planningHome\`, \`changeRoot\`, \`artifactPaths\`, and \`actionContext\`: path and scope context
    - \`artifacts\`: List of artifacts with their status (\`done\` or other)
 
-   If status reports \`actionContext.mode: "workspace-planning"\`, explain that workspace archive is not supported in this slice and STOP. Do not move workspace changes into repo-local archives or edit linked repos.
+   If status reports \`actionContext.mode: "workspace-planning"\`, call \`resolveEditScope()\`. If mode is \`full\`, proceed with archive. If mode is \`partial\`, ask the user to confirm the selected root before proceeding. If mode is \`none\`, explain "Archiving workspace changes requires selecting an edit root first. Use /ape:explore to analyze, then create a sub-change targeting a specific area."
 
    **If any artifacts are not \`done\`:**
    - Display warning listing incomplete artifacts
-   - Use **AskUserQuestion tool** to confirm user wants to proceed
+   - Use **AskUserQuestion tool** with options: [A] Proceed anyway  [B] Cancel archive  [C] Other option: <free input>
    - Proceed if user confirms
 
 3. **Check task completion status**
@@ -49,7 +50,7 @@ export function getArchiveChangeSkillTemplate(): SkillTemplate {
 
    **If incomplete tasks found:**
    - Display warning showing count of incomplete tasks
-   - Use **AskUserQuestion tool** to confirm user wants to proceed
+   - Use **AskUserQuestion tool** with options: [A] Proceed anyway  [B] Cancel archive  [C] Other option: <free input>
    - Proceed if user confirms
 
    **If no plan files exist:** Proceed without task-related warning.
@@ -63,9 +64,9 @@ export function getArchiveChangeSkillTemplate(): SkillTemplate {
    - Determine what changes would be applied (adds, modifications, removals, renames)
    - Show a combined summary before prompting
 
-   **Prompt options:**
-   - If changes needed: "Sync now (recommended)", "Archive without syncing"
-   - If already synced: "Archive now", "Sync anyway", "Cancel"
+   **Prompt options** (use AskUserQuestion tool):
+   - If changes needed: [A] Sync now (recommended)  [B] Archive without syncing  [C] Other option: <free input>
+   - If already synced: [A] Archive now  [B] Sync anyway  [C] Cancel  [D] Other option: <free input>
 
    If user chooses sync, use Task tool (subagent_type: "general-purpose", prompt: "Use Skill tool to invoke apeworkflow-sync-specs for change '<name>'. Delta spec analysis: <include the analyzed delta spec summary>"). Proceed to archive regardless of choice.
 

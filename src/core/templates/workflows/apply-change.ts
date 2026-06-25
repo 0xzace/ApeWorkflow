@@ -72,7 +72,7 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
    - If \`state: "all_done"\`: congratulate, suggest archive
    - Otherwise: proceed to implementation
 
-   **Workspace guard:** If status JSON reports \`actionContext.mode: "workspace-planning"\` and \`allowedEditRoots\` is empty, explain that full workspace apply is not supported in this slice. Treat linked repos and folders as read-only context, ask the user to select an affected area through an explicit implementation workflow, and STOP before editing files.
+   **Workspace guard:** If status JSON reports \`actionContext.mode: "workspace-planning"\`, call \`resolveEditScope()\` to determine the edit scope. If mode is \`full\`, proceed. If mode is \`partial\`, present the available edit roots from the scope and ask the user to select an area. If mode is \`none\`, explain "No editable roots are available in this workspace. Suggested steps: 1) Use /ape:explore to analyze the workspace, 2) Create a sub-change targeting a specific sub-directory, 3) Or use /ape:propose with a specific affected area." Do NOT hard-STOP -- provide actionable next steps.
 
 4. **Read context files**
 

@@ -34,7 +34,7 @@ This is an **agent-driven** operation - you will read delta specs and directly e
    apeworkflow status --change "<name>" --json
    \`\`\`
 
-   If status reports \`actionContext.mode: "workspace-planning"\`, explain that workspace spec sync is not supported in this slice and STOP. Do not fall back to repo-local paths or edit linked repos.
+   If status reports \`actionContext.mode: "workspace-planning"\`, call \`resolveEditScope()\`. If mode is \`full\`, proceed with spec sync. If mode is \`partial\`, confirm the selected root before proceeding. If mode is \`none\`, explain "Syncing specs requires an edit root. Use /ape:explore to analyze, then create a sub-change targeting a specific area."
 
 3. **Find delta specs**
 
@@ -182,7 +182,7 @@ This is an **agent-driven** operation - you will read delta specs and directly e
    apeworkflow status --change "<name>" --json
    \`\`\`
 
-   If status reports \`actionContext.mode: "workspace-planning"\`, explain that workspace spec sync is not supported in this slice and STOP. Do not fall back to repo-local paths or edit linked repos.
+   If status reports \`actionContext.mode: "workspace-planning"\`, call \`resolveEditScope()\`. If mode is \`full\`, proceed with spec sync. If mode is \`partial\`, confirm the selected root before proceeding. If mode is \`none\`, explain "Syncing specs requires an edit root. Use /ape:explore to analyze, then create a sub-change targeting a specific area."
 
 3. **Find delta specs**
 

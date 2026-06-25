@@ -35,24 +35,24 @@ import {
 import { generateSkillContent } from '../../../src/core/shared/skill-generation.js';
 
 const EXPECTED_FUNCTION_HASHES: Record<string, string> = {
-  getExploreSkillTemplate: '9c5bfeb15933787b2d141afb9fddd9a4dd046acc9900cc4a1f12698cd4abf20c',
+  getExploreSkillTemplate: '131cdcb0dc264bd0ca04c6aed4a9497182739423e40c38f67c4f3b06cf06d3e7',
   getNewChangeSkillTemplate: '15210e9373a444d6ea8b889152146f14a5a6c67fc3830f3908be1da0969559b6',
   getBrainstormingSkillTemplate: 'f3af972d16be0cacf6b95135f4630aacf3ddb266561dc9fc55e9dee56feb74d1',
   getContinueChangeSkillTemplate: 'c7e8ec9d0407746ccbabdb5507c96afe75c0ff4b542b723b219e6d81804b5b6b',
-  getApplyChangeSkillTemplate: 'd3149797d1f15ae198c38b8fb404b45ad83ba31c36699f8f53da3090f0ccbf17',
+  getApplyChangeSkillTemplate: '134fc15be752a376fb82708641162fd2a0db7d41b5efee8b0d69febbcd56431a',
   getFfChangeSkillTemplate: 'ed635dbd529279df70c2971939919878d4998d2066940dc1cfdbb053b4f7a50f',
-  getSyncSpecsSkillTemplate: '494052dee37f5c9434aeb27d0035b5aee646ff6c38ca5fa5350da74f4ea342fc',
+  getSyncSpecsSkillTemplate: '99e53834c5ae95422d26a3fc2c1ace91ff725a3f11166947ea919f98b1d13850',
   getOnboardSkillTemplate: 'fb880b4098fd69aaf03ebc8d140e91205a3d6e1f00df2062ddc7bbfa5f285d6a',
   getApeExploreCommandTemplate: '0f193839b57c3880fc45d2434fff0107eb8846a0bc0acb157d02e2ee72804c8b',
   getApeNewCommandTemplate: '8192785fba8d80afd76112732fd15da7fa47ef37d453c5defb2ef87c8f3e4b11',
   getApeContinueCommandTemplate: '8506ea084cf4140d95e4e5f3551862bdbc3492d7cc7397d350934549013805c4',
-  getApeApplyCommandTemplate: '28e56e5e32486c3812975938f97593dbcb4f9ba6f328795f6ec550bfe4e9a520',
+  getApeApplyCommandTemplate: '74236d81ebb70f11fbb631d442bb5eaca42a507539e8b456be1d0b2de1d12204',
   getApeFfCommandTemplate: '80a847e22fe5b3b5ccb5bc53cd68dee3394aa0813ea55249e15cfdc5e0b1d450',
-  getArchiveChangeSkillTemplate: '93d8bd9ccb14d1a803caf12a7e5c66ee03d8d65e1f0ab8eb319b1ac8533dd604',
+  getArchiveChangeSkillTemplate: '3762e579fec5c146cbc19accd37c458c37ee8246d88796d2d72e4c0c31ea1069',
   getBulkArchiveChangeSkillTemplate: 'cde0b69b7592661a2efad7333089c661087417c5e79bf19b8a05f58d5ef43d10',
-  getApeSyncCommandTemplate: '41165e394b4bf4c6c291699a76842450e0af25e61188e5bcf9bf74d219bfd1ce',
+  getApeSyncCommandTemplate: '8556723e50ba7fac3fbee439406e1c2ed11566f3d08c13ca340bc35e9bc445f7',
   getVerifyChangeSkillTemplate: 'ab59c261d3de74a72a0611c121d9debc91376cfd6e0d549c39c795379bb8f5ec',
-  getApeArchiveCommandTemplate: '22021af19ed7ac17a55b164d526dacd0613d2a286e262fd603d0a4fa40388ab6',
+  getApeArchiveCommandTemplate: '62cde76558a2ea360586601a6c5cfefb242d363d85f7af3d7cf695780dc265a5',
   getApeOnboardCommandTemplate: 'e327989d274443b5c5ae3b1ec5681abf8abccf085348e66de9f573119acfcd52',
   getApeBulkArchiveCommandTemplate: 'a6c3854ae4eb61cf8922f277b6e1dcd58e6fa19f072dbbfd413cf38c19bb65f6',
   getApeVerifyCommandTemplate: 'd677166af933e2c5a2fa31b9c7756da2abc635f629ce00bfea1be0d6653a39b9',
@@ -62,17 +62,17 @@ const EXPECTED_FUNCTION_HASHES: Record<string, string> = {
   getWritingPlansSkillTemplate: '77e91046fa6f275f91e85c05f1cd063d74d496660ceeef154decfc150967cf17',
   getApeWritingPlansCommandTemplate: '10a3b5d25027f8e7b33b87e8f2f03430f2ceb802ba7191a79a0b12fe804f22b3',
   getApeFeedbackCommandTemplate: 'e6f9d657f7c8c5a9005041bb076ed165c8ec5482eec32301ce4cba3a2a6758a1',
-  getFeedbackSkillTemplate: '1062057eab299213fdc18db1922cc0b94030c2db04ce80e0641bf3b920cfb92f',
+  getFeedbackSkillTemplate: '33398a868805b6f6f6a45bf1f5ae53f3731aaa941fdbad566129678769d43a49',
 };
 
 const EXPECTED_GENERATED_SKILL_CONTENT_HASHES: Record<string, string> = {
-  'apeworkflow-explore': 'bfeed2adeeb6e88871bf4c8f6ee28bf8bfb0e23c11ab753d1b6172b6b647201c',
+  'apeworkflow-explore': 'ca7949efc425c171d502f365a9eeb213a50897ca37bba0f3da8db61bd1d198d3',
   'apeworkflow-new-change': '869eb643671906f71d954ec7e86cb0f6082cb6504c33bdca59049b511aed9717',
   'apeworkflow-continue-change': '5eac5e2b8dfc48cb2ff49584678ac7916c3b2144e51025de9028200b3551b39f',
-  'apeworkflow-apply-change': '1b0530712171ec4580855f6f7508a3284552dc0c58de9fed32bcb694a362099d',
+  'apeworkflow-apply-change': 'ef92dae60d17c2e4d0a4faae9d04239c2517cd2bcbe42b03da5c2c6593e8a70c',
   'apeworkflow-ff-change': 'd1776adb65dc9ca9bedd6da7810e2f9d7c83683ab9833493e91fefe11bc4517b',
-  'apeworkflow-sync-specs': '0de8739f01806377482308895decde1095f7d4af03dadb775a95246fb993720a',
-  'apeworkflow-archive-change': '011923ebb06b1232484997e16e5a7cceead24c45cf8afba182fb24ebe4fb0a62',
+  'apeworkflow-sync-specs': 'be281e3e04958b50bb15bd0537fed68d5eea7e593992193fb2b9559cc020afbd',
+  'apeworkflow-archive-change': '8911e6f8c4507a83ffd5f535ad4271f678eb9ca13c9e523045ddc4f3cb667d60',
   'apeworkflow-bulk-archive-change': 'c76c4ed42b0c4ceb35132c58b322bae5008705d6f4f911fb57bfde67361bbc2d',
   'apeworkflow-verify-change': '47c865011354277ea358728c1762317f85a8a99b883d960243ada081fefda104',
   'apeworkflow-onboard': '51502e41521e7c7a960f39e7d28bd31a6b9770bdff28a714f2bc1735b98b3a06',
@@ -172,9 +172,9 @@ describe('skill templates split parity', () => {
 
   it('guards unsupported workspace workflows from repo-local fallback edits', () => {
     const guardedSkills: Array<[string, () => SkillTemplate, string]> = [
-      ['apeworkflow-apply-change', getApplyChangeSkillTemplate, 'full workspace apply is not supported'],
-      ['apeworkflow-sync-specs', getSyncSpecsSkillTemplate, 'workspace spec sync is not supported'],
-      ['apeworkflow-archive-change', getArchiveChangeSkillTemplate, 'workspace archive is not supported'],
+      ['apeworkflow-apply-change', getApplyChangeSkillTemplate, 'resolveEditScope()'],
+      ['apeworkflow-sync-specs', getSyncSpecsSkillTemplate, 'resolveEditScope()'],
+      ['apeworkflow-archive-change', getArchiveChangeSkillTemplate, 'resolveEditScope()'],
       ['apeworkflow-bulk-archive-change', getBulkArchiveChangeSkillTemplate, 'workspace bulk archive is not supported'],
       ['apeworkflow-verify-change', getVerifyChangeSkillTemplate, 'full workspace implementation verification is not supported'],
     ];

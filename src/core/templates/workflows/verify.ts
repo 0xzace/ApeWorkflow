@@ -27,8 +27,8 @@ export function getVerificationSkillTemplate(): SkillTemplate {
 
    **Config-aware selection:** Read \`strictness.selectionPolicy\` from config:
    - \`auto-if-single\`: auto-select if only one active change exists
-   - \`always-prompt\`: always prompt the user (recommended for verify)
-   - If not set, use \`always-prompt\` for verify (safer default)
+   - \`always-prompt\`: always prompt the user
+   - If not set, use \`auto-if-single\` as default
 
 2. **Check status**
    \`\`\`bash
