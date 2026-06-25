@@ -378,6 +378,21 @@ program
     }
   });
 
+// Verify command
+program
+  .command('verify [change-name]')
+  .description('Verify artifact consistency for a change and output a scorecard')
+  .option('--json', 'Output as JSON (for programmatic use)')
+  .action(async (changeName?: string, options?: { json?: boolean }) => {
+    try {
+      const { VerifyCommand } = await import('../commands/verify.js');
+      const verifyCommand = new VerifyCommand();
+      await verifyCommand.execute(changeName ?? '.', { json: options?.json });
+    } catch (error) {
+      await handleCliFailure(error, { commandPath: 'verify' });
+    }
+  });
+
 // Completion command with subcommands
 const completionCmd = program
   .command('completion')
