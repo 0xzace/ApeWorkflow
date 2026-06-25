@@ -20,6 +20,7 @@ export interface TaskItem {
   id: string;
   description: string;
   done: boolean;
+  type?: string;  // task type for routing (feature|bugfix|refactor|docs)
 }
 
 export interface TaskTypeRouting {
