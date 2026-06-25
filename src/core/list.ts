@@ -15,6 +15,7 @@ interface ChangeInfo {
 interface ListOptions {
   sort?: 'recent' | 'name';
   json?: boolean;
+  includeArchived?: boolean;
 }
 
 /**
@@ -76,7 +77,7 @@ function formatRelativeTime(date: Date): string {
 
 export class ListCommand {
   async execute(targetPath: string = '.', mode: 'changes' | 'specs' = 'changes', options: ListOptions = {}): Promise<void> {
-    const { sort = 'recent', json = false } = options;
+    const { sort = 'recent', json = false, includeArchived = false } = options;
 
     if (mode === 'changes') {
       const changesDir = path.join(targetPath, 'apeworkflow', 'changes');
@@ -88,10 +89,15 @@ export class ListCommand {
         throw new Error("No ApeWorkflow changes directory found. Run 'apeworkflow init' first.");
       }
 
-      // Get all directories in changes (excluding archive)
+      // Get all directories in changes (excluding archive unless includeArchived is true)
       const entries = await fs.readdir(changesDir, { withFileTypes: true });
       const changeDirs = entries
-        .filter(entry => entry.isDirectory() && entry.name !== 'archive')
+        .filter(entry => {
+          if (!entry.isDirectory()) return false;
+          if (entry.name.startsWith('.')) return false;
+          if (entry.name === 'archive' && !includeArchived) return false;
+          return true;
+        })
         .map(entry => entry.name);
 
       if (changeDirs.length === 0) {
@@ -127,13 +133,26 @@ export class ListCommand {
 
       // JSON output for programmatic use
       if (json) {
-        const jsonOutput = changes.map(c => ({
-          name: c.name,
-          completedTasks: c.completedTasks,
-          totalTasks: c.totalTasks,
-          lastModified: c.lastModified.toISOString(),
-          status: c.totalTasks === 0 ? 'no-tasks' : c.completedTasks === c.totalTasks ? 'complete' : 'in-progress'
-        }));
+        const jsonOutput = changes.map(c => {
+          const entry: {
+            name: string;
+            completedTasks: number;
+            totalTasks: number;
+            lastModified: string;
+            status: string;
+            archived?: boolean;
+          } = {
+            name: c.name,
+            completedTasks: c.completedTasks,
+            totalTasks: c.totalTasks,
+            lastModified: c.lastModified.toISOString(),
+            status: c.totalTasks === 0 ? 'no-tasks' : c.completedTasks === c.totalTasks ? 'complete' : 'in-progress'
+          };
+          if (includeArchived) {
+            entry.archived = c.name === 'archive' || c.name.startsWith('archive-') || /^\d{4}-\d{2}-\d{2}-/.test(c.name);
+          }
+          return entry;
+        });
         console.log(JSON.stringify({ changes: jsonOutput }, null, 2));
         return;
       }
@@ -146,7 +165,8 @@ export class ListCommand {
         const paddedName = change.name.padEnd(nameWidth);
         const status = formatTaskStatus({ total: change.totalTasks, completed: change.completedTasks });
         const timeAgo = formatRelativeTime(change.lastModified);
-        console.log(`${padding}${paddedName}     ${status.padEnd(12)}  ${timeAgo}`);
+        const archivedTag = (includeArchived && (change.name === 'archive' || change.name.startsWith('archive-') || /^\d{4}-\d{2}-\d{2}-/.test(change.name))) ? ' [archived]' : '';
+        console.log(`${padding}${paddedName}     ${status.padEnd(12)}  ${timeAgo}${archivedTag}`);
       }
 
       console.log();

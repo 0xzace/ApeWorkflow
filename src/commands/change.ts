@@ -93,10 +93,10 @@ export class ChangeCommand {
    * - Text default: IDs only; --long prints minimal details (title, counts)
    * - JSON: array of { id, title, deltaCount, taskStatus }, sorted by id
    */
-  async list(options?: { json?: boolean; long?: boolean }): Promise<void> {
+  async list(options?: { json?: boolean; long?: boolean; includeArchived?: boolean }): Promise<void> {
     const changesPath = path.join(process.cwd(), 'apeworkflow', 'changes');
-    
-    const changes = await this.getActiveChanges(changesPath);
+
+    const changes = await this.getActiveChanges(changesPath, options?.includeArchived);
     
     if (options?.json) {
       const changeDetails = await Promise.all(
@@ -219,12 +219,13 @@ export class ChangeCommand {
     }
   }
 
-  private async getActiveChanges(changesPath: string): Promise<string[]> {
+  private async getActiveChanges(changesPath: string, includeArchived = false): Promise<string[]> {
     try {
       const entries = await fs.readdir(changesPath, { withFileTypes: true });
       const result: string[] = [];
       for (const entry of entries) {
-        if (!entry.isDirectory() || entry.name.startsWith('.') || entry.name === ARCHIVE_DIR) continue;
+        if (!entry.isDirectory() || entry.name.startsWith('.')) continue;
+        if (entry.name === ARCHIVE_DIR && !includeArchived) continue;
         const proposalPath = path.join(changesPath, entry.name, 'proposal.md');
         try {
           await fs.access(proposalPath);

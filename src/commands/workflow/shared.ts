@@ -140,13 +140,19 @@ export function getStatusIndicator(status: 'done' | 'ready' | 'blocked'): string
  */
 export async function getAvailableChanges(
   projectRoot: string,
-  changesDir = path.join(projectRoot, 'apeworkflow', 'changes')
+  changesDir = path.join(projectRoot, 'apeworkflow', 'changes'),
+  includeArchived = false
 ): Promise<string[]> {
   const changesPath = changesDir;
   try {
     const entries = await fs.promises.readdir(changesPath, { withFileTypes: true });
     return entries
-      .filter((e) => e.isDirectory() && e.name !== 'archive' && !e.name.startsWith('.'))
+      .filter((e) => {
+        if (!e.isDirectory()) return false;
+        if (e.name.startsWith('.')) return false;
+        if (e.name === 'archive' && !includeArchived) return false;
+        return true;
+      })
       .map((e) => e.name);
   } catch (error: unknown) {
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') return [];
