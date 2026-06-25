@@ -20,6 +20,19 @@ describe('resolveEditScope', () => {
     });
     expect(scope.mode).toBe('partial');
     expect(scope.askUser).toBe(true);
+    expect(scope.roots).toEqual(['/user/repo']);
+  });
+
+  it('returns partial scope using availableEditRoots from actionContext', () => {
+    const scope = resolveEditScope({
+      mode: 'workspace-planning',
+      allowedEditRoots: [],
+      availableEditRoots: ['/linked/repo', '/linked/folder'],
+    });
+    expect(scope.mode).toBe('partial');
+    expect(scope.roots).toEqual(['/linked/repo', '/linked/folder']);
+    expect(scope.askUser).toBe(true);
+    expect(scope.reason).toBeUndefined();
   });
 
   it('returns none mode when no roots available', () => {

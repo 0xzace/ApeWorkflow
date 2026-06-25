@@ -47,6 +47,7 @@ export interface ActionContextInput {
   planningHome?: PlanningHome;
   projectRoot: string;
   artifactIds: string[];
+  availableEditRoots?: string[];
 }
 
 export function summarizePlanningHome(
@@ -92,6 +93,7 @@ export function buildActionContext(input: ActionContextInput): ActionContext {
       linkedContext: (input.planningHome.workspace?.links ?? []).map((name) => ({ name })),
       allowedEditRoots: [],
       requiresAffectedAreaSelection: true,
+      availableEditRoots: input.availableEditRoots ?? (input.planningHome.workspace?.links ?? []),
       constraints: [
         'Treat workspace-local planning artifacts as compatibility context for this local view.',
         'Use initiatives for durable coordination when initiative context exists.',

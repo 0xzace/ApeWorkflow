@@ -139,6 +139,39 @@ describe('change status policy helpers', () => {
       linkedContext: [{ name: 'api' }, { name: 'web' }],
       allowedEditRoots: [],
       requiresAffectedAreaSelection: true,
+      availableEditRoots: ['api', 'web'],
+      constraints: [
+        'Treat workspace-local planning artifacts as compatibility context for this local view.',
+        'Use initiatives for durable coordination when initiative context exists.',
+        'Treat linked repos and folders as context until an explicit edit root is selected.',
+        'Do not make implementation edits without an explicit allowed edit root.',
+      ],
+    });
+
+    expect(
+      buildActionContext({
+        projectRoot: '/repo',
+        artifactIds: ['spec'],
+        planningHome: {
+          kind: 'workspace',
+          root: '/workspace',
+          changesDir: '/workspace/apeworkflow/changes',
+          defaultSchema: 'workspace-planning',
+          workspace: {
+            name: 'platform',
+            links: ['api', 'web'],
+          },
+        },
+        availableEditRoots: ['/explicit/root'],
+      })
+    ).toEqual({
+      mode: 'workspace-planning',
+      sourceOfTruth: 'workspace-local',
+      planningArtifacts: ['spec'],
+      linkedContext: [{ name: 'api' }, { name: 'web' }],
+      allowedEditRoots: [],
+      requiresAffectedAreaSelection: true,
+      availableEditRoots: ['/explicit/root'],
       constraints: [
         'Treat workspace-local planning artifacts as compatibility context for this local view.',
         'Use initiatives for durable coordination when initiative context exists.',
